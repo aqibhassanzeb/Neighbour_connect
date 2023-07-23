@@ -1,0 +1,290 @@
+{
+    "onboardingScreen": {
+        "homeServices": "نحن نقدم كل أنواع الخدمات المنزلية",
+        "getStarted": "البدء",
+        "exitApp": "اضغط مرة أخرى للخروج من التطبيق"
+    },
+    "loginScreen": {
+        "login": "تسجيل الدخول",
+        "pleaseConfirm": "يرجى تأكيد رمز بلدك وإدخال رقم هاتفك المحمول",
+        "enterNumber": "أدخل رقم هاتفك المحمول",
+        "orLogin": "أو تسجيل الدخول باستخدام",
+        "exitApp": "اضغط مرة أخرى للخروج من التطبيق",
+        "search": "بحث",
+        "close": "قريب"
+    },
+    "registerScreen": {
+        "register": "يسجل",
+        "pleaseCreate": "يرجى إنشاء حسابك للمتابعة المرتبطة بنا.",
+        "enterName": "أدخل أسمك",
+        "enterEmail": "أدخل معرف البريد الإلكتروني الخاص بك",
+        "enterNumber": "أدخل رقم هاتفك المحمول"
+    },
+    "verificationScreen": {
+        "verification": "التحقق من OTP",
+        "pleaseEnter": "تم إرسال OTP إليك على رقم هاتفك المحمول ، الرجاء إدخاله أدناه",
+        "verify": "تحقق"
+    },
+    "loader": {
+        "pleaseWait": "يرجى الانتظار"
+    },
+    "bottomTab": {
+        "home": "بيت",
+        "services": "خدمات",
+        "messages": "رسائل",
+        "profile": "الملف الشخصي",
+        "exitApp": "اضغط مرة أخرى للخروج من التطبيق"
+    },
+    "homeScreen": {
+        "search": "بحث",
+        "repairing": "إصلاح التيار المتردد",
+        "atHome": "في الخدمة المنزلية",
+        "off": "خصم 50",
+        "bookNow": "احجز الآن",
+        "services": "خدمات",
+        "more": "أكثر",
+        "bestOffer": "أفضل عرض",
+        "topService": "أفضل مقدمي الخدمات",
+        "seeAll": "اظهار الكل"
+    },
+    "bestOfferScreen": {
+        "bestOffer": "أفضل عرض"
+    },
+    "topServicesScreen": {
+        "topServices": "كبار مقدمي الخدمات"
+    },
+    "categoryScreen": {
+        "filters": "المرشحات",
+        "price": "سعر",
+        "highToLow": "عالية إلى منخفض",
+        "lowToHigh": "من أسفل إلى أعلى",
+        "rate": "معدل",
+        "gender": "جنس تذكير أو تأنيث",
+        "male": "ذكر",
+        "female": "أنثى",
+        "any": "أي",
+        "apply": "تطبيق",
+        "reset": "إعادة ضبط"
+    },
+    "detailsScreen": {
+        "added": "أضاف إلى المفضل",
+        "remove": "تمت إزالته من المفضل",
+        "description": "وصف",
+        "shortDescription": "لوريم الجزر جدا ، طماطم المرحلة الجامعية.الشوكولاتة كرة القدم لا لا دعاية التصنيع Enullalklli أي موريس.ورعاية الحياة ، هو عميل egestapellentesque.الأسد البعض ، إنه ليس مجموعة متنوعة من laoreetg.كرة القدم لكرة القدم تصنيع كرة القدم ، كرة القدم الفلفل الحار.Maecenas في الكراهية SAPIEN الكيميائية.",
+        "longDescription": "لوريم الجزر جدا ، طماطم المرحلة الجامعية.الشوكولاتة كرة القدم لا لا دعاية التصنيع Enullalklli أي موريس.ورعاية الحياة ، هو عميل egestapellentesque.الأسد البعض ، إنه ليس مجموعة متنوعة من laoreetg.كرة القدم لكرة القدم تصنيع كرة القدم ، كرة القدم الفلفل الحار.Maecenas في الكراهية SAPIEN الكيميائية.لوريم الجزر جدا ، طماطم المرحلة الجامعية.الشوكولاتة كرة القدم لا لا دعاية التصنيع Enullalklli أي موريس.ورعاية الحياة ، هو عميل egestapellentesque.الأسد البعض ، إنه ليس مجموعة متنوعة من laoreetg.كرة القدم لكرة القدم تصنيع كرة القدم ، كرة القدم الفلفل الحار.Maecenas في الكراهية SAPIEN الكيميائية.",
+        "readMore": "قراءة المزيد",
+        "readLess": "أقرأ أقل",
+        "serviceReview": "مراجعة الخدمة",
+        "seeAll": "اظهار الكل",
+        "bookNow": "احجز الآن"
+    },
+    "confirmScreen": {
+        "question": "أيهما تحتاج لتنظيف؟",
+        "fullHome": "المنزل الكامل",
+        "kitchen": "مطبخ",
+        "bathroom": "حمام",
+        "parking": "موقف سيارات",
+        "bedroom": "غرفة نوم",
+        "garden": "حديقة",
+        "livingRoom": "غرفة المعيشة",
+        "roof": "سَطح",
+        "apartmentSize": "حجم الشقة (sq.ft)",
+        "selectDate": "حدد تاريخ",
+        "selectTime": "حدد الوقت",
+        "numberRoom": "عدد الغرفة",
+        "phoneNumber": "رقم التليفون",
+        "enterNumber": "أدخل رقم هاتفك",
+        "location": "موقع",
+        "totalPay": "إجمالي الأجور",
+        "confirm": "يتأكد",
+        "cancel": "يلغي",
+        "ok": "موافق"
+    },
+    "paymentMethodScreen": {
+        "paymentMethod": "طريقة الدفع او السداد",
+        "mastercard": "بطاقة ماستر بطاقة ائتمان",
+        "googlePay": "جوجل دفع",
+        "payPal": "payPal",
+        "useWallet": "استخدم المحفظة",
+        "cashServices": "النقد بعد الخدمات",
+        "price": "سعر",
+        "discount": "تخفيض",
+        "total": "مجموع",
+        "continue": "يكمل"
+    },
+    "creditCardScreen": {
+        "mastercard": "بطاقة ماستر بطاقة ائتمان",
+        "name": "إسم صاحب البطاقة",
+        "cardNo": "رقم البطاقة",
+        "enterName": "أدخل اسم حامل البطاقة الخاص بك",
+        "enterCard": "أدخل رقم بطاقتك",
+        "expiryDate": "تاريخ الانتهاء",
+        "enterCvv": "الشفرة",
+        "payment": "قسط"
+
+    },
+    "googlePayScreen": {
+        "googlePay": "جوجل دفع",
+        "payWith": "دفع مع Google Pay",
+        "enter": "أدخل معرف UPI",
+        "payment": "قسط"
+
+    },
+    "payPalScreen": {
+        "enterEmail": "أدخل معرف البريد الإلكتروني",
+        "payment": "قسط",
+        "payPal": "PayPal"
+    },
+    "successScreen": {
+        "paymentSuccessful": "الدفع ناجح!",
+        "description": "لقد تم تقديم طلبك بنجاح من فضلك في انتظار الخدمة الجيدة.",
+        "orderId": "معرف طلبك",
+        "backHome": "العودة إلى المنزل"
+    },
+    "searchScreen": {
+        "recentlySearch": "البحث مؤخرا",
+        "clearAll": "امسح الكل",
+        "search": "ابحث في خدمتك",
+        "trendingSearch": "بحث تتجه"
+
+    },
+    "notificationScreen": {
+        "notification": "إشعار",
+        "noNotification": "لا يوجد إشعار جديد",
+        "remove": "الإخطار تمت إزالته."
+
+    },
+    "reviewScreen": {
+        "serviceReview": "مراجعة الخدمة"
+    },
+    "pickAddressScreen": {
+        "search": "بحث",
+        "pickLocation": "اختر هذا الموقع"
+
+    },
+    "servicesScreen": {
+        "services": "خدمات"
+    },
+    "messagesScreen": {
+        "messages": "رسائل"
+    },
+    "chatScreen": {
+        "typeHere": "اكتب النص هنا...."
+
+    },
+    "profileScreen": {
+        "profile": "الملف الشخصي",
+        "walletAmount": "كمية المحفظة",
+        "myBooking": "الحجز",
+        "favorites": "المفضلة",
+        "referEarn": "الرجوع والكسب",
+        "language": "اللغات",
+        "appSettings": "إعدادات التطبيقات",
+        "termsCondition": "الشروط والشرط",
+        "fAQs": "الأسئلة الشائعة",
+        "privacyPolicy": "سياسة الخصوصية",
+        "contactUs": "اتصل بنا",
+        "logout": "تسجيل خروج",
+        "areSure": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+        "no": "لا",
+        "yes": "نعم"
+    },
+    "editProfileScreen": {
+        "editProfile": "تعديل الملف الشخصي",
+        "name": "اسم",
+        "enterName": "أدخل أسمك",
+        "email": "عنوان الايميل",
+        "enterEmail": "أدخل معرف البريد الإلكتروني الخاص بك",
+        "mobile": "رقم الهاتف المحمول",
+        "enterMobile": "أدخل رقم هاتفك المحمول",
+        "update": "تحديث",
+        "changeProfile": "تغيير صورة الملف الشخصي",
+        "camera": "الة تصوير",
+        "gallery": "صالة عرض",
+        "remove": "إزالة الصورة",
+        "removeImage": "تمت إزالة صورة الملف الشخصي.",
+        "successfully": "تم تحديث الملف الشخصي بنجاح!!",
+        "ok": "موافق",
+        "deny": "لقد رفضت الوصول إلى الكاميرا !!!"
+
+    },
+    "bookingScreen": {
+        "myBooking": "الحجز",
+        "ongoing": "جاري التنفيذ",
+        "history": "تاريخ"
+
+    },
+    "ongoingTab": {
+        "cancel": "يلغي",
+        "noBooking": "لا الحجز حتى الآن ابحث عن خدمتك",
+        "areSure": "هل أنت متأكد من أنك تريد إلغاء هذا الحجز؟",
+        "cancelBooking": "إلغاء الحجز",
+        "no": "لا",
+        "yes": "نعم",
+        "removeSuccess": "تمت إزالته بنجاح."
+    },
+    "historyTab": {
+        "giveRate": "إعطاء معدل",
+        "please": "يرجى تجربتكم معنا",
+        "saySomething": "قل شيئا",
+        "send": "يرسل"
+    },
+    "termsConditionScreen": {
+        "termsCondition": "الشروط والشرط",
+        "shortDescription": "لوريم الجزر جدا ، الطماطم أديبيسكوف Elitj.شوكولاتة كرة القدم أو زيارة Enullalklli أي موريس.و Solliciegestapellentesqueg adipiscing.الأسد البعض ، إنه ليس مصنفة كرة القدم لكرة القدم لكرة القدم في كرة القدم ، كرة القدم الفلفل الحار.Maecenas سعر Sapien Odioh.",
+        "dongDescription": "لوريم الجزر جدا ، مطور طماطم البكالوريوس.طبقة Imperdiet أو ، لقطر الكتلة Viverra.Interdum.Pellentesque Football Football Carton.مطورو Utpulvinar الإلزامي MI Makeup.liberoloros authromodof.تريد أو الواجب المنزلي كجزر Ivenenatislectuss Lorem ، Elit elit. let. heimperdiet nec ، for viverra.interdm mass dim.pellentesque football carton sit.Utpulvinar tincidunt modely mos routrum.liberolorum autris"
+    },
+    "privacyPolicyScreen": {
+        "privacyPolicy": "سياسة الخصوصية",
+        "shortDescription": "لوريم الجزر جدا ، الطماطم أديبيسكوف Elitj.شوكولاتة كرة القدم أو زيارة Enullalklli أي موريس.و Solliciegestapellentesqueg adipiscing.الأسد البعض ، إنه ليس مصنفة كرة القدم لكرة القدم لكرة القدم في كرة القدم ، كرة القدم الفلفل الحار.Maecenas سعر Sapien Odioh.",
+        "dongDescription": "لوريم الجزر جدا ، مطور طماطم البكالوريوس.طبقة Imperdiet أو ، لقطر الكتلة Viverra.Interdum.Pellentesque Football Football Carton.مطورو Utpulvinar الإلزامي MI Makeup.liberoloros authromodof.تريد أو الواجب المنزلي كجزر Ivenenatislectuss Lorem ، Elit elit. let. heimperdiet nec ، for viverra.interdm mass dim.pellentesque football carton sit.Utpulvinar tincidunt modely mos routrum.liberolorum autris"
+    },
+    "fAQsScreen": {
+        "fAQs": "الأسئلة الشائعة",
+        "question1": "كيف تحجز خدمة السباكة؟",
+        "question2": "كيف تحجز خدمة نظيفة المنزل؟",
+        "question3": "كيف تجد أفضل كهربائي؟",
+        "question4": "ما هي عملية الإحالة والكسب؟",
+        "question5": "كيف تكسب المال؟",
+        "answer": "لوريم الجزر جدا ، الطماطم أديبيسكوف Elitj.شوكولاتة كرة القدم أو زيارة Enullalklli أي موريس.و Solliciegestapellentesqueg adipiscing.الأسد البعض ، إنه ليس مصنفة كرة القدم لكرة القدم لكرة القدم في كرة القدم ، كرة القدم الفلفل الحار.Maecenas سعر Sapien Odioh."
+    },
+    "contactUsScreen": {
+        "contactUs": "اتصل بنا",
+        "email": "بريد إلكتروني",
+        "phone": "هاتف",
+        "name": "اسم",
+        "enterName": "أدخل أسمك",
+        "emailId": "عنوان الايميل",
+        "enterEmail": "أدخل معرف البريد الإلكتروني الخاص بك",
+        "message": "رسالة",
+        "writeMessage": "اكتب رسالة هنا",
+        "send": "يرسل"
+    },
+    "appSettingScreen": {
+        "appSettings": "إعدادات التطبيقات",
+        "notification": "إشعار",
+        "location": "موقع",
+        "darkMode": "الوضع المظلم",
+        "applicationUpdate": "تحديث التطبيق"
+    },
+    "favoriteScreen": {
+        "favorites": "المفضلة",
+        "emptyFavorite": "القائمة المفضلة الفارغة",
+        "remove": "تمت إزالته من المفضل"
+    },
+    "referAndEarnScreen": {
+        "refer": "إحالة صديقك وكسب المال",
+        "referYourFriends": "إحالة أصدقائك واحصل على مكافأة 10 دولارات",
+        "shareLinkFriends": "شارك هذا الرابط إلى أصدقائك ، بعد حجز الخدمة ، تحصل على مكافآت بقيمة 10 دولارات في محفظتك",
+        "shareLinkVia": "شارك الرابط عبر",
+        "signUp": "ادع صديقك للتسجيل",
+        "bookService": "بعد خدمة كتاب صديقك",
+        "yourWallet": "تحصل على مكافأة 10 دولارات في محفظتك",
+        "message": "اكتب هنا..",
+        "toastCopy": "نسخ"
+    },
+    "languageScreen": {
+        "language": "لغة",
+        "update": "تحديث"
+    }
+}

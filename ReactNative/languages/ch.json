@@ -1,0 +1,292 @@
+{
+    "onboardingScreen": {
+        "homeServices": "我们提供各种家庭服务",
+        "getStarted": "开始",
+        "exitApp": "再次点击以退出应用程序"
+    },
+    "loginScreen": {
+        "login": "登录",
+        "pleaseConfirm": "请确认您的国家代码并输入您的手机号码",
+        "enterNumber": "输入你的手机号码",
+        "orLogin": "或使用登录",
+        "exitApp": "再次点击以退出应用程序",
+        "search": "搜索",
+        "close": "关"
+    },
+    "registerScreen": {
+        "register": "登记",
+        "pleaseCreate": "请创建您的帐户以继续与我们联系。",
+        "enterName": "输入你的名字",
+        "enterEmail": "输入您的电子邮件ID",
+        "enterNumber": "输入你的手机号码"
+    },
+    "verificationScreen": {
+        "verification": "OTP验证",
+        "pleaseEnter": "OTP已发送给您的手机号码，请在下面输入",
+        "verify": "核实"
+    },
+    "loader": {
+        "pleaseWait": "请稍等"
+    },
+    "bottomTab": {
+        "home": "家",
+        "services": "服务",
+        "messages": "消息",
+        "profile": "轮廓",
+        "exitApp": "再次点击以退出应用程序"
+    },
+    "homeScreen": {
+        "search": "搜索",
+        "repairing": "交流维修",
+        "atHome": "在家服务",
+        "off": "50折优惠",
+        "bookNow": "现在预订",
+        "services": "服务",
+        "more": "更多的",
+        "bestOffer": "最好的报价",
+        "topService": "顶级服务提供商",
+        "seeAll": "查看全部"
+    },
+    "bestOfferScreen": {
+        "bestOffer": "最好的报价"
+    },
+    "topServicesScreen": {
+        "topServices": "顶级服务提供商"
+    },
+    "categoryScreen": {
+        "filters": "过滤器",
+        "price": "价格",
+        "highToLow": "高到低",
+        "lowToHigh": "从低到高",
+        "rate": "速度",
+        "gender": "性别",
+        "male": "男性",
+        "female": "女性",
+        "any": "任何",
+        "apply": "申请",
+        "reset": "重启"
+    },
+    "detailsScreen": {
+        "added": "添加到最爱",
+        "remove": "从最喜欢的地方删除",
+        "description": "描述",
+        "shortDescription": "Lorem非常胡萝卜，番茄本科生Elitj。足球巧克力都不是制造宣传恩拉尔克利。和生活的照顾，是Egendapellentesque的客户。狮子有些，这不是多种劳雷特。足球足球周末足球制造，足球辣椒纯净。化学Sapien仇恨中的Maecenas。",
+        "longDescription": "Lorem非常胡萝卜，番茄本科生Elitj。足球巧克力都不是制造宣传恩拉尔克利。和生活的照顾，是Egendapellentesque的客户。狮子有些，这不是多种劳雷特。足球足球周末足球制造，足球辣椒纯净。化学Sapien仇恨中的Maecenas。Lorem非常胡萝卜，番茄本科生Elitj。足球巧克力都不是制造宣传恩拉尔克利。和生活的照顾，是Egendapellentesque的客户。狮子有些，这不是多种劳雷特。足球足球周末足球制造，足球辣椒纯净。化学Sapien仇恨中的Maecenas。",
+        "readMore": "阅读更多",
+        "readLess": "少阅读",
+        "serviceReview": "服务评论",
+        "seeAll": "查看全部",
+        "bookNow": "现在预订"
+    },
+    "confirmScreen": {
+        "question": "您需要清洁哪个？",
+        "fullHome": "全家",
+        "kitchen": "厨房",
+        "bathroom": "浴室",
+        "parking": "停車處",
+        "bedroom": "卧室",
+        "garden": "花园",
+        "livingRoom": "客厅",
+        "roof": "屋顶",
+        "apartmentSize": "公寓尺寸（平方英尺）",
+        "selectDate": "选择日期",
+        "selectTime": "选择时间",
+        "numberRoom": "空间数",
+        "phoneNumber": "电话号码",
+        "enterNumber": "输入你的电话号码",
+        "location": "地点",
+        "totalPay": "总薪水",
+        "confirm": "确认",
+        "cancel": "取消",
+        "ok": "行"
+    },
+    "paymentMethodScreen": {
+        "paymentMethod": "付款方式",
+        "mastercard": "万事达",
+        "googlePay": "Google Pay",
+        "payPal": "贝宝",
+        "useWallet": "使用钱包",
+        "cashServices": "服务后现金",
+        "price": "价格",
+        "discount": "折扣",
+        "total": "全部的",
+        "continue": "继续"
+    },
+    "creditCardScreen": {
+        "mastercard": "万事达",
+        "name": "持卡人姓名",
+        "cardNo": "卡号",
+        "enterName": "输入您的卡持有人名称",
+        "enterCard": "输入您的卡号",
+        "expiryDate": "到期日",
+        "enterCvv": "代码",
+        "payment": "支付"
+
+    },
+    "googlePayScreen": {
+        "googlePay": "Google Pay",
+        "payWith": "用Google付款",
+        "enter": "输入UPI ID",
+        "payment": "支付"
+
+    },
+    "payPalScreen": {
+        "enterEmail": "输入电子邮件ID",
+        "payment": "支付",
+        "payPal": "贝宝"
+
+
+    },
+    "successScreen": {
+        "paymentSuccessful": "支付成功！",
+        "description": "您的订单已成功完成，请等待优质的服务。",
+        "orderId": "您的订单ID",
+        "backHome": "回到家"
+    },
+    "searchScreen": {
+        "recentlySearch": "最近搜索",
+        "clearAll": "清除全部",
+        "search": "搜索您的服务",
+        "trendingSearch": "趋势搜索"
+
+    },
+    "notificationScreen": {
+        "notification": "通知",
+        "noNotification": "没有新的通知",
+        "remove": "删除了通知。"
+
+    },
+    "reviewScreen": {
+        "serviceReview": "服务评论"
+    },
+    "pickAddressScreen": {
+        "search": "搜索",
+        "pickLocation": "选择此位置"
+
+    },
+    "servicesScreen": {
+        "services": "服务"
+    },
+    "messagesScreen": {
+        "messages": "消息"
+    },
+    "chatScreen": {
+        "typeHere": "在此输入文字...."
+
+    },
+    "profileScreen": {
+        "profile": "轮廓",
+        "walletAmount": "钱包数量",
+        "myBooking": "我的预订",
+        "favorites": "最爱",
+        "referEarn": "参考并赚钱",
+        "language": "语",
+        "appSettings": "应用设置",
+        "termsCondition": "条款与协议",
+        "fAQs": "常见问题解答",
+        "privacyPolicy": "隐私政策",
+        "contactUs": "联系我们",
+        "logout": "登出",
+        "areSure": "您确定要注销吗？",
+        "no": "不",
+        "yes": "是的"
+    },
+    "editProfileScreen": {
+        "editProfile": "编辑个人资料",
+        "name": "姓名",
+        "enterName": "输入你的名字",
+        "email": "电子邮件ID",
+        "enterEmail": "输入您的电子邮件ID",
+        "mobile": "手机号码",
+        "enterMobile": "输入你的手机号码",
+        "update": "更新",
+        "changeProfile": "更改档案照片",
+        "camera": "相机",
+        "gallery": "画廊",
+        "remove": "删除图像",
+        "removeImage": "删除了个人资料照片。",
+        "successfully": "个人资料成功更新了！",
+        "ok": "行",
+        "deny": "您已拒绝访问相机！！！"
+
+    },
+    "bookingScreen": {
+        "myBooking": "我的预订",
+        "ongoing": "正在进行",
+        "history": "历史"
+
+    },
+    "ongoingTab": {
+        "cancel": "取消",
+        "noBooking": "尚无预订搜索您的服务",
+        "areSure": "您确定要取消此预订吗？",
+        "cancelBooking": "取消预订",
+        "no": "不",
+        "yes": "是的",
+        "removeSuccess": "成功删除。"
+    },
+    "historyTab": {
+        "giveRate": "给出费率",
+        "please": "请和我们分享你的经验",
+        "saySomething": "说些什么",
+        "send": "发送"
+    },
+    "termsConditionScreen": {
+        "termsCondition": "条款与协议",
+        "shortDescription": "Lorem非常胡萝卜，番茄adipiscoumf elitj。足球巧克力或参观任何毛里斯的Enullalklli。和solliciegestapellentesqueg涂抹。狮子有些，这不是瓦雷塞特足球周末足球制造业，足球辣椒纯净的纯粹。Maecenas Sapien Odioh的价格。",
+        "dongDescription": "Lorem非常胡萝卜，番茄本科开发人员。Imperdiet层或viverra.interdum质量直径。Pellentesque足球纸箱是。UTPULVINAR开发人员强制性MI开发人员化妆。Liberoloros authromodof。想要或作业为ivennatislectuss lorem胡萝卜，增强了本科生的Elit.imperdiet层NEC，for Viverra.interdum Mass Diam.pellentesque football carton sit.utpulvinar tincidunt tincidunt tincidunt tinciduntemy mos Developer rutrum.liberolum rutiberolum utrisris utrisris utrisris utris utris utris utris utris utris utris utris utris utris utris utris utrisris"
+    },
+    "privacyPolicyScreen": {
+        "privacyPolicy": "隐私政策",
+        "shortDescription": "Lorem非常胡萝卜，番茄adipiscoumf elitj。足球巧克力或参观任何毛里斯的Enullalklli。和solliciegestapellentesqueg涂抹。狮子有些，这不是瓦雷塞特足球周末足球制造业，足球辣椒纯净的纯粹。Maecenas Sapien Odioh的价格。",
+        "dongDescription": "Lorem非常胡萝卜，番茄本科开发人员。Imperdiet层或viverra.interdum质量直径。Pellentesque足球纸箱是。UTPULVINAR开发人员强制性MI开发人员化妆。Liberoloros authromodof。想要或作业为ivennatislectuss lorem胡萝卜，增强了本科生的Elit.imperdiet层NEC，for Viverra.interdum Mass Diam.pellentesque football carton sit.utpulvinar tincidunt tincidunt tincidunt tinciduntemy mos Developer rutrum.liberolum rutiberolum utrisris utrisris utrisris utris utris utris utris utris utris utris utris utris utris utris utris utrisris"
+    },
+    "fAQsScreen": {
+        "fAQs": "常见问题解答",
+        "question1": "如何预订Plumbar服务？",
+        "question2": "如何预订家庭清洁服务？",
+        "question3": "如何找到最佳电工？",
+        "question4": "参考和赚取过程是什么？",
+        "question5": "如何赚钱？",
+        "answer": "Lorem非常胡萝卜，番茄adipiscoumf elitj。足球巧克力或参观任何毛里斯的Enullalklli。和solliciegestapellentesqueg涂抹。狮子有些，这不是瓦雷塞特足球周末足球制造业，足球辣椒纯净的纯粹。Maecenas Sapien Odioh的价格。"
+    },
+    "contactUsScreen": {
+        "contactUs": "联系我们",
+        "email": "电子邮件",
+        "phone": "电话",
+        "name": "姓名",
+        "enterName": "输入你的名字",
+        "emailId": "电子邮件ID",
+        "enterEmail": "输入您的电子邮件ID",
+        "message": "信息",
+        "writeMessage": "在这里写消息",
+        "send": "发送"
+    },
+    "appSettingScreen": {
+        "appSettings": "应用设置",
+        "notification": "通知",
+        "location": "地点",
+        "darkMode": "黑暗模式",
+        "applicationUpdate": "应用程序更新"
+    },
+    "favoriteScreen": {
+        "favorites": "最爱",
+        "emptyFavorite": "空喜欢的列表",
+        "remove": "从最喜欢的地方删除"
+    },
+    "referAndEarnScreen": {
+        "refer": "推荐你的朋友并赚钱",
+        "referYourFriends": "推荐您的朋友并获得10美元的奖励",
+        "shareLinkFriends": "分享此链接到您的朋友，他们预订服务后，您可以在钱包上获得10美元的奖励",
+        "shareLinkVia": "通过",
+        "signUp": "邀请您的朋友注册",
+        "bookService": "在您的朋友书籍服务之后",
+        "yourWallet": "您的钱包里有10美元的奖励",
+        "message": "写在这里..",
+        "toastCopy": "复制"
+    },
+    "languageScreen": {
+        "language": "语",
+        "update": "更新"
+    }
+}

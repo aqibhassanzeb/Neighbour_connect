@@ -1,0 +1,289 @@
+{
+    "onboardingScreen": {
+        "homeServices": "Kami menyediakan semua jenis layanan rumah",
+        "getStarted": "Memulai",
+        "exitApp": "Ketuk Kembali Lagi untuk Keluar dari Aplikasi"
+    },
+    "loginScreen": {
+        "login": "Gabung",
+        "pleaseConfirm": "Harap konfirmasi kode negara Anda dan masukkan nomor ponsel Anda",
+        "enterNumber": "Masukkan nomor ponsel Anda",
+        "orLogin": "Atau login menggunakan",
+        "exitApp": "Ketuk Kembali Lagi untuk Keluar dari Aplikasi",
+        "search": "Mencari",
+        "close": "Menutup"
+    },
+    "registerScreen": {
+        "register": "Daftar",
+        "pleaseCreate": "Harap buat akun Anda untuk terus terkait dengan kami.",
+        "enterName": "Masukkan nama Anda",
+        "enterEmail": "Masukkan ID Email Anda",
+        "enterNumber": "Masukkan nomor ponsel Anda"
+    },
+    "verificationScreen": {
+        "verification": "Verifikasi OTP",
+        "pleaseEnter": "OTP telah dikirimkan kepada Anda di nomor ponsel Anda, silakan masukkan di bawah ini",
+        "verify": "Memeriksa"
+    },
+    "loader": {
+        "pleaseWait": "Mohon tunggu"
+    },
+    "bottomTab": {
+        "home": "Rumah",
+        "services": "Jasa",
+        "messages": "Pesan",
+        "profile": "Profil",
+        "exitApp": "Ketuk Kembali Lagi untuk Keluar dari Aplikasi"
+    },
+    "homeScreen": {
+        "search": "Mencari",
+        "repairing": "Perbaikan AC",
+        "atHome": "di layanan rumah",
+        "off": "diskon 50",
+        "bookNow": "Pesan sekarang",
+        "services": "Jasa",
+        "more": "Lagi",
+        "bestOffer": "Penawaran terbaik",
+        "topService": "Penyedia layanan teratas",
+        "seeAll": "Lihat semua"
+    },
+    "bestOfferScreen": {
+        "bestOffer": "Penawaran terbaik"
+    },
+    "topServicesScreen": {
+        "topServices": "Penyedia layanan teratas"
+    },
+    "categoryScreen": {
+        "filters": "Filter",
+        "price": "Harga",
+        "highToLow": "Tinggi sampai rendah",
+        "lowToHigh": "Rendah ke tinggi",
+        "rate": "Kecepatan",
+        "gender": "Jenis kelamin",
+        "male": "Pria",
+        "female": "Perempuan",
+        "any": "Setiap",
+        "apply": "Menerapkan",
+        "reset": "Mengatur ulang"
+    },
+    "detailsScreen": {
+        "added": "Ditambahkan ke favorit",
+        "remove": "Dihapus dari favorit",
+        "description": "Keterangan",
+        "shortDescription": "Lorem sangat wortel, elite sarjana tomat.Cokelat Sepak Bola Baik propaganda manufaktur enullalklli mauris.Dan perawatan hidup, adalah pelanggan Egestapellentesque.Singa beberapa, itu bukan variasi laoreetg.Manufaktur Sepak Bola Sepak Bola Sepak Bola Sepak Bola, Sepak Bola Cabai.Maecenas dalam bahan kimia Sapien Hate.",
+        "longDescription": "Lorem sangat wortel, elite sarjana tomat.Cokelat Sepak Bola Baik propaganda manufaktur enullalklli mauris.Dan perawatan hidup, adalah pelanggan Egestapellentesque.Singa beberapa, itu bukan variasi laoreetg.Manufaktur Sepak Bola Sepak Bola Sepak Bola Sepak Bola, Sepak Bola Cabai.Maecenas dalam bahan kimia Sapien Hate.Lorem sangat wortel, elite sarjana tomat.Cokelat Sepak Bola Baik propaganda manufaktur enullalklli mauris.Dan perawatan hidup, adalah pelanggan Egestapellentesque.Singa beberapa, itu bukan variasi laoreetg.Manufaktur Sepak Bola Sepak Bola Sepak Bola Sepak Bola, Sepak Bola Cabai.Maecenas dalam bahan kimia Sapien Hate.",
+        "readMore": "Baca lebih lajut",
+        "readLess": "Baca lebih sedikit",
+        "serviceReview": "Ulasan Layanan",
+        "seeAll": "Lihat semua",
+        "bookNow": "Pesan sekarang"
+    },
+    "confirmScreen": {
+        "question": "Mana yang perlu Anda bersihkan?",
+        "fullHome": "Rumah penuh",
+        "kitchen": "Dapur",
+        "bathroom": "Kamar mandi",
+        "parking": "Parkir",
+        "bedroom": "Kamar tidur",
+        "garden": "Kebun",
+        "livingRoom": "Ruang keluarga",
+        "roof": "Atap",
+        "apartmentSize": "Ukuran apartemen (sq.ft)",
+        "selectDate": "Pilih Tanggal",
+        "selectTime": "Pilih waktu",
+        "numberRoom": "Jumlah kamar",
+        "phoneNumber": "Nomor telepon",
+        "enterNumber": "Masukkan nomor telepon Anda",
+        "location": "Lokasi",
+        "totalPay": "Total pembayaran",
+        "confirm": "Mengonfirmasi",
+        "cancel": "membatalkan",
+        "ok": "Oke"
+    },
+    "paymentMethodScreen": {
+        "paymentMethod": "Cara Pembayaran",
+        "mastercard": "MasterCard",
+        "googlePay": "Google Pay",
+        "payPal": "Paypal",
+        "useWallet": "Gunakan dompet",
+        "cashServices": "Uang tunai setelah layanan",
+        "price": "Harga",
+        "discount": "Diskon",
+        "total": "total",
+        "continue": "Melanjutkan"
+    },
+    "creditCardScreen": {
+        "mastercard": "MasterCard",
+        "name": "Tanda pengenal",
+        "cardNo": "Nomor kartu",
+        "enterName": "Masukkan Nama Pemegang Kartu Anda",
+        "enterCard": "Masukkan Nomor Kartu Anda",
+        "expiryDate": "Tanggal kadaluarsa",
+        "enterCvv": "kode",
+        "payment": "Pembayaran"
+
+    },
+    "googlePayScreen": {
+        "googlePay": "Google Pay",
+        "payWith": "Bayar dengan Google Pay",
+        "enter": "Masukkan UPI ID",
+        "payment": "Pembayaran"
+    },
+    "payPalScreen": {
+        "enterEmail": "Masukkan ID Email",
+        "payment": "Pembayaran",
+        "payPal": "Paypal"
+    },
+    "successScreen": {
+        "paymentSuccessful": "Pembayaran berhasil!",
+        "description": "Pesanan Anda telah berhasil dilakukan, harap menunggu layanan yang baik.",
+        "orderId": "ID pesanan Anda",
+        "backHome": "Kembali ke rumah"
+    },
+    "searchScreen": {
+        "recentlySearch": "Baru -baru ini pencarian",
+        "clearAll": "Bersihkan semua",
+        "search": "Cari layanan Anda",
+        "trendingSearch": "Pencarian tren"
+
+    },
+    "notificationScreen": {
+        "notification": "Pemberitahuan",
+        "noNotification": "Tidak ada pemberitahuan baru",
+        "remove": "Pemberitahuan dihapus."
+
+    },
+    "reviewScreen": {
+        "serviceReview": "Ulasan Layanan"
+    },
+    "pickAddressScreen": {
+        "search": "Mencari",
+        "pickLocation": "Pilih lokasi ini"
+
+    },
+    "servicesScreen": {
+        "services": "Jasa"
+    },
+    "messagesScreen": {
+        "messages": "Pesan"
+    },
+    "chatScreen": {
+        "typeHere": "Ketik teks Anda di sini ...."
+
+    },
+    "profileScreen": {
+        "profile": "Profil",
+        "walletAmount": "Jumlah dompet",
+        "myBooking": "Pemesanan saya",
+        "favorites": "Favorit",
+        "referEarn": "Merujuk dan mendapatkan",
+        "language": "Bahasa",
+        "appSettings": "Pengaturan aplikasi",
+        "termsCondition": "Syarat & Kondisi",
+        "fAQs": "FAQ",
+        "privacyPolicy": "Kebijakan pribadi",
+        "contactUs": "Hubungi kami",
+        "logout": "Keluar",
+        "areSure": "Apakah Anda yakin ingin keluar?",
+        "no": "Tidak",
+        "yes": "Ya"
+    },
+    "editProfileScreen": {
+        "editProfile": "Sunting profil",
+        "name": "Nama",
+        "enterName": "Masukkan nama Anda",
+        "email": "ID Email",
+        "enterEmail": "Masukkan ID Email Anda",
+        "mobile": "Nomor handphone",
+        "enterMobile": "Masukkan nomor ponsel Anda",
+        "update": "Memperbarui",
+        "changeProfile": "Ubah foto profil",
+        "camera": "Kamera",
+        "gallery": "Galeri",
+        "remove": "Hapus gambar",
+        "removeImage": "Foto profil dihapus.",
+        "successfully": "Profil berhasil diperbarui !!",
+        "ok": "Oke",
+        "deny": "Anda telah menolak untuk mengakses Kamera!!!"
+
+    },
+    "bookingScreen": {
+        "myBooking": "Pemesanan saya",
+        "ongoing": "Sedang berlangsung",
+        "history": "Sejarah"
+
+    },
+    "ongoingTab": {
+        "cancel": "Membatalkan",
+        "noBooking": "Belum ada pemesanan yang mencari layanan Anda",
+        "areSure": "Apakah Anda yakin ingin membatalkan pemesanan ini?",
+        "cancelBooking": "Batalkan pemesanan",
+        "no": "Tidak",
+        "yes": "Ya",
+        "removeSuccess": "berhasil dihapus."
+    },
+    "historyTab": {
+        "giveRate": "Memberi tingkat",
+        "please": "Silakan bagikan pengalaman Anda dengan kami",
+        "saySomething": "Katakan sesuatu",
+        "send": "Mengirim"
+    },
+    "termsConditionScreen": {
+        "termsCondition": "Syarat & Kondisi",
+        "shortDescription": "Lorem sangat wortel, tomat adipiscoumf elitj.Cokelat sepak bola atau kunjungan enullalklli setiap mauris.Dan SollicieDestapellentesqueg adipiscing.The Lion beberapa, ini bukan valoreeth sepak bola akhir pekan sepak bola manufaktur sepak bola, sepak bola Chili at the Puruse.Maecenas Harga Sapien Odioh.",
+        "dongDescription": "Lorem sangat wortel, pengembang sarjana tomat.Lapisan imperdiet atau, untuk diameter massa viverra.interdum.Karton sepakbola sepak bola Pellentesque adalah.Pengembang Utpulvinar Makeup Pengembang MI Wajib.Liberoloros Authromodof.Ingin atau pekerjaan rumah sebagai wortel lorem iVenenatislectuss, elit sarjana yang ditingkatkan."
+    },
+    "privacyPolicyScreen": {
+        "privacyPolicy": "Kebijakan pribadi",
+        "shortDescription": "Lorem sangat wortel, tomat adipiscoumf elitj.Cokelat sepak bola atau kunjungan enullalklli setiap mauris.Dan SollicieDestapellentesqueg adipiscing.The Lion beberapa, ini bukan valoreeth sepak bola akhir pekan sepak bola manufaktur sepak bola, sepak bola Chili at the Puruse.Maecenas Harga Sapien Odioh.",
+        "dongDescription": "Lorem sangat wortel, pengembang sarjana tomat.Lapisan imperdiet atau, untuk diameter massa viverra.interdum.Karton sepakbola sepak bola Pellentesque adalah.Pengembang Utpulvinar Makeup Pengembang MI Wajib.Liberoloros Authromodof.Ingin atau pekerjaan rumah sebagai wortel lorem iVenenatislectuss, elit sarjana yang ditingkatkan."
+    },
+    "fAQsScreen": {
+        "fAQs": "FAQ",
+        "question1": "Bagaimana cara memesan layanan plumbar?",
+        "question2": "Bagaimana cara memesan layanan bersih rumah?",
+        "question3": "Bagaimana cara menemukan tukang listrik terbaik?",
+        "question4": "Apa proses referensi dan hasilnya?",
+        "question5": "Bagaimana cara mendapatkan uang?",
+        "answer": "Lorem sangat wortel, tomat adipiscoumf elitj.Cokelat sepak bola atau kunjungan enullalklli setiap mauris.Dan SollicieDestapellentesqueg adipiscing.The Lion beberapa, ini bukan valoreeth sepak bola akhir pekan sepak bola manufaktur sepak bola, sepak bola Chili at the Puruse.Maecenas Harga Sapien Odioh."
+    },
+    "contactUsScreen": {
+        "contactUs": "Hubungi kami",
+        "email": "Surel",
+        "phone": "Telepon",
+        "name": "Nama",
+        "enterName": "Masukkan nama Anda",
+        "emailId": "ID Email",
+        "enterEmail": "Masukkan ID Email Anda",
+        "message": "Pesan",
+        "writeMessage": "Tulis pesan di sini",
+        "send": "Mengirim"
+    },
+    "appSettingScreen": {
+        "appSettings": "Pengaturan aplikasi",
+        "notification": "Pemberitahuan",
+        "location": "Lokasi",
+        "darkMode": "Mode gelap",
+        "applicationUpdate": "Pembaruan Aplikasi"
+    },
+    "favoriteScreen": {
+        "favorites": "Favorit",
+        "emptyFavorite": "Daftar favorit kosong",
+        "remove": "Dihapus dari favorit"
+    },
+    "referAndEarnScreen": {
+        "refer": "Rujuk teman Anda dan dapatkan uang",
+        "referYourFriends": "Rujuk teman Anda dan dapatkan hadiah $ 10",
+        "shareLinkFriends": "Bagikan tautan ini ke teman Anda, setelah mereka memesan layanan Anda mendapatkan hadiah $ 10 di dompet Anda",
+        "shareLinkVia": "Bagikan tautan melalui",
+        "signUp": "Undang teman Anda untuk mendaftar",
+        "bookService": "Setelah Layanan Buku Teman Anda",
+        "yourWallet": "Anda mendapatkan hadiah $ 10 di dompet Anda",
+        "message": "Tulis disini..",
+        "toastCopy": "Disalin"
+    },
+    "languageScreen": {
+        "language": "Bahasa",
+        "update": "Memperbarui"
+    }
+}

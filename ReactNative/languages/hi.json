@@ -1,0 +1,289 @@
+{
+    "onboardingScreen": {
+        "homeServices": "हम सभी तरह की घरेलू सेवाएं प्रदान करते हैं",
+        "getStarted": "शुरू हो जाओ",
+        "exitApp": "ऐप से बाहर निकलने के लिए फिर से टैप करें"
+    },
+    "loginScreen": {
+        "login": "लॉग इन करें",
+        "pleaseConfirm": "कृपया अपने देश कोड की पुष्टि करें और अपना मोबाइल नंबर दर्ज करें",
+        "enterNumber": "अपना मोबाइल नंबर दर्ज करें",
+        "orLogin": "या लॉगिन का उपयोग कर लॉगिन करें",
+        "exitApp": "ऐप से बाहर निकलने के लिए फिर से टैप करें",
+        "search": "खोज",
+        "close": "बंद करना"
+    },
+    "registerScreen": {
+        "register": "पंजीकरण करवाना",
+        "pleaseCreate": "कृपया हमारे साथ जुड़े रहने के लिए अपना खाता बनाएं।",
+        "enterName": "अपना नाम दर्ज करें",
+        "enterEmail": "अपना ईमेल आईडी दर्ज करें",
+        "enterNumber": "अपना मोबाइल नंबर दर्ज करें"
+    },
+    "verificationScreen": {
+        "verification": "ओटीपी सत्यापन",
+        "pleaseEnter": "OTP आपको अपने मोबाइल नंबर पर भेजा गया है कृपया इसे नीचे दर्ज करें",
+        "verify": "सत्यापित करना"
+    },
+    "loader": {
+        "pleaseWait": "कृपया प्रतीक्षा करें"
+    },
+    "bottomTab": {
+        "home": "घर",
+        "services": "सेवाएं",
+        "messages": "संदेशों",
+        "profile": "प्रोफ़ाइल",
+        "exitApp": "ऐप से बाहर निकलने के लिए फिर से टैप करें"
+    },
+    "homeScreen": {
+        "search": "खोज",
+        "repairing": "एसी मरम्मत",
+        "atHome": "घर की सेवा में",
+        "off": "50 प्रतिशत की छूट",
+        "bookNow": "अभी बुक करें",
+        "services": "सेवाएं",
+        "more": "अधिक",
+        "bestOffer": "सबसे अच्छा प्रस्ताव",
+        "topService": "शीर्ष सेवा प्रदाता",
+        "seeAll": "सभी देखें"
+    },
+    "bestOfferScreen": {
+        "bestOffer": "सबसे अच्छा प्रस्ताव"
+    },
+    "topServicesScreen": {
+        "topServices": "शीर्ष सेवा प्रदाता"
+    },
+    "categoryScreen": {
+        "filters": "फिल्टर",
+        "price": "कीमत",
+        "highToLow": "ऊॅंचा से नीचा",
+        "lowToHigh": "नीचे से उच्चा",
+        "rate": "दर",
+        "gender": "लिंग",
+        "male": "नर",
+        "female": "मादा",
+        "any": "कोई भी",
+        "apply": "लागू करना",
+        "reset": "रीसेट"
+    },
+    "detailsScreen": {
+        "added": "पसंदीदा में जोड़ा गया",
+        "remove": "पसंदीदा से हटा दिया गया",
+        "description": "विवरण",
+        "shortDescription": "लोरम बहुत गाजर, टमाटर स्नातक एलिटज।फुटबॉल चॉकलेट न तो न तो विनिर्माण प्रोपेगैंडा एनुलल्कली किसी भी मौरिस।और जीवन की देखभाल, egestapellentesque ग्राहक है।शेर कुछ, यह विभिन्न प्रकार के looreetg नहीं है।सॉकर फुटबॉल वीकेंड फुटबॉल मैन्युफैक्चरिंग, फुटबॉल मिर्च पुरूज़।रासायनिक सैपियन नफरत में maecenas।",
+        "longDescription": "लोरम बहुत गाजर, टमाटर स्नातक एलिटज।फुटबॉल चॉकलेट न तो न तो विनिर्माण प्रोपेगैंडा एनुलल्कली किसी भी मौरिस।और जीवन की देखभाल, egestapellentesque ग्राहक है।शेर कुछ, यह विभिन्न प्रकार के looreetg नहीं है।सॉकर फुटबॉल वीकेंड फुटबॉल मैन्युफैक्चरिंग, फुटबॉल मिर्च पुरूज़।रासायनिक सैपियन नफरत में maecenas।लोरम बहुत गाजर, टमाटर स्नातक एलिटज।फुटबॉल चॉकलेट न तो न तो विनिर्माण प्रोपेगैंडा एनुलल्कली किसी भी मौरिस।और जीवन की देखभाल, egestapellentesque ग्राहक है।शेर कुछ, यह विभिन्न प्रकार के looreetg नहीं है।सॉकर फुटबॉल वीकेंड फुटबॉल मैन्युफैक्चरिंग, फुटबॉल मिर्च पुरूज़।रासायनिक सैपियन नफरत में maecenas।",
+        "readMore": "अधिक पढ़ें",
+        "readLess": "कम पढ़ें",
+        "serviceReview": "सेवा समीक्षा",
+        "seeAll": "सभी देखें",
+        "bookNow": "अभी बुक करें"
+    },
+    "confirmScreen": {
+        "question": "आपको साफ करने की आवश्यकता है?",
+        "fullHome": "पूरा घर",
+        "kitchen": "रसोईघर",
+        "bathroom": "स्नानघर",
+        "parking": "पार्किंग",
+        "bedroom": "सोने का कमरा",
+        "garden": "बगीचा",
+        "livingRoom": "बैठक",
+        "roof": "छत",
+        "apartmentSize": "अपार्टमेंट आकार (sq.ft)",
+        "selectDate": "तारीख़ चुनें",
+        "selectTime": "समय का चयन करें",
+        "numberRoom": "कमरे की संख्या",
+        "phoneNumber": "फ़ोन नंबर",
+        "enterNumber": "अपना फोन नंबर डालें",
+        "location": "जगह",
+        "totalPay": "कुल वेतन",
+        "confirm": "पुष्टि करें",
+        "cancel": "रद्द करना",
+        "ok": "ठीक"
+    },
+    "paymentMethodScreen": {
+        "paymentMethod": "भुगतान का तरीका",
+        "mastercard": "मास्टर कार्ड",
+        "googlePay": "गूगल पे",
+        "payPal": "पेपैल",
+        "useWallet": "बटुए का उपयोग करें",
+        "cashServices": "सेवाओं के बाद नकदी",
+        "price": "कीमत",
+        "discount": "छूट",
+        "total": "कुल",
+        "continue": "जारी रखना"
+    },
+    "creditCardScreen": {
+        "mastercard": "मास्टर कार्ड",
+        "name": "कार्डधारक का नाम",
+        "cardNo": "कार्ड संख्या",
+        "enterName": "अपना कार्ड धारक नाम दर्ज करें",
+        "enterCard": "अपना कार्ड नंबर दर्ज करें",
+        "expiryDate": "समाप्ति तिथि",
+        "enterCvv": "कोड",
+        "payment": "भुगतान"
+
+    },
+    "googlePayScreen": {
+        "googlePay": "गूगल पे",
+        "payWith": "Google वेतन के साथ भुगतान करें",
+        "enter": "UPI ID दर्ज करें",
+        "payment": "भुगतान"
+    },
+    "payPalScreen": {
+        "enterEmail": "ईमेल आईडी दर्ज करें",
+        "payment": "भुगतान",
+        "payPal": "पेपैल"
+    },
+    "successScreen": {
+        "paymentSuccessful": "भुगतान सफल!",
+        "description": "आपका आदेश सफलतापूर्वक किया गया है कृपया अच्छी सेवा की प्रतीक्षा कर रहे हैं।",
+        "orderId": "आपका ऑर्डर आईडी",
+        "backHome": "घर वापिस जा रहा हूँ"
+    },
+    "searchScreen": {
+        "recentlySearch": "हाल ही में खोज",
+        "clearAll": "सभी साफ करें",
+        "search": "अपनी सेवा खोजें",
+        "trendingSearch": "ट्रेंडिंग सर्च"
+
+    },
+    "notificationScreen": {
+        "notification": "अधिसूचना",
+        "noNotification": "कोई नई अधिसूचना नहीं",
+        "remove": "अधिसूचना हटा दी गई।"
+
+    },
+    "reviewScreen": {
+        "serviceReview": "सेवा समीक्षा"
+    },
+    "pickAddressScreen": {
+        "search": "खोज",
+        "pickLocation": "इस स्थान को चुनें"
+
+    },
+    "servicesScreen": {
+        "services": "सेवाएं"
+    },
+    "messagesScreen": {
+        "messages": "संदेशों"
+    },
+    "chatScreen": {
+        "typeHere": "अपना पाठ यहाँ लिखें...."
+
+    },
+    "profileScreen": {
+        "profile": "प्रोफ़ाइल",
+        "walletAmount": "बटुए की मात्रा",
+        "myBooking": "मेरी बुकिंग",
+        "favorites": "पसंदीदा",
+        "referEarn": "देखें और अर्जित करना",
+        "language": "भाषा",
+        "appSettings": "एप्लिकेशन सेटिंग",
+        "termsCondition": "नियम व शर्त",
+        "fAQs": "पूछे जाने वाले प्रश्न",
+        "privacyPolicy": "गोपनीयता नीति",
+        "contactUs": "संपर्क करें",
+        "logout": "लॉग आउट",
+        "areSure": "क्या आप लॉग आउट करना चाहते हैं?",
+        "no": "नहीं",
+        "yes": "हां"
+    },
+    "editProfileScreen": {
+        "editProfile": "प्रोफ़ाइल संपादित करें",
+        "name": "नाम",
+        "enterName": "अपना नाम दर्ज करें",
+        "email": "ईमेल आईडी",
+        "enterEmail": "अपना ईमेल आईडी दर्ज करें",
+        "mobile": "मोबाइल नंबर",
+        "enterMobile": "अपना मोबाइल नंबर दर्ज करें",
+        "update": "अपडेट करना",
+        "changeProfile": "प्रोफ़ाइल फोटो बदलें",
+        "camera": "कैमरा",
+        "gallery": "गेलरी",
+        "remove": "छवि निकालें",
+        "removeImage": "प्रोफ़ाइल फोटो हटा दिया गया।",
+        "successfully": "प्रोफाइल को सफलतापूर्वक अपडेट किया गया!!",
+        "ok": "ठीक है",
+        "deny": "आपने कैमरा एक्सेस करने से मना कर दिया है!!!"
+
+    },
+    "bookingScreen": {
+        "myBooking": "मेरी बुकिंग",
+        "ongoing": "चल रहे",
+        "history": "इतिहास"
+
+    },
+    "ongoingTab": {
+        "cancel": "रद्द करना",
+        "noBooking": "कोई बुकिंग अभी तक अपनी सेवा खोजें",
+        "areSure": "क्या आप सुनिश्चित हैं कि आप इस बुकिंग को रद्द करना चाहते हैं?",
+        "cancelBooking": "रद्द बुकिंग",
+        "no": "नहीं",
+        "yes": "हां",
+        "removeSuccess": "सफलतापूर्वक हटा दिया गया।"
+    },
+    "historyTab": {
+        "giveRate": "दर देना",
+        "please": "अपना अनुभव हमारे साथ साझा करें",
+        "saySomething": "कुछ कहो",
+        "send": "भेजना"
+    },
+    "termsConditionScreen": {
+        "termsCondition": "नियम व शर्त",
+        "shortDescription": "लोरम बहुत गाजर, टमाटर एडिपिस्कॉमफ एलिटज।फुटबॉल चॉकलेट या किसी भी मौरिस के साथ एनलॉल्कली का दौरा किया।और Solliciegestapellentesqueg adipiscing।द लायन कुछ, यह एक वैलेथग फुटबॉल फुटबॉल सप्ताहांत फुटबॉल विनिर्माण नहीं है, फुटबॉल मिर्च एथ द पुरूज़।Maecenas Sapien Odioh की कीमत।",
+        "dongDescription": "लोरम बहुत गाजर, टमाटर स्नातक डेवलपर।Imprediet परत या, viverra.interdum द्रव्यमान व्यास के लिए।Pellentesque फुटबॉल फुटबॉल कार्टन है।Utpulvinar डेवलपर्स अनिवार्य MI डेवलपर मेकअप।लिबरोलोरोस ऑथ्रोमोडोफ़।एक IneNeNatislectuss Lorem गाजर के रूप में चाहते हैं या होमवर्क, Viverra.interdum मास डायम के लिए अंडरग्रेजुएट Elit.Imperdiet लेयर NEC को बढ़ाया।"
+    },
+    "privacyPolicyScreen": {
+        "privacyPolicy": "गोपनीयता नीति",
+        "shortDescription": "लोरम बहुत गाजर, टमाटर एडिपिस्कॉमफ एलिटज।फुटबॉल चॉकलेट या किसी भी मौरिस के साथ एनलॉल्कली का दौरा किया।और Solliciegestapellentesqueg adipiscing।द लायन कुछ, यह एक वैलेथग फुटबॉल फुटबॉल सप्ताहांत फुटबॉल विनिर्माण नहीं है, फुटबॉल मिर्च एथ द पुरूज़।Maecenas Sapien Odioh की कीमत।",
+        "dongDescription": "लोरम बहुत गाजर, टमाटर स्नातक डेवलपर।Imprediet परत या, viverra.interdum द्रव्यमान व्यास के लिए।Pellentesque फुटबॉल फुटबॉल कार्टन है।Utpulvinar डेवलपर्स अनिवार्य MI डेवलपर मेकअप।लिबरोलोरोस ऑथ्रोमोडोफ़।एक IneNeNatislectuss Lorem गाजर के रूप में चाहते हैं या होमवर्क, Viverra.interdum मास डायम के लिए अंडरग्रेजुएट Elit.Imperdiet लेयर NEC को बढ़ाया।"
+    },
+    "fAQsScreen": {
+        "fAQs": "पूछे जाने वाले प्रश्न",
+        "question1": "प्लंबर सेवा कैसे बुक करें?",
+        "question2": "घर की स्वच्छ सेवा कैसे बुक करें?",
+        "question3": "सर्वश्रेष्ठ इलेक्ट्रीशियन कैसे खोजें?",
+        "question4": "संदर्भ और कमाई की प्रक्रिया क्या है?",
+        "question5": "पैसे कैसे कमाएं?",
+        "answer": "लोरम बहुत गाजर, टमाटर एडिपिस्कॉमफ एलिटज।फुटबॉल चॉकलेट या किसी भी मौरिस के साथ एनलॉल्कली का दौरा किया।और Solliciegestapellentesqueg adipiscing।द लायन कुछ, यह एक वैलेथग फुटबॉल फुटबॉल सप्ताहांत फुटबॉल विनिर्माण नहीं है, फुटबॉल मिर्च एथ द पुरूज़।Maecenas Sapien Odioh की कीमत।"
+    },
+    "contactUsScreen": {
+        "contactUs": "संपर्क करें",
+        "email": "ईमेल",
+        "phone": "फ़ोन",
+        "name": "नाम",
+        "enterName": "अपना नाम दर्ज करें",
+        "emailId": "ईमेल आईडी",
+        "enterEmail": "अपना ईमेल आईडी दर्ज करें",
+        "message": "संदेश",
+        "writeMessage": "यहाँ संदेश लिखें",
+        "send": "भेजना"
+    },
+    "appSettingScreen": {
+        "appSettings": "एप्लिकेशन सेटिंग",
+        "notification": "अधिसूचना",
+        "location": "जगह",
+        "darkMode": "डार्क मोड",
+        "applicationUpdate": "अनुप्रयोग अद्यतन"
+    },
+    "favoriteScreen": {
+        "favorites": "पसंदीदा",
+        "emptyFavorite": "खाली पसंदीदा सूची",
+        "remove": "पसंदीदा से हटा दिया गया"
+    },
+    "referAndEarnScreen": {
+        "refer": "अपने दोस्त को देखें और पैसे कमाएं",
+        "referYourFriends": "अपने दोस्तों को देखें और $ 10 का इनाम प्राप्त करें",
+        "shareLinkFriends": "इस लिंक को अपने दोस्तों को साझा करें, सेवा बुक करने के बाद आपको अपने बटुए में $ 10 पुरस्कार मिलते हैं",
+        "shareLinkVia": "के माध्यम से लिंक साझा करें",
+        "signUp": "साइन अप करने के लिए अपने दोस्त को आमंत्रित करें",
+        "bookService": "आपकी मित्र पुस्तक सेवा के बाद",
+        "yourWallet": "आप अपने बटुए में $ 10 का पुरस्कृत करते हैं",
+        "message": "यहाँ लिखें..",
+        "toastCopy": "कॉपी किया गया"
+    },
+    "languageScreen": {
+        "language": "भाषा",
+        "update": "अपडेट करना"
+    }
+}

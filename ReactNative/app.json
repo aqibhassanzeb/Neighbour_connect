@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "RN-HomeService",
+    "slug": "RN-HomeService",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "bundleIdentifier": "com.camelcase.rnhomeservice",
+      "buildNumber": "1.0.0",
+      "supportsTablet": true,
+      "config":{
+        "googleMapsApiKey":"ENTER_YOUR_GOOGLE_MAP_API_KEY_HERE"
+      }
+    },
+    "android": {
+      "package": "com.camelcase.rnhomeservice",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "config":{
+        "googleMaps":{
+          "apiKey":"AIzaSyDxeLoSv7tRgK2ulIAnW3dxU85tg_cLSjo"
+        }
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}

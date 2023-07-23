@@ -1,0 +1,291 @@
+{
+    "onboardingScreen": {
+        "homeServices": "We provide all kind of home services",
+        "getStarted": "Get started",
+        "exitApp": "Tap back again to exit the App"
+    },
+    "loginScreen": {
+        "login": "Login",
+        "pleaseConfirm": "Please confirm your country code and enter your mobile number ",
+        "enterNumber": "Enter your mobile number",
+        "orLogin": "Or Login using",
+        "exitApp": "Tap back again to exit the App",
+        "search": "Search",
+        "close": "Close"
+    },
+    "registerScreen": {
+        "register": "Register",
+        "pleaseCreate": "Please create your account to continue associated with us.",
+        "enterName": "Enter your name",
+        "enterEmail": "Enter your email id",
+        "enterNumber": "Enter your mobile number"
+    },
+    "verificationScreen": {
+        "verification": "OTP verification",
+        "pleaseEnter": "Otp has been sent to you on your mobile number please enter it below ",
+        "verify": "Verify"
+    },
+    "loader": {
+        "pleaseWait": "Please wait"
+    },
+    "bottomTab": {
+        "home": "Home",
+        "services": "Services",
+        "messages": "Messages",
+        "profile": "Profile",
+        "exitApp": "Tap back again to exit the App"
+    },
+    "homeScreen": {
+        "search": "Search",
+        "repairing": "AC Repairing",
+        "atHome": "at home service",
+        "off": "50% off",
+        "bookNow": "Book now",
+        "services": "Services",
+        "more": "More",
+        "bestOffer": "Best offer",
+        "topService": "Top service providers",
+        "seeAll": "See all"
+    },
+    "bestOfferScreen": {
+        "bestOffer": "Best offer"
+    },
+    "topServicesScreen": {
+        "topServices": "Top services providers"
+    },
+    "categoryScreen": {
+        "filters": "Filters",
+        "price": "Price",
+        "highToLow": "High to low",
+        "lowToHigh": "Low to high",
+        "rate": "Rate",
+        "gender": "Gender",
+        "male": "Male",
+        "female": "Female",
+        "any": "Any",
+        "apply": "Apply",
+        "reset": "Reset"
+    },
+    "detailsScreen": {
+        "added": "Added to Favorite",
+        "remove": "Removed from Favorite",
+        "description": "Description",
+        "shortDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elitj. Eu scelerisque neque neque vestibulum augue enullalkll quis mauris. Ac sollicitudin vitae, sit egestapellentesque adipiscing. Leo aliquam, aliquam non sit varius laoreetg. Morbi felis volutpat eu vestibulum, ornare purus puruse. Pretium maecenas in eget sapien odio. ",
+        "longDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elitj. Eu scelerisque neque neque vestibulum augue enullalkll quis mauris. Ac sollicitudin vitae, sit egestapellentesque adipiscing. Leo aliquam, aliquam non sit varius laoreetg. Morbi felis volutpat eu vestibulum, ornare purus puruse. Pretium maecenas in eget sapien odio. Lorem ipsum dolor sit amet, consectetur adipiscing elitj. Eu scelerisque neque neque vestibulum augue enullalkll quis mauris. Ac sollicitudin vitae, sit egestapellentesque adipiscing. Leo aliquam, aliquam non sit varius laoreetg. Morbi felis volutpat eu vestibulum, ornare purus puruse. Pretium maecenas in eget sapien odio.",
+        "readMore": "Read more",
+        "readLess": "Read Less",
+        "serviceReview": "Service review",
+        "seeAll": "See all",
+        "bookNow": "Book now"
+    },
+    "confirmScreen": {
+        "question": "Which do you need to clean?",
+        "fullHome": "Full home",
+        "kitchen": "Kitchen",
+        "bathroom": "Bathroom",
+        "parking": "Parking",
+        "bedroom": "Bedroom",
+        "garden": "Garden",
+        "livingRoom": "Living room",
+        "roof": "Roof",
+        "apartmentSize": "Apartment size(sq.ft)",
+        "selectDate": "Select date",
+        "selectTime": "Select time",
+        "numberRoom": "Number of room",
+        "phoneNumber": "Phone number",
+        "enterNumber": "Enter your phone number",
+        "location": "Location",
+        "totalPay": "Total pay",
+        "confirm": "Confirm",
+        "cancel": "Cancel",
+        "ok": "Ok"
+    },
+    "paymentMethodScreen": {
+        "paymentMethod": "Payment method",
+        "mastercard": "Mastercard",
+        "googlePay": "Google pay",
+        "payPal": "PayPal",
+        "useWallet": "Use wallet",
+        "cashServices": "Cash after services",
+        "price": "Price",
+        "discount": "Discount",
+        "total": "Total",
+        "continue": "Continue"
+    },
+    "creditCardScreen": {
+        "mastercard": "Mastercard",
+        "name": "Card holder name",
+        "cardNo": "Card Number",
+        "enterName": "Enter your card holder name",
+        "enterCard": "Enter your card number",
+        "expiryDate": "Expiry date",
+        "enterCvv": "code",
+        "payment": "Payment"
+
+    },
+    "googlePayScreen": {
+        "googlePay": "Google pay",
+        "payWith": "Pay with google pay",
+        "enter": "Enter UPI Id",
+        "payment": "Payment"
+
+    },
+    "payPalScreen": {
+        "enterEmail": "Enter email id",
+        "payment": "Payment",
+        "payPal": "PayPal"
+
+
+    },
+    "successScreen": {
+        "paymentSuccessful": "Payment successful!",
+        "description": "Your order has been successfully done please waiting for the good service.",
+        "orderId": "Your Order Id",
+        "backHome": "Back to home"
+    },
+    "searchScreen": {
+        "recentlySearch": "Recently search",
+        "clearAll": "clear all",
+        "search": "Search your service",
+        "trendingSearch": "Trending search"
+
+    },
+    "notificationScreen": {
+        "notification": "Notification",
+        "noNotification": "No new notification",
+        "remove": "Notification removed."
+
+    },
+    "reviewScreen": {
+        "serviceReview": "Service review"
+    },
+    "pickAddressScreen": {
+        "search": "Search ",
+        "pickLocation": "Pick this location"
+
+    },
+    "servicesScreen": {
+        "services": "Services"
+    },
+    "messagesScreen": {
+        "messages": "Messages"
+    },
+    "chatScreen": {
+        "typeHere": "Type your text here...."
+
+    },
+    "profileScreen": {
+        "profile": "Profile",
+        "walletAmount": "Wallet amount",
+        "myBooking": "My booking",
+        "favorites": "Favorites",
+        "referEarn": "Refer and earn",
+        "language": "Language",
+        "appSettings": "App settings",
+        "termsCondition": "Terms & condition",
+        "fAQs": "FAQs",
+        "privacyPolicy": "Privacy policy",
+        "contactUs": "Contact us",
+        "logout": "Logout",
+        "areSure": "Are you sure you want to logout?",
+        "no": "No",
+        "yes": "Yes"
+    },
+    "editProfileScreen": {
+        "editProfile": "Edit profile",
+        "name": "Name",
+        "enterName": "Enter your name",
+        "email": "Email id",
+        "enterEmail": "Enter your email id",
+        "mobile": "Mobile number",
+        "enterMobile": "Enter your mobile number",
+        "update": "Update",
+        "changeProfile": "Change profile Photo",
+        "camera": "Camera",
+        "gallery": "Gallery",
+        "remove": "Remove image",
+        "removeImage": "Profile photo removed.",
+        "successfully": "Profile updated successfully!!",
+        "ok": "Ok",
+        "deny": "You has denied to access Camera!!!"
+    },
+    "bookingScreen": {
+        "myBooking": "My booking",
+        "ongoing": "Ongoing",
+        "history": "History"
+
+    },
+    "ongoingTab": {
+        "cancel": "Cancel",
+        "noBooking": "No booking yet search your service",
+        "areSure": "Are you sure you want to cancel this booking?",
+        "cancelBooking": "Cancel booking",
+        "no": "No",
+        "yes": "Yes",
+        "removeSuccess": "successfully Removed."
+    },
+    "historyTab": {
+        "giveRate": "Give rate",
+        "please": "Please share your experience with us",
+        "saySomething": "Say something",
+        "send": "Send"
+    },
+    "termsConditionScreen": {
+        "termsCondition": "Terms & condition",
+        "shortDescription": "Lorem ipsum dolor sit amet, consectetur adipiscindf elitj. Eu scelerisque neque neque vestibulumaugued enullalkll quis mauris. Ac solliciegestapellentesqueg adipiscing. Leo aliquam, aliquam non sit valaoreethg Morbi felis volutpat eu vestibulum, ornare purus ath the puruse. Pretium maecenas in eget sapien odioh. ",
+        "dongDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Imperdiet accumsan nec, enim viverra.Interdum massa diam. Pellentesque ornare ornare lobortis sit. Utpulvinar tincidunt amet mi elit rutrum. Liberolorem acommodof. Egestas vel duis ut a ivenenatisLectuss Lorem ipsum dolor sit amet, consectetur adipiscing elit.Imperdiet accumsan nec, enim viverra.Interdum massa diam.Pellentesque ornare ornare lobortis sit.Utpulvinar tincidunt amet mi elit rutrum.Liberolorem acommodof.Egestas vel duis ut a ivenenatisLectuss "
+    },
+    "privacyPolicyScreen": {
+        "privacyPolicy": "Privacy policy",
+        "shortDescription": "Lorem ipsum dolor sit amet, consectetur adipiscindf elitj. Eu scelerisque neque neque vestibulumaugued enullalkll quis mauris. Ac solliciegestapellentesqueg adipiscing. Leo aliquam, aliquam non sit valaoreethg Morbi felis volutpat eu vestibulum, ornare purus ath the puruse. Pretium maecenas in eget sapien odioh. ",
+        "dongDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Imperdiet accumsan nec, enim viverra.Interdum massa diam. Pellentesque ornare ornare lobortis sit. Utpulvinar tincidunt amet mi elit rutrum. Liberolorem acommodof. Egestas vel duis ut a ivenenatisLectuss Lorem ipsum dolor sit amet, consectetur adipiscing elit.Imperdiet accumsan nec, enim viverra.Interdum massa diam.Pellentesque ornare ornare lobortis sit.Utpulvinar tincidunt amet mi elit rutrum.Liberolorem acommodof.Egestas vel duis ut a ivenenatisLectuss "
+    },
+    "fAQsScreen": {
+        "fAQs": "FAQs",
+        "question1": "How to book plumbar service?",
+        "question2": "How to book home clean service?",
+        "question3": "How to find best electrician?",
+        "question4": "What is the refer and earn process?",
+        "question5": "How to earn money?",
+        "answer": "Lorem ipsum dolor sit amet, consectetur adipiscindf elitj. Eu scelerisque neque neque vestibulumaugued enullalkll quis mauris. Ac solliciegestapellentesqueg adipiscing. Leo aliquam, aliquam non sit valaoreethg Morbi felis volutpat eu vestibulum, ornare purus ath the puruse. Pretium maecenas in eget sapien odioh. "
+    },
+    "contactUsScreen": {
+        "contactUs": "Contact us",
+        "email": "Email",
+        "phone": "Phone",
+        "name": "Name",
+        "enterName": "Enter your name",
+        "emailId": "Email id",
+        "enterEmail": "Enter your email id",
+        "message": "Message",
+        "writeMessage": "Write message here",
+        "send": "Send"
+    },
+    "appSettingScreen": {
+        "appSettings": "App settings",
+        "notification": "Notification",
+        "location": "Location",
+        "darkMode": "Dark mode",
+        "applicationUpdate": "Application update"
+    },
+    "favoriteScreen": {
+        "favorites": "Favorites",
+        "emptyFavorite": "Empty favorite list",
+        "remove": "Removed from Favorite"
+    },
+    "referAndEarnScreen": {
+        "refer": "Refer your friend and Earn money ",
+        "referYourFriends": "Refer your friends and get a reward of $10 ",
+        "shareLinkFriends": "Share this link to your friends, after they book service you  get $10 rewards at your wallet",
+        "shareLinkVia": "Share link via",
+        "signUp": "Invite your friend to sign up ",
+        "bookService": "After your friend book service ",
+        "yourWallet": "You get reward $10 at your wallet",
+        "message": "Write here..",
+        "toastCopy": "Copied"
+    },
+    "languageScreen": {
+        "language": "Language",
+        "update": "Update"
+    }
+}
