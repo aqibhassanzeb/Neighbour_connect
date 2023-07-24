@@ -1,14 +1,7 @@
 import {lostandFound} from '../models/lost_found.js'
-import mongodb from 'mongodb';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const { Point, distance } = mongodb;
-const { MongoClient } = mongodb;
-const { GeoJSON } = mongodb;
-
-const uri = process.env.MONGODB_URI;
-const client = new MongoClient(uri);
 
 export const lostandfound_Create = async(req, res) => {
     const {title,description,category} = req.body
@@ -59,7 +52,8 @@ export const lostandfound_Get = async(req, res) => {
     }
         try {
             const result= await lostandFound.find(filter)
-               res.status(200).json({data:result})
+            
+               res.status(200).json({data:result,count:result.length})
         } catch (error) {
                res.status(400).json({ error: "something went wrong!" })
             
@@ -69,40 +63,29 @@ export const lostandfound_Get = async(req, res) => {
 
 export const lostandfoundLoc_Get = async (req, res) => {
     try {
-        await client.connect();
-        const db = client.db('test');
-        const collection = db.collection('lost_found');
+        let {address_range,address}=req.user
+        let {latitude,longitude}=address
+
+        const result = await lostandFound.find()
+        const filteredData = result.filter(elm => {
+            if (elm.visibility === "connections" && req.user.connections.includes(elm.createdBy)) {
+                return true; 
+            }
+            const docLatitude = parseFloat(elm.location.latitude);
+            const docLongitude = parseFloat(elm.location.longitude);
+
+            // Calculate the distance in kilometers between two points
+            const distanceInKm = calculateDistanceInKm(latitude, longitude, docLatitude, docLongitude);
+
+            // Check if the distance is within the specified range
+            return distanceInKm <= parseFloat(address_range);
+        });
 
 
-
-        // Create a 2dsphere index on the coordinates field
-      let abccollection=  await collection.createIndex({ coordinates: "2dsphere" });
-        console.log("collection :",abccollection)
-        const { latitude, longitude, address_range } = req.body;
-        const rangeInMeters = parseFloat(req.user?.address_range) * 1000;
-        const locationPoint = {
-            type: 'Point',
-            coordinates: [parseFloat(req.user?.address?.longitude), parseFloat(req.user?.address?.latitude)]
-        };
-        
-        const filter = {
-            isActive: true,
-            address: {
-                $near: {
-                    $geometry: locationPoint,
-                    $maxDistance: rangeInMeters,
-                },
-            },
-        };
-
-        const result = await collection.find(filter).toArray();
-        res.status(200).json({ data: result });
+        res.status(200).json({ data: filteredData,count :filteredData.length });
     } catch (error) {
-        console.error("Error creating index:", error);
         res.status(400).json({ error: "something went wrong!" });
-    } finally {
-        await client.close();
-    }
+    } 
 };
 
 
@@ -119,3 +102,21 @@ export const lostandfound_Delete = async(req, res) => {
      
 }
 
+
+function calculateDistanceInKm(lat1, lon1, lat2, lon2) {
+    const earthRadiusKm = 6371; 
+    const dLat = degreesToRadians(lat2 - lat1);
+    const dLon = degreesToRadians(lon2 - lon1);
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(degreesToRadians(lat1)) * Math.cos(degreesToRadians(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = earthRadiusKm * c;
+    return distance;
+}
+
+
+function degreesToRadians(degrees) {
+    return degrees * (Math.PI / 180);
+}
