@@ -20,6 +20,9 @@ import {
 import Feather from "react-native-vector-icons/Feather";
   import Ionicons from "react-native-vector-icons/Ionicons";
   import { useTranslation } from "react-i18next";
+import { lostItemGet } from "../apis/apis";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Loader from "../components/loader";
   
 const { width, height } = Dimensions.get("window");
 
@@ -69,6 +72,10 @@ const { width, height } = Dimensions.get("window");
     const [dropdownOpend, setDropdownOpend] = useState(false);
     
     const [dropdownOpendd, setDropdownOpendd] = useState(false);
+
+    const [data, setData] = useState([])
+    const [loader, setLoader] = useState(false)
+
     const handleButtonPress = (buttonValue) => {
       setSelectedValue(buttonValue);
       setDropdownOpen(false);
@@ -76,10 +83,42 @@ const { width, height } = Dimensions.get("window");
       setDropdownOpend(false);
       setDropdownOpendd(false);
     };
-  
+
+    const truncateString = (str) => {
+      const words = str.split(" ");
+      const truncated = words.slice(0, 2).join(" ");
+      return words.length > 2 ? truncated + "..." : truncated;
+    };
+
+    const handleGetitem=async()=>{
+      try {
+        setLoader(true)
+        let paylaod={}
+        const userData = await AsyncStorage.getItem('userData');
+         const parseUserdata = userData && JSON.parse(userData);
+        paylaod.createdBy= parseUserdata.user._id
+        let result= await lostItemGet(paylaod)
+        
+        if(result.status==200){
+          // console.log("result in yourlist :",result.data)
+          setData(result.data.data)
+        }
+      } catch (error) {
+        alert("something went wrong!")
+      } finally{
+        setLoader(false)
+        
+      }
+    }  
+        
+        useEffect(() => {
+      handleGetitem()
+    }, [])
+
     return (
       
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
+        {loader && <Loader/>}
        <View
           style={{
             paddingVertical: Default.fixPadding * 1.2,
@@ -115,7 +154,12 @@ const { width, height } = Dimensions.get("window");
             </>
           )}
          
-          <View
+         {data.length > 0 ?
+         data.map((elm)=>(
+
+         
+         
+         <View
             style={{
               //margin: Default.fixPadding * 2,
               marginLeft:20
@@ -135,7 +179,7 @@ const { width, height } = Dimensions.get("window");
          
          onPress={() =>
           navigation.navigate("Losted", {
-            title: "Losted",
+            _id: elm._id,
           })
         }
             style={{
@@ -155,7 +199,7 @@ const { width, height } = Dimensions.get("window");
           >
             <Image 
 
-              source={require("../assets/images/bag.jpg")}
+              source={{uri:elm.gallary_images[0]}}
               style={{ height: 85, width: 75 , ...Default.shadow}}
             />
             <View>
@@ -175,7 +219,7 @@ const { width, height } = Dimensions.get("window");
                 marginRight:120
               }}
             >
-             BAG
+             {elm.title}
             </Text>
             <Text
               style={{
@@ -185,7 +229,7 @@ const { width, height } = Dimensions.get("window");
                 
               }}
             >
-              Pink Bag
+             {truncateString(elm.description)}
             </Text>
             <Text
               style={{
@@ -275,6 +319,8 @@ const { width, height } = Dimensions.get("window");
        
           </View>
           </View>
+        ))  : <Text>Not Found</Text>
+        }
  
   <Modal
         animationType="fade"

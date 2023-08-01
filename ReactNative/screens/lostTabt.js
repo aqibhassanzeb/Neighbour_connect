@@ -1,5 +1,5 @@
 import { Text, View, TouchableOpacity, BackHandler,Button, StyleSheet ,SafeAreaView,ScrollView, TextInput} from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Colors, Default, Fonts } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
@@ -7,17 +7,44 @@ import Founded from "../components/Founded";
 
 import llost from "../components/llost";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import { lostItemGetbyLoc } from "../apis/apis";
+import { useDispatch } from "react-redux";
+import { handleLoader, updataData } from "../redux/loanandfoundSlice";
+// import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 const Tab = createMaterialTopTabNavigator();
 
 const CustomTabBar = ({ state, descriptors, navigation, position }) => {
   const { t, i18n } = useTranslation();
+  const dispatch = useDispatch()
 
   const isRtl = i18n.dir() == "rtl";
 
   function tr(key) {
     return t(`bookingScreen:${key}`);
   }
+  const handleGetlost=async()=>{
+    try {
+      dispatch(handleLoader({loader:true}))
+      let check = state?.index == 0 ?  true:false 
+      let result= await lostItemGetbyLoc({type: check ? "lost":"found"})
+      
+      if(result.status==200){
+        dispatch(updataData(result.data?.data))
+        // setloseandfoundData(result.data?.data)
+      }
+    } catch (error) {
+      
+    } finally{
+      dispatch(handleLoader({loader:false}))
+      
+    }
+  }  
+      
+      useEffect(() => {
+    handleGetlost()
+  }, [state.index])
+  
   return (
     <SafeAreaView style={{  backgroundColor: Colors.extraLightGrey }}>
     <ScrollView>
@@ -108,7 +135,6 @@ const CustomTabBar = ({ state, descriptors, navigation, position }) => {
               : options.title !== undefined
               ? options.title
               : route.name;
-
           const isFocused = state.index === index;
 
           const onPress = () => {
@@ -117,7 +143,6 @@ const CustomTabBar = ({ state, descriptors, navigation, position }) => {
               target: route.key,
               canPreventDefault: true,
             });
-
             if (!isFocused && !event.defaultPrevented) {
               navigation.navigate({ name: route.name, merge: true });
             }
@@ -163,7 +188,7 @@ const CustomTabBar = ({ state, descriptors, navigation, position }) => {
               <Text
                 style={isFocused ? Fonts.Bold16primary : Fonts.Medium16Black }
               >
-                {label}
+                {label} 
               </Text>
               </View>
             </TouchableOpacity>
@@ -196,12 +221,16 @@ const BookingScreen = (props) => {
   }, []);
   const title = isRtl ? ("Found Items") : ("Lost Items");
   const title2 = isRtl ? ("Lost Items") : ("Found Items");
-
+  
+  // const Tab = createBottomTabNavigator();
+  // console.log("TAb :@@@@@@@@@@@@2 :",Tab)
+  
   return (
     <Tab.Navigator  tabBar={(props) => <CustomTabBar {...props} />}>
       <Tab.Screen  
         name="llost"
         component={llost}
+        // initialParams={{data: loseandfoundData}}
         options={{
           title: title,
         }}
@@ -209,6 +238,7 @@ const BookingScreen = (props) => {
       <Tab.Screen
         name="Founded"
         component={Founded}
+        // initialParams={{data: loseandfoundData}}
         options={{
           title: title2,
         }}

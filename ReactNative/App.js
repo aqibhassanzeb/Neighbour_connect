@@ -120,7 +120,8 @@ import Photo from "./screens/Photo"
 import Tutoring from "./screens/Tutoring"
 import Appearance from "./screens/Appearance"
 import Myaccount from "./screens/Myaccount"
-
+import { store } from './redux/store'
+import { Provider as ReduxProvider } from 'react-redux'
 
 
 
@@ -750,7 +751,7 @@ const ReloadAppOnLanguageChange = withTranslation("translation", {
   bindStore: false,
 })(MainNavigation);
 
-export default function App() {
+ function App() {
   const [loaded] = useFonts({
     Bold: require("./assets/fonts/Inter-Bold.ttf"),
     ExtraBold: require("./assets/fonts/Inter-ExtraBold.ttf"),
@@ -769,3 +770,11 @@ export default function App() {
     </Provider>
   );
 }
+
+export default () => {
+  return (
+    <ReduxProvider store={store}>
+      <App />
+    </ReduxProvider>
+  );
+};

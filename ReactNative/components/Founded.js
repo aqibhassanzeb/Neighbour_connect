@@ -10,7 +10,7 @@ import {
     Modal,
     SafeAreaView,
   } from "react-native";
-  import React, { useState } from "react";
+  import React, { useEffect, useState } from "react";
   import { Colors, Default, Fonts } from "../constants/styles";
   import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
   import Feather from "react-native-vector-icons/Feather";
@@ -18,6 +18,8 @@ import {
   
 import Ionicons from "react-native-vector-icons/Ionicons";
   import SnackbarToast from "./snackbarToast";
+import { useSelector } from "react-redux";
+import Loader from "./loader";
   //import Founded from "../screens/Founded";
   const { width } = Dimensions.get("window");
   
@@ -36,28 +38,31 @@ import Ionicons from "react-native-vector-icons/Ionicons";
   
     
     const [allClear, setAllClear] = useState(false);
+    const [foundDatalist, setFoundDatalist] = useState([])
+
+
+    const {data, loader} = useSelector((state) => state.loanandfound)
+
+    const truncateString = (str) => {
+      const words = str.split(" ");
+      const truncated = words.slice(0, 2).join(" ");
+      return words.length > 2 ? truncated + "..." : truncated;
+    };
+  
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
-      
-          
-         
-          
+        
         <ScrollView showsVerticalScrollIndicator={false}>
-          {allClear ? null : (
-            <>
-          
-             
-  
-           
-            </>
-          )}
-          
-      
+        <Loader visible={loader} />
+      { data.length > 0 && data.map((elm,index) => (
+       
       <View
             style={{
               //margin: Default.fixPadding * 2,
               marginLeft:20
             }}
+            key={elm._id}
           >
             
              <View
@@ -72,7 +77,8 @@ import Ionicons from "react-native-vector-icons/Ionicons";
           <TouchableOpacity
             onPress={() =>
               props.navigation.navigate("Losted", {
-                title: "Losted",
+                _id: elm._id,
+                name:"Found"
               })
             }
             style={{
@@ -92,7 +98,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
           >
             <Image 
 
-              source={require("../assets/images/bag.jpg")}
+              source={{uri:elm.gallary_images[0]}}
               style={{ height: 75, width: 75 , ...Default.shadow}}
             />
             <View>
@@ -111,7 +117,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
                 color:'black'
               }}
             >
-             BAG
+            {elm.title}
             </Text>
             <Text   style={{
                 fontSize:18,
@@ -120,7 +126,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
                 paddingLeft:16,
                 fontWeight:'600',
                 
-              }}> Found</Text>
+              }}> {elm.type}</Text>
             <Text
               style={{
                 ...Fonts.SemiBold15primary,
@@ -129,7 +135,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
                 
               }}
             >
-              Pink Bag
+              {truncateString(elm.description)}
             </Text>
            
             <Text
@@ -151,14 +157,17 @@ import Ionicons from "react-native-vector-icons/Ionicons";
                 
               }}
             >
-             Posted by Laiba
+            {`Posted by ${elm.createdBy?.name}`}
             </Text>
             </View>
+           
           </TouchableOpacity>
           </View>
           
   </View>
-  <View
+ ))}
+
+  {/* <View
             style={{
               marginLeft:20
             }}
@@ -562,7 +571,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
           </TouchableOpacity>
           </View>
          
-  </View> 
+  </View>  */}
 
 
         </ScrollView>

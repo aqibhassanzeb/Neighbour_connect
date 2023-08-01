@@ -20,10 +20,12 @@ import {
   import SnackbarToast from "../components/snackbarToast";
   import Swiper from "react-native-swiper";
   import ChatScreen from "../screens/chatScreen";
+import { lostItemGet } from "../apis/apis";
+import { handleLoaderforOne } from "../redux/loanandfoundSlice";
+import Loader from "../components/loader";
   const { width, height } = Dimensions.get("window");
   
   const Losted = ({ navigation, route }) => {
-    const { name } = route.params;
   
     const { t, i18n } = useTranslation();
   
@@ -57,10 +59,34 @@ import {
     const onToggleSnackBarAdd = () => setLikeAdd(false);
   
     const [readMore, setReadMore] = useState(false);
+
+    const [data, setData] = useState("")
+    const [loader, setLoader] = useState(false)
   
-  
+    const handleGetitem=async()=>{
+      try {
+        setLoader(true)
+        let paylaod={}
+        paylaod._id= route.params._id
+        let result= await lostItemGet(paylaod)
+        
+        if(result.status==200){
+          setData(result.data.data[0])
+        }
+      } catch (error) {
+        alert("something went wrong!")
+      } finally{
+        setLoader(false)
+        
+      }
+    }  
+        
+        useEffect(() => {
+      handleGetitem()
+    }, [route.params._id])
+
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
+   loader ? <Loader/> :   <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
         <View
           style={{
             paddingVertical: Default.fixPadding * 1.2,
@@ -122,14 +148,20 @@ import {
             }}
             loop={true}
           >
-            <View>
+            {
+             data && data.gallary_images.map((elm,index)=>(
+
+                  <View key={index}>
               <Image
-                source={require("../assets/images/bag.jpg")}
+                source={{uri:elm}}
                 style={{ height: height / 2.8, width: width }}
                 resizeMode="cover"
-              />
+                />
             </View>
-            <View>
+                
+             ))
+            }
+            {/* <View>
               <Image
                 source={require("../assets/images/bag1.jpeg")}
                 style={{ height: height / 2.8, width: width }}
@@ -142,7 +174,7 @@ import {
                 style={{ height: height / 2.8, width: width }}
                 resizeMode="cover"
               />
-            </View>
+            </View> */}
           </Swiper>
           </View>
         <View
@@ -181,7 +213,7 @@ import {
                 marginHorizontal: Default.fixPadding * 1.2,
               }}
             >
-              {name}
+              {data.type}
             </Text>
           </View>
   
@@ -217,7 +249,7 @@ import {
                     
                   }}
                 >
-                  Laiba Riaz
+                 {data.createdBy?.name}
                 </Text>
   
                 <View
@@ -238,6 +270,7 @@ import {
                       marginLeft: Default.fixPadding * 0.3,
                     }}
                   >
+                    
                     street #04 Harley
                   </Text>
                 </View>
@@ -348,7 +381,7 @@ import {
                 
               }}
             >
-          Pink Bag 
+          {data.description}
             </Text>
             <Text
               style={{
@@ -373,7 +406,7 @@ import {
                 
               }}
             >
-          Laiba Riaz
+          {data.createdBy?.name}
             </Text>
             <Text
               style={{
@@ -421,7 +454,7 @@ import {
                 
               }}
             >
-          Bag
+          {data.title}
             </Text>
             </View>
             

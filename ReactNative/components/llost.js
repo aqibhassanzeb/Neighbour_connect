@@ -18,12 +18,14 @@ import {
   import SnackbarToast from "./snackbarToast";
   import Losted from "../screens/Losted";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
 
   const { width } = Dimensions.get("window");
   
   const OngoingTab = (props) => {
     const { t, i18n } = useTranslation();
-  
+  // console.log("params 2",props)
     const isRtl = i18n.dir() == "rtl";
   
     function tr(key) {
@@ -36,6 +38,10 @@ import Ionicons from "react-native-vector-icons/Ionicons";
   
     
     const [allClear, setAllClear] = useState(false);
+
+    const {data, loader} = useSelector((state) => state.loanandfound)
+
+    
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       
@@ -52,7 +58,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
             </>
           )}
       
-          <View
+          {/* <View
             style={{
               //margin: Default.fixPadding * 2,
               marginLeft:20
@@ -155,8 +161,8 @@ import Ionicons from "react-native-vector-icons/Ionicons";
           </TouchableOpacity>
           </View>
           
-  </View>
-  <View
+  </View> */}
+  {/* <View
             style={{
               marginLeft:20
             }}
@@ -256,11 +262,14 @@ import Ionicons from "react-native-vector-icons/Ionicons";
           </TouchableOpacity>
           </View>
           
-  </View>
-  <View
+  </View> */}
+  {data.length > 0 ?   data.map((elm,index) => (
+    
+    <View
             style={{
               marginLeft:20
             }}
+            key={elm._id}
           >
              <View
           style={{
@@ -274,7 +283,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
           <TouchableOpacity
            onPress={() =>
             props.navigation.navigate("Losted", {
-              title: "Losted",
+              _id: elm._id,
             })
           }
             style={{
@@ -294,7 +303,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
           >
             <Image
 
-              source={require("../assets/images/key.jpg")}
+              source={{uri:elm.gallary_images[0]}}
               style={{ height: 75, width: 75 , ...Default.shadow}}
             />
             <View>
@@ -313,7 +322,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
                 color:'black'
               }}
             >
-             KEYS
+             {elm.title}
             </Text>
             <Text   style={{
                 fontSize:18,
@@ -322,7 +331,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
                 paddingLeft:16,
                 fontWeight:'600',
                 
-              }}> Lost</Text>
+              }}> {elm.type}</Text>
             <Text
               style={{
                 ...Fonts.SemiBold15primary,
@@ -353,20 +362,25 @@ import Ionicons from "react-native-vector-icons/Ionicons";
                 
               }}
             >
-             Posted by Laiba
+            { ` Posted by ${elm.createdBy.name} `}  
             </Text>
             </View>
-            <View style={styles.container}>
+          {elm.mark_found==true &&  <View style={styles.container}>
       <View style={styles.border}>
         <Text style={styles.text}>Recovered</Text>
         <View style={styles.bar} />
       </View>
-    </View>
+    </View>}
           </TouchableOpacity>
           </View>
           
-  </View>
-  <View
+  </View> 
+  ))  : 
+  <Text style={{
+    marginLeft:50
+  }}> No Data</Text>
+}
+  {/* <View
             style={{
               marginLeft:20
             }}
@@ -467,7 +481,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
           </TouchableOpacity>
           </View>
           
-  </View>
+  </View> */}
   <View
             style={{
               marginLeft:20

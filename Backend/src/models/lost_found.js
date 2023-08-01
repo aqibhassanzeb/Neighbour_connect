@@ -41,6 +41,9 @@ const lostFound = new mongoose.Schema({
         type:Boolean,
         default:true
     },
+    date:{
+        type:String,
+    },
     createdBy:{
         type:mongoose.Schema.Types.ObjectId, ref: "user",
         required:true
