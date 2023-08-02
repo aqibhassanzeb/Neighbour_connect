@@ -28,7 +28,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
   import Ionicons from "react-native-vector-icons/Ionicons";
   import { useTranslation } from "react-i18next";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { lostandfoundCategGet, lostandfoundCreate } from "../apis/apis";
+import { lostItemGet, lostandfoundCategGet, lostandfoundCreate, lostandfoundUpdate } from "../apis/apis";
 import { FontAwesome5 } from '@expo/vector-icons';
 import Loader from "../components/loader";
 import axios from "axios";
@@ -48,7 +48,7 @@ const { width, height } = Dimensions.get("window");
       title: '',
       description: '',
     });
-  
+  const [updateHandle, setUpdateHandle] = useState(false)
 
     const [dropdownOpens, setDropdownOpens] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState('Type');
@@ -172,19 +172,19 @@ const { width, height } = Dimensions.get("window");
           alert( 'Please select date.');
           return false;
         }
-        if(!route.params?.address){
-          alert( 'Please select the location.');
-          return false;
+        // if(!route.params?.address){
+        //   alert( 'Please select the location.');
+        //   return false;
 
-        }
+        // }
         if(formData.description.trim()==""){
           alert( 'Please enter a description.');
           return false;
         }
-        if(selectedImages.length ==0){
-          alert( 'Please select atleast one image.');
-          return false;
-        }
+        // if(selectedImages.length ==0){
+        //   alert( 'Please select atleast one image.');
+        //   return false;
+        // }
         if(selectedOptions =="Type"){
           alert( 'Please select a type.');
           return false;
@@ -255,9 +255,21 @@ const { width, height } = Dimensions.get("window");
         let picurl=["https://res.cloudinary.com/dbdxsvxda/image/upload/v1690110912/niegbour_proj/vsmzv4fseavk4b8zoql5.png",
       "https://res.cloudinary.com/dbdxsvxda/image/upload/v1690110914/niegbour_proj/bmkuc68k8jnqp9vqvxqp.png"
       ]
-        let payload={title:formData.title,description:formData.description,type:selectedOptions,visibility:selectedOptionsd,
-          gallary_images:picurl,location:route.params.address,notify:checked,date:date,category:selectedOption._id
-        }
+
+      
+          let payload={title:formData.title,description:formData.description,type:selectedOptions,visibility:selectedOptionsd,
+            gallary_images:picurl,location:route.params?.address ,notify:checked,date:date,category:selectedOption._id
+          }
+          
+
+       
+          let payload2={_id:route.params?.itemId,title:formData.title,description:formData.description,type:selectedOptions,visibility:selectedOptionsd,
+            gallary_images:picurl,location:route.params.address,notify:checked,date:date,category:selectedOption._id
+          }
+
+
+        
+
   //       let formData2 = new FormData();
   // formData2.append('title', payload.title);
   // formData2.append('description', payload.description);
@@ -286,14 +298,17 @@ const { width, height } = Dimensions.get("window");
     setHandleLoading(true)
           // console.log("form Data :",formData2)
           console.log("submited 1")
-
-          let result= await lostandfoundCreate(payload)
+          let result
+          if(updateHandle){
+           result =await lostandfoundUpdate(payload2)
+          }else{
+             result= await lostandfoundCreate(payload)
+          }
           console.log("submited 2" ,result)
           if(result.status == 200){
-            
+            updateHandle ? alert("updated successfully") :
             navigation.navigate("LostPosted");
           }else{
-            console.log("result :",result)
             alert(result.data.error)
           }
         } catch (error) {
@@ -308,8 +323,41 @@ const { width, height } = Dimensions.get("window");
         console.log("not submitted :")
       }
     }
+  const  handleGetfoundandlostItem=async()=>{
+    try {
+      setHandleLoading(true)
+      let paylaod={}
+      paylaod._id= route.params.itemId
+      let result= await lostItemGet(paylaod)
+      
+      if(result.status==200){
+    //  console.log("result :",result.data.data)
+     let itemData=result.data.data[0]
+     console.log("item data :",itemData)
+     setUpdateHandle(true)
+     setFormData({
+      ...formData,
+      title: itemData.title,description:itemData.description
+    });
+    handleOptionSelect({name:itemData.category?.name,_id:itemData.category?._id})
+    handleOptionSelects(itemData.type);
+    handleOptionSelectsd(itemData.visibility)
+    setChecked(itemData.notify)
+    setDate(itemData.date)
+        // setData(result.data.data[0])
+      }
+    } catch (error) {
+      alert("something went wrong!")
+    } finally{
+      setHandleLoading(false)
+      
+    }
+    }
+    useEffect(() => {
+      !!route.params?.itemId && handleGetfoundandlostItem()
 
-   
+    }, [route.params])
+    
     
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
@@ -336,7 +384,7 @@ const { width, height } = Dimensions.get("window");
               marginHorizontal: Default.fixPadding * 1.2,
             }}
           >
-            {("Add Item")}
+            {updateHandle ? "Update Item" :"Add Item"}
           </Text>
         </View>
   
@@ -427,6 +475,7 @@ const { width, height } = Dimensions.get("window");
                   marginHorizontal: Default.fixPadding,
                   textAlign: isRtl ? "right" : "left",
                 }}
+                value={formData.title}
                 onChangeText={(text) => handleInputChange('title', text)}
               />
               
@@ -710,12 +759,12 @@ const { width, height } = Dimensions.get("window");
         style={styles.dropdownsd}
         >
           
-          <TouchableOpacity onPress={() => handleOptionSelects('Lost ')}>
+          <TouchableOpacity onPress={() => handleOptionSelects('lost')}>
             
    
             <Text style={{ padding: 10 }}>Lost </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleOptionSelects('Found ')}>
+          <TouchableOpacity onPress={() => handleOptionSelects('found')}>
             
             <Text style={{ padding: 10 }}>Found</Text>
           </TouchableOpacity>
@@ -756,6 +805,7 @@ const { width, height } = Dimensions.get("window");
                   marginHorizontal: Default.fixPadding,
                   textAlign: isRtl ? "right" : "left",
                 }}
+                value={formData.description}
                 onChangeText={(text) => handleInputChange('description', text)}
               />
               
@@ -824,12 +874,12 @@ const { width, height } = Dimensions.get("window");
         style={styles.dropdown}
         >
           
-          <TouchableOpacity onPress={() => handleOptionSelectsd('Neighborhood ')}>
+          <TouchableOpacity onPress={() => handleOptionSelectsd('neighborhood')}>
             
    
             <Text style={{ padding: 10 }}>Neighborhood </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleOptionSelectsd('Connection ')}>
+          <TouchableOpacity onPress={() => handleOptionSelectsd('connection')}>
             
             <Text style={{ padding: 10 }}>Connection</Text>
           </TouchableOpacity>
@@ -891,7 +941,7 @@ const { width, height } = Dimensions.get("window");
               marginHorizontal: Default.fixPadding * 2,
             }}
           >
-            <Text style={{ ...Fonts.SemiBold18white }}>{tr("Post")}</Text>
+            <Text style={{ ...Fonts.SemiBold18white }}>{updateHandle ? ("Update") : ("Post")}</Text>
           </TouchableOpacity>
           <Modal
         animationType="fade"

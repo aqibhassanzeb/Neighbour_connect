@@ -56,6 +56,7 @@ export const lostandfound_Get = async(req, res) => {
 
         try {
             const result= await lostandFound.find(filter).populate("createdBy",'-password')
+            .populate("category")
             
                res.status(200).json({data:result,count:result.length})
         } catch (error) {
