@@ -9,13 +9,14 @@ import llost from "../components/llost";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { lostItemGetbyLoc } from "../apis/apis";
 import { useDispatch } from "react-redux";
-import { handleLoader, updataData } from "../redux/loanandfoundSlice";
+import { clearSearch, handleLoader, handleSearchData, updataData } from "../redux/loanandfoundSlice";
 // import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 const Tab = createMaterialTopTabNavigator();
 
 const CustomTabBar = ({ state, descriptors, navigation, position }) => {
   const { t, i18n } = useTranslation();
+  const [searchTerm, setSearchTerm] = useState('');
   const dispatch = useDispatch()
 
   const isRtl = i18n.dir() == "rtl";
@@ -40,7 +41,12 @@ const CustomTabBar = ({ state, descriptors, navigation, position }) => {
       
     }
   }  
-      
+
+  const handleSearch = (text) => {
+    setSearchTerm(text);
+
+      dispatch(handleSearchData(text));
+  }; 
       useEffect(() => {
     handleGetlost()
   }, [state.index])
@@ -91,6 +97,8 @@ const CustomTabBar = ({ state, descriptors, navigation, position }) => {
         >
           <Ionicons name="search" size={20} color={Colors.grey} />
           <TextInput
+          value={searchTerm}
+          onChangeText={handleSearch}
            placeholder="Search"
             style={{
               ...Fonts.SemiBold16grey,

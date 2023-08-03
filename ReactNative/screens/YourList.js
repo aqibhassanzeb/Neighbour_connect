@@ -187,6 +187,7 @@ const { width, height } = Dimensions.get("window");
               //margin: Default.fixPadding * 2,
               marginLeft:20
             }}
+            key={elm._id}
           >
              <View
           style={{

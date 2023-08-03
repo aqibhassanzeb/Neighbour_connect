@@ -39,8 +39,11 @@ import { useSelector } from "react-redux";
     
     const [allClear, setAllClear] = useState(false);
 
-    const {data, loader} = useSelector((state) => state.loanandfound)
+    const {data, loader,searchKeyword} = useSelector((state) => state.loanandfound)
 
+    console.log("data ",data)
+    const regexPattern = new RegExp(searchKeyword, 'i');
+   let newData =data.length > 0 && data.filter((elm) => regexPattern.test(elm.title))
     
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
@@ -263,7 +266,7 @@ import { useSelector } from "react-redux";
           </View>
           
   </View> */}
-  {data.length > 0 ?   data.map((elm,index) => (
+  {newData.length > 0 ?   newData.map((elm,index) => (
     
     <View
             style={{

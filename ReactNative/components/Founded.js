@@ -41,7 +41,10 @@ import Loader from "./loader";
     const [foundDatalist, setFoundDatalist] = useState([])
 
 
-    const {data, loader} = useSelector((state) => state.loanandfound)
+    const {data, loader,searchKeyword} = useSelector((state) => state.loanandfound)
+
+    const regexPattern = new RegExp(searchKeyword, 'i');
+    let newData =data.length > 0 && data.filter((elm) => regexPattern.test(elm.title))
 
     const truncateString = (str) => {
       const words = str.split(" ");
@@ -55,7 +58,7 @@ import Loader from "./loader";
         
         <ScrollView showsVerticalScrollIndicator={false}>
         <Loader visible={loader} />
-      { data.length > 0 && data.map((elm,index) => (
+      { newData.length > 0 && newData.map((elm,index) => (
        
       <View
             style={{
