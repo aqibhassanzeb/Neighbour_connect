@@ -9,6 +9,8 @@ import { View, TextInput, Button, StyleSheet, Dimensions,
   import Ionicons from "react-native-vector-icons/Ionicons";
 
     import { Colors, Default, Fonts } from "../constants/styles";
+import { useremailUpdate } from '../apis/apis';
+import Loader from '../components/loader';
     
   const { width } = Dimensions.get("window");
 const MyAccountScreen = (props) => {
@@ -29,24 +31,37 @@ const MyAccountScreen = (props) => {
       return () =>
         BackHandler.removeEventListener("hardwareBackPress", backAction);
     }, []);
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+  const [loader, setLoader] = useState(false)
   
-    const [currentPassword, setCurrentPassword] = useState('');
-    const [newPassword, setNewPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-  
-    const handleChangePassword = () => {
-      // Validate the form inputs and perform the password change logic
-      if (newPassword !== confirmPassword) {
-        // Show an error message that passwords do not match
-        return;
+    const handleSubmit = async() => {
+      if(!email){
+        return alert("please enter email")
       }
-  
-      // Perform the password change logic here
-      // ...
+      const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+      const isValidEmail = emailRegex.test(email);
+      if(!isValidEmail){
+        return alert("Please enter valid email")
+      }
+      let _id=props.route.params.userData?._id
+      const payload={new_email:email,_id}
+      setLoader(true);
+      try {
+        let user= await useremailUpdate(payload)
+        if(user.status == 200){
+          setEmail("")
+         props.navigation.navigate("VerifysEmail",{ userData: props.route.params?.userData });
+        }else{
+          alert(user.data.error)
+        }
+      } catch (error) {
+        alert("something went wrong!")
+      } finally{
+        
+        setLoader(false);
+      }
+
+
     };
     const [isVisibles, setIsVisibles] = useState(false);
 
@@ -60,6 +75,7 @@ const MyAccountScreen = (props) => {
     return (
         
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
+        {loader && <Loader/>}
         <View
           style={{
             paddingVertical: Default.fixPadding * 1.2,
@@ -77,6 +93,7 @@ const MyAccountScreen = (props) => {
             />
           </TouchableOpacity>
           <Text
+          
             style={{
               ...Fonts.SemiBold18white,
               marginHorizontal: Default.fixPadding * 1.2,
@@ -89,13 +106,14 @@ const MyAccountScreen = (props) => {
             <Text style={{color:Colors.black, fontSize:24,fontWeight:"bold", marginBottom:32}}>Change your Email</Text>
 <Text style={{color:Colors.black, fontSize:17, marginBottom:32}}>Enter Your Email</Text>
       <TextInput
+      maxLength={30}
         style={styles.input}
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
       />
    
-          <TouchableOpacity style={styles.button}  onPress={() => props.navigation.navigate("VerifysEmail")}>
+          <TouchableOpacity style={styles.button}  onPress={() => handleSubmit()}>
         <Text style={styles.buttonText}>Verify</Text>
       </TouchableOpacity>
     </View>

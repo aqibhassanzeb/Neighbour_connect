@@ -41,7 +41,6 @@ import { useSelector } from "react-redux";
 
     const {data, loader,searchKeyword} = useSelector((state) => state.loanandfound)
 
-    console.log("data ",data)
     const regexPattern = new RegExp(searchKeyword, 'i');
    let newData =data.length > 0 && data.filter((elm) => regexPattern.test(elm.title))
     

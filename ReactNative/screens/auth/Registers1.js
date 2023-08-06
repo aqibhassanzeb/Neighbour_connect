@@ -62,12 +62,18 @@ import { GOOGLE_APIKEY } from "../../config";
       if(!isValidEmail){
         return alert("Please fill valid email")
       }
+      const passRegex = /^(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;   
+      if(password.length < 8){
+        return alert("password should be minimum 8 characters")
+      }
+      if (!passRegex.test(password)) {
+        return alert("Password should contain at least one special character")
+      }
+    
       if(password !== passwords){
         return alert("password and conform password not match")
       }
-      if(password.length < 8){
-        return alert("password should be minimum 8 caractors")
-      }
+     
       const payload={name,email,password,status:"user"}
       setRegisterLoader(true);
       try {
@@ -250,7 +256,7 @@ import { GOOGLE_APIKEY } from "../../config";
                 secureTextEntry={true}
                 selectionColor={Colors.primary}
                 value={password}
-                maxLength={30}
+                maxLength={20}
                 style={{
                   ...Fonts.Medium15Black,
                   flex: 9.3,
@@ -286,7 +292,7 @@ import { GOOGLE_APIKEY } from "../../config";
                 secureTextEntry={true}
                 selectionColor={Colors.primary}
                 value={passwords}
-                maxLength={10}
+                maxLength={20}
                 style={{
                   ...Fonts.Medium15Black,
                   flex: 9.3,

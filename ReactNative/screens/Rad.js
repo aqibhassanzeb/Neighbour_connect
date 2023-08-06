@@ -80,6 +80,16 @@ import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
       }, 800);
     };
   
+  //   useEffect(() => {
+  //     if(route.params.updateSection){
+  //    console.log("route radius :222")
+  //    const addressRange = route.params.userData?.address_range;
+  //   const addressRangeNumber = Number(addressRange);
+  //   console.log("addressRangeNumber :",addressRangeNumber)
+  //   setValue(addressRangeNumber);
+  //  }
+  // }, [route.params])
+
     return (
       <SafeAreaView
         style={{

@@ -91,8 +91,23 @@ export const verifyEmail = async (data) => {
 export const userUpdate = async (data) => {
   let {_id}=data
   
-  console.log("data api :",data,"_id :",_id)
   let result = await apiRequest('PUT', `user_update/${_id}`, data, headers);
+  return result;
+};
+export const userpassUpdate = async (data) => {
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest('PUT', `user_passupdate`, data, headersWithToken);
+  return result;
+};
+export const useremailUpdate = async (data) => {
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest('PUT', `user_emailupdate`, data, headersWithToken);
+  return result;
+};
+export const userGet = async (data) => {
+  let queryString = data && new URLSearchParams(data).toString();
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest('GET', `user_get?${queryString}`,null, headersWithToken);
   return result;
 };
 

@@ -14,7 +14,7 @@ import {
   Animated, PanResponder,
   StatusBar,
 } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Colors, Default, Fonts } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -34,7 +34,7 @@ const HomeScreen = ({ navigation }) => {
 
   
   const [cancelModal, setCancelModal] = useState(false);
-    
+  const [userData, setUserData] = useState("")
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const toggleSidePanel = () => {
     setIsSidePanelOpen(!isSidePanelOpen);
@@ -59,6 +59,25 @@ const handleLogout=async()=>{
   
 }
 
+
+const loadUserData = async () => {
+  try {
+    const userDataString = await AsyncStorage.getItem('userData');
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+      setUserData(userData?.user)
+    } else {
+      console.log('No user data found in AsyncStorage.');
+    }
+  } catch (error) {
+    console.error('Error loading user data:', error);
+  }
+};
+
+useEffect(() => {
+  // Load user data from AsyncStorage when the component mounts
+  loadUserData();
+}, []);
   return (
 
     <SafeAreaView
@@ -370,9 +389,11 @@ const handleLogout=async()=>{
      
         <View style={isSidePanelOpen ? styles.sidePanelOpen : styles.sidePanelClosed}>
 
-  <TouchableOpacity style={styles.panelButton} onPress={() =>  navigation.navigate('Myaccount', {
-        title: "Losted",
-  })}>
+  <TouchableOpacity style={styles.panelButton} onPress={() => { 
+    toggleSidePanel();
+    navigation.navigate('Myaccount', {
+        userData: userData,
+  })}}>
     <Text style={styles.panelButtonText}>Account Settings</Text>
   </TouchableOpacity>
  
@@ -382,7 +403,7 @@ const handleLogout=async()=>{
     <Text style={styles.panelButtonText}>Notification Settings</Text>
   </TouchableOpacity>
   <TouchableOpacity style={styles.panelButton} onPress={() =>  navigation.navigate('Cradius', {
-        title: "Losted",
+         userData: userData,
   })}>
     <Text style={styles.panelButtonText}>Customize Radius</Text>
   </TouchableOpacity>
@@ -401,7 +422,11 @@ const handleLogout=async()=>{
   })}>
     <Text style={styles.panelButtonText}>Privacy Policy</Text>
   </TouchableOpacity>
-  <TouchableOpacity style={styles.panelButton}     onPress={() => { setCancelModal(true) }}>
+  <TouchableOpacity style={styles.panelButton}     onPress={() => {
+      toggleSidePanel();
+     setCancelModal(true) }}
+     
+     >
     <Text style={styles.panelButtonText}>Sign out</Text>
   </TouchableOpacity>
   

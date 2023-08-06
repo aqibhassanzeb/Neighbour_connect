@@ -25,7 +25,7 @@ import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
   
   const { width, height } = Dimensions.get("window");
   
-  const RegisterScreen = ({ navigation }) => {
+  const RegisterScreen = ({ navigation,route }) => {
 
     
   
@@ -68,6 +68,7 @@ import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
       }, 800);
     };
   
+    console.log("route in craduis :",route)
     return (
       <SafeAreaView
         style={{
@@ -128,7 +129,7 @@ import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
          Update Radius
         </Text>
           <TouchableOpacity
-            onPress={() => navigation.navigate("Rad")}
+            onPress={() => navigation.navigate("Radius",{userData:route.params.userData,updateSection:true})}
             style={{
               ...Default.shadow,
               borderRadius: 10,

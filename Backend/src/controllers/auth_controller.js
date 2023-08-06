@@ -44,8 +44,42 @@ export const userSignup = async(req, res) => {
   }
 };
 
+
+
+
+export const userEmailUpdate = async (req, res) => {
+  const {new_email,_id}=req.body
+  console.log("req body ;",req.body)
+  if(!_id){
+    return res.status(400).json({ error: "user id is required" });
+  }
+  if(!new_email){
+    return res.status(400).json({ error: "please fill the email" });
+  }
+  try {
+    let userCheck= await User.find({email:new_email});
+    if(userCheck.length > 0){
+      return res.status(400).json({ error: "Email already exist" });    
+    } 
+    function generateActivationCode() {
+      const min = 1000; 
+      const max = 9999; 
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    
+    const activationCode = generateActivationCode();
+    await sendMail(new_email, "Email Verification Code ", `<h2>Code :</h2>
+    ${activationCode} `)
+    await User.findByIdAndUpdate(_id, {verification_code:activationCode,temp_email:new_email});
+  res.status(200).json({ message: "please veirfy your email" });
+  } catch (error) {
+    res.status(400).json({ error: "something went wrong!" });
+  }
+};
+
+
 export const userVerify = async (req, res) => {
-  const {verification_code,_id}=req.body
+  const {verification_code,_id,emailChange}=req.body
   if(!_id){
     return res.status(400).json({ error: "user id is required" });
   }
@@ -57,7 +91,11 @@ export const userVerify = async (req, res) => {
     if(userCheck.verification_code !== verification_code){
       return res.status(400).json({ error: "please enter valid code" });    
    }
-   await User.findByIdAndUpdate(_id, {verification_code:null,email_verified:true});
+   if(emailChange){
+     await User.findByIdAndUpdate(_id, {verification_code:null,temp_email:undefined,email:userCheck.temp_email});
+   }else{ 
+     await User.findByIdAndUpdate(_id, {verification_code:null,email_verified:true});
+    }
     res.status(200).json({ message: "verified email successfully" });
   } catch (error) {
     res.status(400).json({ error: "something went wrong!" });
@@ -115,6 +153,31 @@ export const userUpdate = async (req, res) => {
 };
 
 
+export const userPassUpdate = async (req, res) => {
+  const {currPassword,newPassword,_id}=req.body
+  if(!currPassword || !newPassword || !_id){
+    return res.status(400).json({ error: "please fill all fields" });
+  }
+  try {
+    let userData =await User.findById({_id})
+
+    if (!userData) {
+    return  res.status(400).json({ error: "user not found" });
+    }
+    const isPasswordMatch = await bycrypt.compare(currPassword, userData.password);
+    if(!isPasswordMatch){
+      return res.status(400).json({ error: "current password not match" });
+    }
+    let hashedpassword = await bycrypt.hash(newPassword, 12)
+    const updateData = { password: hashedpassword }
+    await User.findByIdAndUpdate(_id, updateData);
+    res.status(200).json({ message: "updated successfully" });
+  } catch (error) {
+    res.status(400).json({ error: "something went wrong!" });
+  }
+};
+
+
 export const userGet = async (req, res) => {
   let filter = {isActive: true };
   if (req.query._id) {
@@ -163,7 +226,6 @@ export const forgotPass = async(req, res) => {
 // verify forgot code 
 
 export const verifyForgotcode = async (req, res) => {
-  console.log("req body :",req.body)
   const {resetCode,_id}=req.body
   if(!_id){
     return res.status(400).json({ error: "user id is required" });
