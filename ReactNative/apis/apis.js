@@ -90,8 +90,8 @@ export const verifyEmail = async (data) => {
 };
 export const userUpdate = async (data) => {
   let {_id}=data
-  
-  let result = await apiRequest('PUT', `user_update/${_id}`, data, headers);
+    const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest('PUT', `user_update/${_id}`, data, headersWithToken);
   return result;
 };
 export const userpassUpdate = async (data) => {

@@ -25,17 +25,20 @@ import Stars from "react-native-stars";
 
   import Swiper from "react-native-swiper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Loader from "../components/loader";
+import { userGet } from "../apis/apis";
 
 const { width, height } = Dimensions.get("window");
 
 
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation,route }) => {
 
   
   const [cancelModal, setCancelModal] = useState(false);
   const [userData, setUserData] = useState("")
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
+  const [loader, setLoader] = useState(false)
   const toggleSidePanel = () => {
     setIsSidePanelOpen(!isSidePanelOpen);
   };
@@ -59,16 +62,34 @@ const handleLogout=async()=>{
   
 }
 
+const handleGetuser=async()=>{
+  try {
+    setLoader(true)
+    let paylaod={}
+    let userData = await AsyncStorage.getItem("userData");
+   let userInfo= JSON.parse(userData);
+    paylaod._id= userInfo.user?._id
+    let result= await userGet(paylaod)
+    if(result.status==200){
+    return  result.data.data[0]
+    }
+  } catch (error) {
+    console.log("error ;",error)
+    alert("something went wrong!" )
+  } finally{
+    setLoader(false)
+    
+  }
+}  
+
 
 const loadUserData = async () => {
   try {
-    const userDataString = await AsyncStorage.getItem('userData');
-    if (userDataString) {
-      const userData = JSON.parse(userDataString);
-      setUserData(userData?.user)
-    } else {
-      console.log('No user data found in AsyncStorage.');
-    }
+      let newUserData =  await handleGetuser()
+      setUserData(newUserData)
+      const userDataJson = JSON.stringify(newUserData);
+      await AsyncStorage.setItem('userDatainfo', userDataJson)
+    
   } catch (error) {
     console.error('Error loading user data:', error);
   }
@@ -77,7 +98,7 @@ const loadUserData = async () => {
 useEffect(() => {
   // Load user data from AsyncStorage when the component mounts
   loadUserData();
-}, []);
+}, [route]);
   return (
 
     <SafeAreaView
@@ -87,6 +108,7 @@ useEffect(() => {
         paddingTop: StatusBar.currentHeight,
       }}
     >
+      {loader && <Loader/>}
       <View
         style={{
           backgroundColor: Colors.primary,
@@ -402,9 +424,11 @@ useEffect(() => {
   })}>
     <Text style={styles.panelButtonText}>Notification Settings</Text>
   </TouchableOpacity>
-  <TouchableOpacity style={styles.panelButton} onPress={() =>  navigation.navigate('Cradius', {
+  <TouchableOpacity style={styles.panelButton} onPress={() => 
+  { navigation.navigate('Cradius', {
          userData: userData,
-  })}>
+  });toggleSidePanel()}
+  }>
     <Text style={styles.panelButtonText}>Customize Radius</Text>
   </TouchableOpacity>
   <TouchableOpacity style={styles.panelButton} onPress={() =>   navigation.navigate('Appearance', {

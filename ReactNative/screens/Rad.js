@@ -25,10 +25,12 @@ import { Slider } from "react-native-range-slider-expo";
   import Loader from "../components/loader";
   
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
+import { userUpdate } from "../apis/apis";
+import AsyncStorage from "@react-native-async-storage/async-storage";
   
   const { width, height } = Dimensions.get("window");
   
-  const RegisterScreen = ({ navigation }) => {
+  const RegisterScreen = ({ navigation,route }) => {
 
     const [isVisibles, setIsVisibles] = useState(false);
 
@@ -37,7 +39,7 @@ import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
   
       setTimeout(() => {
         setIsVisibles(false);
-        navigation.navigate("Cradius")
+        navigation.navigate("homeScreen")
       }, 2000);
     };
   
@@ -72,23 +74,47 @@ import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
   
     const [registerLoader, setRegisterLoader] = useState(false);
   
-    const handleRegister = () => {
-      setRegisterLoader(true);
-      setTimeout(() => {
-        setRegisterLoader(false);
-        navigation.navigate("Outh");
-      }, 800);
-    };
+    // const handleRegister = () => {
+    //   setRegisterLoader(true);
+    //   setTimeout(() => {
+    //     setRegisterLoader(false);
+    //     navigation.navigate("Outh");
+    //   }, 800);
+    // };
+
+    const handleUpdate = async() => {
+        
+      try {
+    let  payload= { address_range:value,_id:route.params.userData?._id}
+    setRegisterLoader(true);
+    let verified= await userUpdate(payload)
+    if(verified.status == 200){
+      await  AsyncStorage.setItem('userUpdated', "true"),
+      alert("updated successfully")
+      navigation.navigate("homeScreen");
+
+    }else{
+      alert(verified.data.error)
+    }
+  } catch (error) {
+    alert("something went wrong!")
+  } finally{
+    
+    setRegisterLoader(false);
+  }
+
+  };
   
-  //   useEffect(() => {
-  //     if(route.params.updateSection){
-  //    console.log("route radius :222")
-  //    const addressRange = route.params.userData?.address_range;
-  //   const addressRangeNumber = Number(addressRange);
-  //   console.log("addressRangeNumber :",addressRangeNumber)
-  //   setValue(addressRangeNumber);
-  //  }
-  // }, [route.params])
+
+    useEffect(() => {
+      if(route.params){
+     console.log("route radius :222")
+     const addressRange = route.params.userData?.address_range;
+    const addressRangeNumber = Number(addressRange);
+    console.log("addressRangeNumber :",addressRangeNumber)
+    setValue(addressRangeNumber);
+   }
+  }, [route.params])
 
     return (
       <SafeAreaView
@@ -98,6 +124,7 @@ import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
           paddingTop: StatusBar.currentHeight,
         }}
       >
+        {registerLoader && <Loader/>}
         <View
           style={{
             backgroundColor: Colors.primary,
@@ -148,6 +175,7 @@ import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
           <Slider
             min={1}
             max={5}
+            value={value}
             valueOnChange={(value) => setValue(value)}
             valueLabelsBackgroundColor={Colors.primary}
             inRangeBarColor={Colors.extraLightGrey}
@@ -160,7 +188,7 @@ import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
   
             <TouchableOpacity
          
-        onPress={toggleModals}
+        onPress={handleUpdate}
               style={{
                 backgroundColor: Colors.primary,
                 borderRadius: 10,

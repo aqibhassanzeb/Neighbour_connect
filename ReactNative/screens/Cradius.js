@@ -68,7 +68,6 @@ import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
       }, 800);
     };
   
-    console.log("route in craduis :",route)
     return (
       <SafeAreaView
         style={{
@@ -129,7 +128,7 @@ import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
          Update Radius
         </Text>
           <TouchableOpacity
-            onPress={() => navigation.navigate("Radius",{userData:route.params.userData,updateSection:true})}
+            onPress={() => navigation.navigate("Rad",{userData:route.params.userData})}
             style={{
               ...Default.shadow,
               borderRadius: 10,

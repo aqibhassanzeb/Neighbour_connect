@@ -91,7 +91,7 @@ const MyAccountScreen = (props) => {
             setFirstName(result.data?.data.length > 0 && result.data?.data[0].name)
             setLastName(result.data?.data.length > 0 && result.data?.data[0].last_name)
           }
-          console.log("result :",result)
+          // console.log("result :",result)
         } catch (error) {
           console.log("error ;",error)
           alert("something went wrong!" )

@@ -135,6 +135,7 @@ export const userLogin = (req, res) => {
 
 
 export const userUpdate = async (req, res) => {
+  console.log("user update ;",req.body)
   const { _id } = req.params;
   const {password}=req.body
   let passwordUpdate=false
