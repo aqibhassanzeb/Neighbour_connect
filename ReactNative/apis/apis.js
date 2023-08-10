@@ -1,38 +1,41 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export const baseUrl = `http://192.168.10.6:3333/api/v1/`;
+export const baseUrl = `http://192.168.43.147:3333/api/v1/`;
 // export const baseUrl = `http://192.168.43.77:3333/api/v1/`;
-let token
+let token;
 const getData = async () => {
   try {
-    const userData = await AsyncStorage.getItem('userData');
-    if(userData){
-      let parseUserdata= JSON.parse(userData)
-      console.log("parseUserdata",parseUserdata.token)
-      token= parseUserdata.token
+    const userData = await AsyncStorage.getItem("userData");
+    if (userData) {
+      let parseUserdata = JSON.parse(userData);
+      console.log("parseUserdata", parseUserdata.token);
+      token = parseUserdata.token;
     }
   } catch (e) {
     console.log("assyn storage error");
   }
 };
-}
-getData()
+
+getData();
 // console.log("assyn storage ",getData())
-const headers = { Accept: "application/json", "Content-Type": "application/json" };
+const headers = {
+  Accept: "application/json",
+  "Content-Type": "application/json",
+};
 // const headersWithToken = { Accept: "application/json", "Content-Type": "application/json",
 // authorization: token && `Bearer ${token}`
 // };
 
 const getHeadersWithToken = async () => {
   try {
-    const userData = await AsyncStorage.getItem('userData');
+    const userData = await AsyncStorage.getItem("userData");
     if (userData) {
       const parseUserdata = JSON.parse(userData);
       const token = parseUserdata.token;
       const headersWithToken = {
         Accept: "application/json",
-        "Content-Type":"application/json",
+        "Content-Type": "application/json",
         authorization: `Bearer ${token}`,
       };
       return headersWithToken;
@@ -44,13 +47,13 @@ const getHeadersWithToken = async () => {
 };
 const getHeadersWithTokenFormData = async () => {
   try {
-    const userData = await AsyncStorage.getItem('userData');
+    const userData = await AsyncStorage.getItem("userData");
     if (userData) {
       const parseUserdata = JSON.parse(userData);
       const token = parseUserdata.token;
       const headersWithToken = {
         Accept: "application/json",
-        "Content-Type":"multipart/form-data",
+        "Content-Type": "multipart/form-data",
         authorization: `Bearer ${token}`,
       };
       return headersWithToken;
@@ -60,7 +63,6 @@ const getHeadersWithTokenFormData = async () => {
   }
   return null;
 };
-
 
 async function apiRequest(method, url, data = null, headers = {}) {
   try {
@@ -90,25 +92,45 @@ export const verifyEmail = async (data) => {
   return result;
 };
 export const userUpdate = async (data) => {
-  let {_id}=data
-    const headersWithToken = await getHeadersWithToken();
-  let result = await apiRequest('PUT', `user_update/${_id}`, data, headersWithToken);
+  let { _id } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "PUT",
+    `user_update/${_id}`,
+    data,
+    headersWithToken
+  );
   return result;
 };
 export const userpassUpdate = async (data) => {
   const headersWithToken = await getHeadersWithToken();
-  let result = await apiRequest('PUT', `user_passupdate`, data, headersWithToken);
+  let result = await apiRequest(
+    "PUT",
+    `user_passupdate`,
+    data,
+    headersWithToken
+  );
   return result;
 };
 export const useremailUpdate = async (data) => {
   const headersWithToken = await getHeadersWithToken();
-  let result = await apiRequest('PUT', `user_emailupdate`, data, headersWithToken);
+  let result = await apiRequest(
+    "PUT",
+    `user_emailupdate`,
+    data,
+    headersWithToken
+  );
   return result;
 };
 export const userGet = async (data) => {
   let queryString = data && new URLSearchParams(data).toString();
   const headersWithToken = await getHeadersWithToken();
-  let result = await apiRequest('GET', `user_get?${queryString}`,null, headersWithToken);
+  let result = await apiRequest(
+    "GET",
+    `user_get?${queryString}`,
+    null,
+    headersWithToken
+  );
   return result;
 };
 
@@ -134,35 +156,59 @@ export const connectionRequests = async (data) => {
   return result;
 };
 
-
-// lost and found apis 
+// lost and found apis
 
 export const lostItemGetbyLoc = async (data) => {
-  let {type}=data
+  let { type } = data;
   const headersWithToken = await getHeadersWithToken();
-  let result = await apiRequest('GET', `lostandfound_byloc?type=${type}`, null, headersWithToken);
+  let result = await apiRequest(
+    "GET",
+    `lostandfound_byloc?type=${type}`,
+    null,
+    headersWithToken
+  );
   return result;
 };
 export const lostItemGet = async (data) => {
   let queryString = data && new URLSearchParams(data).toString();
   const headersWithToken = await getHeadersWithToken();
-  let result = await apiRequest('GET', `lostandfound?${queryString}`, null, headersWithToken);
+  let result = await apiRequest(
+    "GET",
+    `lostandfound?${queryString}`,
+    null,
+    headersWithToken
+  );
   return result;
 };
 export const lostandfoundCategGet = async () => {
   const headersWithToken = await getHeadersWithToken();
-  let result = await apiRequest('GET', `lostfoundCateg`, null, headersWithToken);
+  let result = await apiRequest(
+    "GET",
+    `lostfoundCateg`,
+    null,
+    headersWithToken
+  );
   return result;
 };
 export const lostandfoundCreate = async (data) => {
   const headersWithToken = await getHeadersWithToken();
-  let result = await apiRequest('POST', `lostandfound_create`, data, headersWithToken);
+  let result = await apiRequest(
+    "POST",
+    `lostandfound_create`,
+    data,
+    headersWithToken
+  );
   return result;
 };
 export const lostandfoundUpdate = async (data) => {
-  console.log("payload data ;",data)
-  let {_id}=data
+  console.log("payload data ;", data);
+  let { _id } = data;
   const headersWithToken = await getHeadersWithToken();
-  let result = await apiRequest('PUT', `lostandfound_update/${_id}`, data, headersWithToken);
+  let result = await apiRequest(
+    "PUT",
+    `lostandfound_update/${_id}`,
+    data,
+    headersWithToken
+  );
   return result;
 };
