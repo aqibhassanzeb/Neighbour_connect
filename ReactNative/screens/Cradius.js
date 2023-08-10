@@ -25,7 +25,7 @@ import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
   
   const { width, height } = Dimensions.get("window");
   
-  const RegisterScreen = ({ navigation }) => {
+  const RegisterScreen = ({ navigation,route }) => {
 
     
   
@@ -128,7 +128,7 @@ import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
          Update Radius
         </Text>
           <TouchableOpacity
-            onPress={() => navigation.navigate("Rad")}
+            onPress={() => navigation.navigate("Rad",{userData:route.params.userData})}
             style={{
               ...Default.shadow,
               borderRadius: 10,

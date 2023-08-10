@@ -14,7 +14,7 @@ import {
   Animated, PanResponder,
   StatusBar,
 } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Colors, Default, Fonts } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -25,17 +25,20 @@ import Stars from "react-native-stars";
 
   import Swiper from "react-native-swiper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Loader from "../components/loader";
+import { userGet } from "../apis/apis";
 
 const { width, height } = Dimensions.get("window");
 
 
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation,route }) => {
 
   
   const [cancelModal, setCancelModal] = useState(false);
-    
+  const [userData, setUserData] = useState("")
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
+  const [loader, setLoader] = useState(false)
   const toggleSidePanel = () => {
     setIsSidePanelOpen(!isSidePanelOpen);
   };
@@ -59,6 +62,43 @@ const handleLogout=async()=>{
   
 }
 
+const handleGetuser=async()=>{
+  try {
+    setLoader(true)
+    let paylaod={}
+    let userData = await AsyncStorage.getItem("userData");
+   let userInfo= JSON.parse(userData);
+    paylaod._id= userInfo.user?._id
+    let result= await userGet(paylaod)
+    if(result.status==200){
+    return  result.data.data[0]
+    }
+  } catch (error) {
+    console.log("error ;",error)
+    alert("something went wrong!" )
+  } finally{
+    setLoader(false)
+    
+  }
+}  
+
+
+const loadUserData = async () => {
+  try {
+      let newUserData =  await handleGetuser()
+      setUserData(newUserData)
+      const userDataJson = JSON.stringify(newUserData);
+      await AsyncStorage.setItem('userDatainfo', userDataJson)
+    
+  } catch (error) {
+    console.error('Error loading user data:', error);
+  }
+};
+
+useEffect(() => {
+  // Load user data from AsyncStorage when the component mounts
+  loadUserData();
+}, [route]);
   return (
 
     <SafeAreaView
@@ -68,6 +108,7 @@ const handleLogout=async()=>{
         paddingTop: StatusBar.currentHeight,
       }}
     >
+      {loader && <Loader/>}
       <View
         style={{
           backgroundColor: Colors.primary,
@@ -370,9 +411,11 @@ const handleLogout=async()=>{
      
         <View style={isSidePanelOpen ? styles.sidePanelOpen : styles.sidePanelClosed}>
 
-  <TouchableOpacity style={styles.panelButton} onPress={() =>  navigation.navigate('Myaccount', {
-        title: "Losted",
-  })}>
+  <TouchableOpacity style={styles.panelButton} onPress={() => { 
+    toggleSidePanel();
+    navigation.navigate('Myaccount', {
+        userData: userData,
+  })}}>
     <Text style={styles.panelButtonText}>Account Settings</Text>
   </TouchableOpacity>
  
@@ -381,9 +424,11 @@ const handleLogout=async()=>{
   })}>
     <Text style={styles.panelButtonText}>Notification Settings</Text>
   </TouchableOpacity>
-  <TouchableOpacity style={styles.panelButton} onPress={() =>  navigation.navigate('Cradius', {
-        title: "Losted",
-  })}>
+  <TouchableOpacity style={styles.panelButton} onPress={() => 
+  { navigation.navigate('Cradius', {
+         userData: userData,
+  });toggleSidePanel()}
+  }>
     <Text style={styles.panelButtonText}>Customize Radius</Text>
   </TouchableOpacity>
   <TouchableOpacity style={styles.panelButton} onPress={() =>   navigation.navigate('Appearance', {
@@ -401,7 +446,11 @@ const handleLogout=async()=>{
   })}>
     <Text style={styles.panelButtonText}>Privacy Policy</Text>
   </TouchableOpacity>
-  <TouchableOpacity style={styles.panelButton}     onPress={() => { setCancelModal(true) }}>
+  <TouchableOpacity style={styles.panelButton}     onPress={() => {
+      toggleSidePanel();
+     setCancelModal(true) }}
+     
+     >
     <Text style={styles.panelButtonText}>Sign out</Text>
   </TouchableOpacity>
   

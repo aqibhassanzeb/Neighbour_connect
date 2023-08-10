@@ -11,21 +11,19 @@ import OTPTextView from "react-native-otp-textinput";
   import Ionicons from "react-native-vector-icons/Ionicons";
 
     import { Colors, Default, Fonts } from "../constants/styles";
+import Loader from '../components/loader';
+import { verifyEmail } from '../apis/apis';
     
   const { width } = Dimensions.get("window");
 const MyAccountScreen = (props) => {
+
+  const [code, setCode] = useState("")
+  const [verifyLoader, setVerifyLoader] = useState(false)
     const { t, i18n } = useTranslation();
     const handleTextChange = (otp) => {
-        if (otp.length === 4) {
-          return handleVerify();
-        }
-      };
+      setCode(otp)
+  };
     const isRtl = i18n.dir() == "rtl";
-    const handleVerify = () => {
-        setTimeout(() => {
-          props.navigation.navigate("ChangeEmail");
-        }, 1500);
-      };
     function tr(key) {
       return t(`editProfileScreen:${key}`);
     }
@@ -39,39 +37,37 @@ const MyAccountScreen = (props) => {
       return () =>
         BackHandler.removeEventListener("hardwareBackPress", backAction);
     }, []);
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-  
-    const [currentPassword, setCurrentPassword] = useState('');
-    const [newPassword, setNewPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-  
-    const handleChangePassword = () => {
-      // Validate the form inputs and perform the password change logic
-      if (newPassword !== confirmPassword) {
-        // Show an error message that passwords do not match
-        return;
-      }
-  
-      // Perform the password change logic here
-      // ...
-    };
     const [isVisibles, setIsVisibles] = useState(false);
 
-    const toggleModal = () => {
-      setIsVisibles(true);
+
+    const handleVerify = async() => {
+      if(code.length != 4 ){
+        return alert('please fill the code')
+      }
+      try {
+        let _id=props.route.params.userData?._id
+          let payload={verification_code:code,_id,emailChange:true}
+        setVerifyLoader(true);
+        let verified= await verifyEmail(payload)
+        if(verified.status == 200){
+          alert("Email updated successfully")
+          props.navigation.navigate("Myaccount");
+        }else{
+          alert(verified.data.error)
+        }
+      } catch (error) {
+        alert("something went wrong!")
+      } finally{
+        
+        setVerifyLoader(false);
+      }
   
-      setTimeout(() => {
-        setIsVisibles(false);
-        props.navigation.navigate("ChangeEmail"); // Replace "NextScreen" with the desired screen name
- 
-      }, 2000);
     };
+
     return (
         
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
+        {verifyLoader && <Loader/>}
         <View
           style={{
             paddingVertical: Default.fixPadding * 1.2,
@@ -117,7 +113,7 @@ const MyAccountScreen = (props) => {
             keyboardType="numeric"
             handleTextChange={handleTextChange}
           />
-          <TouchableOpacity style={styles.button} onPress={toggleModal}>
+          <TouchableOpacity style={styles.button} onPress={handleVerify}>
         <Text style={styles.buttonText}>Save</Text>
       </TouchableOpacity>
     </View>

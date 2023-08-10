@@ -20,7 +20,7 @@ const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 const PickAddressScreen = ({ navigation,route}) => {
-  const {user}=route.params
+  const {user,lostandfoundCreate}=route.params
   const [region, setRegion] = useState(null);
   const [poi, setPoi] = useState(null);
   const [search, setSearch] = useState("");
@@ -108,13 +108,24 @@ const PickAddressScreen = ({ navigation,route}) => {
 
   const handlePickLocation = () => {
     if (poi) {
-      navigation.navigate("Radius", {
-        user,
-        address: {
-          latitude: poi.coordinate.latitude,
-          longitude: poi.coordinate.longitude,
-        },
-      });
+      if(lostandfoundCreate){
+        navigation.navigate("ListItem", {
+          address: {
+            latitude: poi.coordinate.latitude,
+            longitude: poi.coordinate.longitude,
+          },
+        });
+        
+      }else{
+        navigation.navigate("Radius", {
+          user,
+          address: {
+            latitude: poi.coordinate.latitude,
+            longitude: poi.coordinate.longitude,
+          },
+        });
+        
+      }
     }
   };
 

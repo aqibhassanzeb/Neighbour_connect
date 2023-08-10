@@ -20,6 +20,9 @@ import {
 import Feather from "react-native-vector-icons/Feather";
   import Ionicons from "react-native-vector-icons/Ionicons";
   import { useTranslation } from "react-i18next";
+import { lostItemGet, lostandfoundUpdate } from "../apis/apis";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Loader from "../components/loader";
   
 const { width, height } = Dimensions.get("window");
 
@@ -67,8 +70,13 @@ const { width, height } = Dimensions.get("window");
     
     const [dropdownOpens, setDropdownOpens] = useState(false);
     const [dropdownOpend, setDropdownOpend] = useState(false);
+    const [setselectedEditId, setSetselectedEditId] = useState("")
     
     const [dropdownOpendd, setDropdownOpendd] = useState(false);
+
+    const [data, setData] = useState([])
+    const [loader, setLoader] = useState(false)
+
     const handleButtonPress = (buttonValue) => {
       setSelectedValue(buttonValue);
       setDropdownOpen(false);
@@ -76,10 +84,64 @@ const { width, height } = Dimensions.get("window");
       setDropdownOpend(false);
       setDropdownOpendd(false);
     };
-  
+
+    const truncateString = (str) => {
+      const words = str.split(" ");
+      const truncated = words.slice(0, 2).join(" ");
+      return words.length > 2 ? truncated + "..." : truncated;
+    };
+
+    const handleGetitem=async()=>{
+      try {
+        setLoader(true)
+        let paylaod={}
+        const userData = await AsyncStorage.getItem('userData');
+         const parseUserdata = userData && JSON.parse(userData);
+        paylaod.createdBy= parseUserdata.user._id
+        let result= await lostItemGet(paylaod)
+        
+        if(result.status==200){
+          // console.log("result in yourlist :",result.data)
+          setData(result.data.data)
+        }
+      } catch (error) {
+        alert("something went wrong!")
+      } finally{
+        setLoader(false)
+        
+      }
+    }  
+        
+        useEffect(() => {
+      handleGetitem()
+    }, [])
+
+    const handleUpdate=async()=>{
+      console.log("selected id :",setselectedEditId)
+      setCancelModal(false);
+    try {
+      setLoader(true)
+      let paylaod={_id:setselectedEditId,mark_found:true}
+    let result=  await lostandfoundUpdate(paylaod)
+    if(result.status == 200){
+            
+      navigation.navigate("lostTabt")
+    }else{
+      console.log("result :",result)
+      alert(result.data.error)
+    }
+    } catch (error) {
+      alert("something went wrong!")
+    }finally{
+      setLoader(false)
+      
+    }
+    }
+
     return (
       
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
+        {loader && <Loader/>}
        <View
           style={{
             paddingVertical: Default.fixPadding * 1.2,
@@ -115,11 +177,17 @@ const { width, height } = Dimensions.get("window");
             </>
           )}
          
-          <View
+         {data.length > 0 ?
+         data.map((elm)=>(
+
+         
+         
+         <View
             style={{
               //margin: Default.fixPadding * 2,
               marginLeft:20
             }}
+            key={elm._id}
           >
              <View
           style={{
@@ -135,7 +203,7 @@ const { width, height } = Dimensions.get("window");
          
          onPress={() =>
           navigation.navigate("Losted", {
-            title: "Losted",
+            _id: elm._id,
           })
         }
             style={{
@@ -155,7 +223,7 @@ const { width, height } = Dimensions.get("window");
           >
             <Image 
 
-              source={require("../assets/images/bag.jpg")}
+              source={{uri:elm.gallary_images[0]}}
               style={{ height: 85, width: 75 , ...Default.shadow}}
             />
             <View>
@@ -175,7 +243,7 @@ const { width, height } = Dimensions.get("window");
                 marginRight:120
               }}
             >
-             BAG
+             {elm.title}
             </Text>
             <Text
               style={{
@@ -185,7 +253,7 @@ const { width, height } = Dimensions.get("window");
                 
               }}
             >
-              Pink Bag
+             {truncateString(elm.description)}
             </Text>
             <Text
               style={{
@@ -195,10 +263,10 @@ const { width, height } = Dimensions.get("window");
                 
               }}
             >
-             Street#04 Harley
+             Street#04 Harley 
             </Text>
           
-            <View style={styles.container}>
+         { elm.type == "lost" &&  <View style={styles.container}>
       <View style={styles.buttonContainer}>
       <View
           style={{
@@ -209,7 +277,10 @@ const { width, height } = Dimensions.get("window");
         >
           <TouchableOpacity
             onPress={() => {
-              setCancelModal(true);
+              if(elm.mark_found != true ){
+                setCancelModal(true);
+                setSetselectedEditId(elm._id)
+              }
             //  setSelectedId(item.key);
             }}
             // style={{
@@ -227,7 +298,7 @@ const { width, height } = Dimensions.get("window");
                 overflow: "hidden",
               }}
             >
-              {("Mark As Recovered")}
+              {elm.mark_found == true ? "Founded " : "Mark As Recovered" }
             </Text>
           </TouchableOpacity>
         </View>
@@ -235,7 +306,7 @@ const { width, height } = Dimensions.get("window");
        
       </View>
       
-    </View>
+    </View>}
             {/* <Button title="Mark As Found" onPress={() => alert('Button pressed')}  style={{
               //  ...Fonts.SemiBold15primary,
               paddingRight:55,
@@ -244,25 +315,25 @@ const { width, height } = Dimensions.get("window");
               }}/> */}
           
             </View>
-{/*             
-           <Ionicons name="ellipsis-vertical" size={24} color="black" /> */}
+            
+           {/* <Ionicons name="ellipsis-vertical" size={24} color="black" /> */}
            <View style={styles.contain}>
       <TouchableOpacity
         style={styles.selectedButton}
-        onPress={() => setDropdownOpend(!dropdownOpend)}
+        onPress={() =>{setSetselectedEditId(elm._id); setDropdownOpend(!dropdownOpend)}}
       >
          <Ionicons name="ellipsis-vertical" size={24} color="black" /> 
         <Text style={styles.selectedButtonText}>{selectedValue}</Text>
       </TouchableOpacity>
 
-      {dropdownOpend && (
+      {(dropdownOpend && setselectedEditId ==elm._id)&& (
         <View style={styles.dropdown}>
           <TouchableOpacity
             style={[
               styles.dropdownButton,
               selectedValue === 'button1' && styles.dropdownButtonSelected,
             ]}
-            onPress={() => navigation.navigate("ListItem")}
+            onPress={() => {navigation.navigate("ListItem",{ itemId: elm._id }),setDropdownOpend(false)}}
           >
             <Ionicons name="create-outline" size={20} color="black" />
             <Text style={styles.dropdownButtonText}>Edit</Text>
@@ -275,6 +346,8 @@ const { width, height } = Dimensions.get("window");
        
           </View>
           </View>
+        ))  : <Text>Not Found</Text>
+        }
  
   <Modal
         animationType="fade"
@@ -351,7 +424,7 @@ const { width, height } = Dimensions.get("window");
                   }}
                 
                    
-                  onPress={() => navigation.navigate("lostTabt")}
+                  onPress={() =>handleUpdate() }
                  >
                 
                   <Text
@@ -438,7 +511,7 @@ const { width, height } = Dimensions.get("window");
      // borderWidth: 1,
       borderColor: 'gray',
       
-      marginLeft:124
+      marginLeft:70
       //borderRadius: 5,
     },
     selectedButtonText: {
@@ -463,7 +536,7 @@ const { width, height } = Dimensions.get("window");
           shadowRadius: 3.84,
      // marginRight:70,
           
-      marginLeft:80
+      marginLeft:40
           
         },
         dropdownButton: {

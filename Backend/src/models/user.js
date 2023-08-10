@@ -5,6 +5,9 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    last_name: {
+      type: String,
+    },
     status: {
       type: String,
       required: true,
@@ -56,6 +59,9 @@ const UserSchema = new mongoose.Schema(
     },
     connections: {
       type: [],
+    },
+    temp_email: {
+      tyep: String,
     },
     email_verified: {
       type: Boolean,

@@ -9,6 +9,7 @@ import { View, TextInput, Button, StyleSheet, Dimensions,
   import Ionicons from "react-native-vector-icons/Ionicons";
 
     import { Colors, Default, Fonts } from "../constants/styles";
+import { userpassUpdate } from '../apis/apis';
     
   const { width } = Dimensions.get("window");
 const MyAccountScreen = (props) => {
@@ -37,16 +38,47 @@ const MyAccountScreen = (props) => {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [loader, setLoader] = useState(false)
   
-    const handleChangePassword = () => {
+    const handleChangePassword = async() => {
       // Validate the form inputs and perform the password change logic
-      if (newPassword !== confirmPassword) {
-        // Show an error message that passwords do not match
-        return;
+
+      if(!currentPassword){
+        return alert("please enter the current password")
       }
-  
-      // Perform the password change logic here
-      // ...
+      const passRegex = /^(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;   
+      if(newPassword.length < 8){
+        return alert("password should be minimum 8 characters")
+      }
+      if (!passRegex.test(newPassword)) {
+        return alert("Password should contain at least one special character")
+      }
+    
+      if(newPassword !== confirmPassword){
+        return alert("password and conform password not match")
+      }
+
+      let _id=props.route.params.userData?._id
+      const payload={currPassword:currentPassword,newPassword,_id}
+      setLoader(true);
+      try {
+        let user= await userpassUpdate(payload)
+        if(user.status == 200){
+          setCurrentPassword("")
+          setNewPassword("")
+          setConfirmPassword("")
+          alert("password updated successfully")
+        }else{
+          alert(user.data.error)
+        }
+      } catch (error) {
+        alert("something went wrong!")
+        // console.log('errror 2:',error)
+      } finally{
+        
+        setLoader(false);
+      }
+     
     };
     const [isVisibles, setIsVisibles] = useState(false);
 
@@ -89,6 +121,7 @@ const MyAccountScreen = (props) => {
             <Text style={{color:Colors.black, fontSize:24,fontWeight:"bold", marginBottom:32}}>Change your password</Text>
 <Text style={{color:Colors.black, fontSize:17, marginBottom:32}}>For a strong password, try choosing a unique phrase that you don't use on any other accounts.</Text>
       <TextInput
+      maxLength={20}
         style={styles.input}
         secureTextEntry
         placeholder="Current Password"
@@ -98,6 +131,7 @@ const MyAccountScreen = (props) => {
       <TouchableOpacity onPress={() => props.navigation.navigate("Forgets")}><Text style={{color:Colors.primary, fontSize:17, fontWeight:"bold", marginBottom:20}}>Forgot your password?</Text></TouchableOpacity>
 
       <TextInput
+      maxLength={20}
         style={styles.input}
         secureTextEntry
         placeholder="New Password"
@@ -106,13 +140,14 @@ const MyAccountScreen = (props) => {
       />
 
       <TextInput
+      maxLength={20}
         style={styles.input}
         secureTextEntry
         placeholder="Confirm New Password"
         value={confirmPassword}
         onChangeText={setConfirmPassword}
       />
-          <TouchableOpacity style={styles.button} onPress={toggleModal}>
+          <TouchableOpacity style={styles.button} onPress={handleChangePassword}>
         <Text style={styles.buttonText}>Save</Text>
       </TouchableOpacity>
     </View>

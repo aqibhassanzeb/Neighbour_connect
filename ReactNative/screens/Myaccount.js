@@ -7,11 +7,13 @@ import { View, TextInput, Button, StyleSheet,
   import Ionicons from "react-native-vector-icons/Ionicons";
 
     import { Colors, Default, Fonts } from "../constants/styles";
+import Loader from '../components/loader';
+import { userGet, userUpdate } from '../apis/apis';
 const MyAccountScreen = (props) => {
-  
   const { width, height } = Dimensions.get("window");
   const [cancelModal, setCancelModal] = useState(false);
-  
+  const [userData, setUserData] = useState("")
+  const [loader, setLoader] = useState(false)
   const [cancelModals, setCancelModals] = useState(false);
     const { t, i18n } = useTranslation();
   
@@ -36,9 +38,31 @@ const MyAccountScreen = (props) => {
     const [password, setPassword] = useState('');
   
     const handleSave = () => {
-      // Perform save logic here, such as updating user data in a database
-      // ...
+    if(!firstName){
+     return  alert("please fill name")
+    }
+      setCancelModals(true)
     };
+
+    const handleSubmit = async() => {
+      setCancelModals(false)
+      try {
+    let  payload= { name:firstName,last_name:lastName,_id:userData._id}
+    setLoader(true);
+    let verified= await userUpdate(payload)
+    if(verified.status == 200){
+      alert("updated successfully")
+    }else{
+      alert(verified.data.error)
+    }
+  } catch (error) {
+    alert("something went wrong!")
+  } finally{
+    
+    setLoader(false);
+  }
+
+  };
   
     const handleChangePassword = () => {
       // Perform change password logic here
@@ -53,10 +77,39 @@ const MyAccountScreen = (props) => {
         // Logic for deactivating the account
         // ...
       };
+
+
+      const handleGetuser=async()=>{
+        try {
+          setLoader(true)
+          let paylaod={}
+          paylaod._id= props.route.params.userData?._id
+          let result= await userGet(paylaod)
+          
+          if(result.status==200){
+            setUserData(result.data.data[0])
+            setFirstName(result.data?.data.length > 0 && result.data?.data[0].name)
+            setLastName(result.data?.data.length > 0 && result.data?.data[0].last_name)
+          }
+          // console.log("result :",result)
+        } catch (error) {
+          console.log("error ;",error)
+          alert("something went wrong!" )
+        } finally{
+          setLoader(false)
+          
+        }
+      }  
+      
+          
+          useEffect(() => {
+        handleGetuser()
+      }, [])
   
     return (
         
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
+        {loader && <Loader/>}
         <View
           style={{
             paddingVertical: Default.fixPadding * 1.2,
@@ -97,8 +150,9 @@ const MyAccountScreen = (props) => {
             First Name
         </Text>
         <TextInput
+        maxLength={20}
           style={styles.input}
-          placeholder="Nisa"
+          placeholder="First Name"
           value={firstName}
           onChangeText={setFirstName}
         />
@@ -108,8 +162,9 @@ const MyAccountScreen = (props) => {
             Last Name
         </Text>
         <TextInput
+        maxLength={20}
           style={styles.input}
-          placeholder="Waheed"
+          placeholder="Last Name"
           value={lastName}
           onChangeText={setLastName}
         />
@@ -119,7 +174,7 @@ const MyAccountScreen = (props) => {
          Email
         </Text>
     <View>
-      <TouchableOpacity style={styles.button} onPress={() => props.navigation.navigate("ChangeEmail")}>
+      <TouchableOpacity style={styles.button} onPress={() => props.navigation.navigate("ChangeEmail",{userData:userData})}>
         <Text style={styles.buttonText}>Change Email</Text>
       </TouchableOpacity>
     </View>
@@ -127,13 +182,13 @@ const MyAccountScreen = (props) => {
          Password
         </Text>
         <View>
-      <TouchableOpacity style={styles.button} onPress={() => props.navigation.navigate("Changepass")}>
+      <TouchableOpacity style={styles.button} onPress={() => props.navigation.navigate("Changepass",{userData:userData})}>
         <Text style={styles.buttonText}>Change Password</Text>
       </TouchableOpacity>
     </View>
    
-    <TouchableOpacity style={styles.button} onPress={() =>  {              setCancelModals(true);
-            //  setSelectedId(item.key);
+    <TouchableOpacity style={styles.button} onPress={() =>  {      
+            handleSave()
             }}>
         <Text style={styles.buttonText}>save</Text>
       </TouchableOpacity>
@@ -337,7 +392,7 @@ const MyAccountScreen = (props) => {
                 }}
               >
                 <TouchableOpacity
-                onPress={() =>   setCancelModals(false)}
+                onPress={() =>  handleSubmit()}
                   style={{
                     ...Default.shadow,
                     backgroundColor: Colors.primary,

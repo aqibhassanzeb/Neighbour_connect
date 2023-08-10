@@ -28,15 +28,28 @@ import DateTimePicker from "@react-native-community/datetimepicker";
   import Ionicons from "react-native-vector-icons/Ionicons";
   import { useTranslation } from "react-i18next";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { lostItemGet, lostandfoundCategGet, lostandfoundCreate, lostandfoundUpdate } from "../apis/apis";
+import { FontAwesome5 } from '@expo/vector-icons';
+import Loader from "../components/loader";
+import axios from "axios";
 
   
 const { width, height } = Dimensions.get("window");
-  const PayPalScreen = ({ navigation }) => {
+  const PayPalScreen = ({ navigation,route }) => {
  
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState('Category');
+    const [selectedOption, setSelectedOption] = useState({name:'Category',_id:null});
+    const [categoryList, setCategoryList] = useState([])
+    const [fetchingCategLoader, setFetchingCategLoader] = useState(false)
+    const [setselectedImages, setSetselectedImages] = useState(null)
+    const [handleLoading, setHandleLoading] = useState(false)
+    const [selectedImages, setSelectedImages] = useState([]);
+    const [formData, setFormData] = useState({
+      title: '',
+      description: '',
+    });
+  const [updateHandle, setUpdateHandle] = useState(false)
 
-    
     const [dropdownOpens, setDropdownOpens] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState('Type');
 
@@ -76,18 +89,7 @@ const { width, height } = Dimensions.get("window");
         BackHandler.removeEventListener("hardwareBackPress", backAction);
     }, []);
     const [email, setEmail] = useState();
-    const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
-        });
-    
-        if (!result.cancelled) {
-          setImage(result.uri);
-        }
-      };
+   
   
       const [value, setValue] = useState(0);
 
@@ -105,8 +107,261 @@ const { width, height } = Dimensions.get("window");
         return date !== "" ? `${tempDate[2]} ${tempDate[1]} ${tempDate[3]}` : "";
       };
     
+
+      const handleGetCateg=async()=>{
+        try {
+          setFetchingCategLoader(true)
+          let result= await lostandfoundCategGet()
+          
+          if(result.status==200){
+            setCategoryList(result.data?.data)
+          }
+        } catch (error) {
+          
+        } finally{
+          setFetchingCategLoader(false)
+        }
+      }  
+          
+          useEffect(() => {
+            handleGetCateg()
+      }, [])
+
+
+      const pickImageAsync = async () => {
+        if (selectedImages.length >= 3) {
+          alert('You can select a maximum of three images.');
+          return;
+        }
+      
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        });
+      
+        if (!result.canceled) {
+          setSelectedImages([...selectedImages, result.assets[0]]);
+        } else {
+          alert('You did not select any image.');
+        }
+      };
+
+      const handleImageRemove = (index) => {
+        const updatedImages = selectedImages.filter((uri, i) => i !== index);
+        setSelectedImages(updatedImages);
+      };
+      const handleInputChange = (key, value) => {
+        setFormData({
+          ...formData,
+          [key]: value,
+        });
+      };
+
+      const validateForm = () => {
+        if (formData.title.trim() === '') {
+          alert( 'Please enter a title.');
+          return false;
+        }
+        if(selectedOption.name =="Category"){
+          alert( 'Please select category.');
+          return false;
+        }
+        if(!date){
+          alert( 'Please select date.');
+          return false;
+        }
+        // if(!route.params?.address){
+        //   alert( 'Please select the location.');
+        //   return false;
+
+        // }
+        if(formData.description.trim()==""){
+          alert( 'Please enter a description.');
+          return false;
+        }
+        // if(selectedImages.length ==0){
+        //   alert( 'Please select atleast one image.');
+        //   return false;
+        // }
+        if(selectedOptions =="Type"){
+          alert( 'Please select a type.');
+          return false;
+        }
+        if(selectedOptionsd =="Visibility"){
+          alert( 'Please select a visibility.');
+          return false;
+        }
+    
+    
+        return true;
+      };
+
+      const selectedImageToFile = async (selectedImage) => {
+        // Get the file name from the URI
+        const fileName = selectedImage.uri.split('/').pop();
+    
+        // Create a File object with the URI and type 'image/jpeg' (you can change the type as needed)
+        const file = {
+          uri: selectedImage.uri,
+          name: fileName,
+          type: 'image/jpeg', // Change the type as needed based on the image format
+        };
+    
+        return file;
+      };
+
+      const uploadImagesToCloudinary = async (selectedImages) => {
+        try {
+          const cloudName = 'dbdxsvxda'; // Replace with your Cloudinary cloud name
+          // const uploadPreset = 'YOUR_UPLOAD_PRESET'; // Replace with your Cloudinary upload preset
+      
+          const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
+      
+          const uploadPromises = selectedImages.map(async (selectedImage) => {
+          console.log("selectedImage  :",selectedImage)
+          const response = await fetch(selectedImage.uri);
+          console.log("selectedImage  2:",response)
+            const blob = await response.blob();
+      
+            const formData = new FormData();
+            formData.append('file', blob);
+            // formData.append('upload_preset', uploadPreset);
+      
+            const uploadResponse = await fetch(uploadUrl, {
+              method: 'POST',
+              body: formData,
+            });
+      
+            if (!uploadResponse.ok) {
+              throw new Error('Failed to upload image to Cloudinary');
+            }
+      
+            const uploadResult = await uploadResponse.json();
+            return uploadResult.secure_url;
+          });
+      
+          const uploadedImageUrls = await Promise.all(uploadPromises);
+          return uploadedImageUrls;
+        } catch (error) {
+          console.error('Error uploading images to Cloudinary:', error);
+          throw error;
+        }
+      };
+
+    const handleSubmit=async()=>{
+      if(validateForm()){
+        let picurl=["https://res.cloudinary.com/dbdxsvxda/image/upload/v1690110912/niegbour_proj/vsmzv4fseavk4b8zoql5.png",
+      "https://res.cloudinary.com/dbdxsvxda/image/upload/v1690110914/niegbour_proj/bmkuc68k8jnqp9vqvxqp.png"
+      ]
+
+      
+          let payload={title:formData.title,description:formData.description,type:selectedOptions,visibility:selectedOptionsd,
+            gallary_images:picurl,location:route.params?.address ,notify:checked,date:date,category:selectedOption._id
+          }
+          
+
+       
+          let payload2={_id:route.params?.itemId,title:formData.title,description:formData.description,type:selectedOptions,visibility:selectedOptionsd,
+            gallary_images:picurl,location:route.params.address,notify:checked,date:date,category:selectedOption._id
+          }
+
+
+        
+
+  //       let formData2 = new FormData();
+  // formData2.append('title', payload.title);
+  // formData2.append('description', payload.description);
+  // formData2.append('type', payload.type);
+  // formData2.append('visibility', payload.visibility);
+  // formData2.append('notify', payload.notify);
+  // formData2.append('location', payload.location); 
+  // formData2.append('category', payload.category); 
+  // formData2.append('gallary_images',picurl)
+  // formData2.append('date',confirmDate())
+
+  // Append selectedImages array as individual files with a unique key
+  
+  // for (let index = 0; index < selectedImages.length; index++) {
+  //   const selectedImage = selectedImages[index];
+  //   const fileName = selectedImage.uri.split('/').pop();
+  //   const file = {
+  //     uri: selectedImage.uri,
+  //     name: fileName,
+  //     type: 'image/jpeg', // Change the type as needed based on the image format
+  //   };
+  //   formData2.append(`files[${index}]`, file);
+  // }
+  try {
+    
+    setHandleLoading(true)
+          // console.log("form Data :",formData2)
+          console.log("submited 1")
+          let result
+          if(updateHandle){
+           result =await lostandfoundUpdate(payload2)
+          }else{
+             result= await lostandfoundCreate(payload)
+          }
+          console.log("submited 2" ,result)
+          if(result.status == 200){
+            updateHandle ? alert("updated successfully") :
+            navigation.navigate("LostPosted");
+          }else{
+            alert(result.data.error)
+          }
+        } catch (error) {
+          alert("something went wrong!")
+          console.log('errror 2:',error)
+        } finally{
+          
+          setHandleLoading(false);
+        }
+      
+      }else{
+        console.log("not submitted :")
+      }
+    }
+  const  handleGetfoundandlostItem=async()=>{
+    try {
+      setHandleLoading(true)
+      let paylaod={}
+      paylaod._id= route.params.itemId
+      let result= await lostItemGet(paylaod)
+      
+      if(result.status==200){
+    //  console.log("result :",result.data.data)
+     let itemData=result.data.data[0]
+     console.log("item data :",itemData)
+     setUpdateHandle(true)
+     setFormData({
+      ...formData,
+      title: itemData.title,description:itemData.description
+    });
+    handleOptionSelect({name:itemData.category?.name,_id:itemData.category?._id})
+    handleOptionSelects(itemData.type);
+    handleOptionSelectsd(itemData.visibility)
+    setChecked(itemData.notify)
+    setDate(itemData.date)
+        // setData(result.data.data[0])
+      }
+    } catch (error) {
+      alert("something went wrong!")
+    } finally{
+      setHandleLoading(false)
+      
+    }
+    }
+    useEffect(() => {
+      !!route.params?.itemId && handleGetfoundandlostItem()
+
+    }, [route.params])
+    
+    
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
+        {handleLoading && <Loader/>}
         <View
           style={{
             paddingVertical: Default.fixPadding * 1.2,
@@ -129,7 +384,7 @@ const { width, height } = Dimensions.get("window");
               marginHorizontal: Default.fixPadding * 1.2,
             }}
           >
-            {("Add Item")}
+            {updateHandle ? "Update Item" :"Add Item"}
           </Text>
         </View>
   
@@ -137,10 +392,26 @@ const { width, height } = Dimensions.get("window");
          
         
         <View style={{ alignItems: 'center', justifyContent: 'center', flexDirection: 'row' , marginTop:20 }}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={pickImageAsync}>
         <Ionicons name="ios-camera" size={80} color="grey" />
       </TouchableOpacity>
-      {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
+      {/* <ScrollView horizontal style={{ marginBottom: 10 }}>
+        {selectedImages.map((uri, index) => (
+          <TouchableOpacity
+            key={index}
+            onPress={() => {
+              // Implement any action you want when an image is tapped here
+              console.log('Image tapped:', uri);
+            }}
+          >
+            <Image
+              source={{ uri: uri }}
+              style={{ width: 200, height: 200, marginRight: 10, borderRadius: 10 }}
+            />
+          </TouchableOpacity>
+        ))}
+      </ScrollView> */}
+      {/* {setselectedImages && <Image source={{ uri: setselectedImages }} style={{ width: 200, height: 200 }} />} */}
     </View>
           <View
             style={{
@@ -153,7 +424,27 @@ const { width, height } = Dimensions.get("window");
                 color:Colors.grey,
                 marginLeft:135
               }}>Upload Pictures</Text>
-  
+  <ScrollView horizontal style={{ marginBottom: 10,marginTop:10 }}>
+        {selectedImages.map((uri, index) => (
+          <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <TouchableOpacity
+              onPress={() => handleImageRemove(index)}
+              style={{ marginRight: 10 }}
+            >
+              <Image
+                source={{ uri: uri.uri }}
+                style={{ width: 200, height: 200, borderRadius: 10 }}
+              />
+              <FontAwesome5
+                name="times-circle" // Use the FontAwesome5 cross icon
+                size={24}
+                color="red"
+                style={{ position: 'absolute', top: -1, right: -1, zIndex: 1 }}
+              />
+            </TouchableOpacity>
+          </View>
+        ))}
+      </ScrollView>
             <View
               style={{
                 ...Default.shadow,
@@ -177,12 +468,15 @@ const { width, height } = Dimensions.get("window");
                 placeholder={tr("Title")}
                 placeholderTextColor={Colors.grey}
                 selectionColor={Colors.primary}
+                maxLength={16}
                 style={{
                   ...Fonts.Medium16Black,
                   flex: 9.3,
                   marginHorizontal: Default.fixPadding,
                   textAlign: isRtl ? "right" : "left",
                 }}
+                value={formData.title}
+                onChangeText={(text) => handleInputChange('title', text)}
               />
               
             </View>
@@ -232,7 +526,7 @@ const { width, height } = Dimensions.get("window");
           marginTop:3,
           color:'grey',
 
-              }}>{selectedOption}</Text>
+              }}>{selectedOption.name}</Text>
               <View   style={{
           color:'grey',
           
@@ -250,10 +544,18 @@ const { width, height } = Dimensions.get("window");
         <View
         style={styles.dropdowns}
         >
-         <TouchableOpacity onPress={() => handleOptionSelect('Person ')}>
-            <Text style={{ padding: 10 }}>Person </Text>
+        {
+          categoryList.length > 0 && categoryList.map((elm)=>(
+
+            <TouchableOpacity key={elm._id} onPress={() => handleOptionSelect(elm)}>
+            <Text style={{ padding: 10 }}>{elm.name} </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleOptionSelect('Pet ')}>
+           )) 
+         }
+         <TouchableOpacity onPress={() => handleOptionSelect({name:"other",_id:null})}>
+            <Text style={{ padding: 10 }}>other </Text>
+          </TouchableOpacity>
+          {/* <TouchableOpacity onPress={() => handleOptionSelect('Pet ')}>
             <Text style={{ padding: 10 }}>Pet</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleOptionSelect('Electronics')}>
@@ -267,7 +569,7 @@ const { width, height } = Dimensions.get("window");
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleOptionSelect('Other')}>
             <Text style={{ padding: 10 }}>Other</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
          
         </View>
       )}
@@ -352,7 +654,10 @@ const { width, height } = Dimensions.get("window");
                 textAlign: isRtl ? "right" : "left", }}>
           
           <TouchableOpacity
-            onPress={() => navigation.navigate("Location")}
+            onPress={() => 
+              navigation.navigate("Address",{lostandfoundCreate:true})  
+              // navigation.navigate("Location")
+            }
             style={{
               flexDirection: isRtl ? "row-reverse" : "row",
               alignItems: "center",
@@ -454,12 +759,12 @@ const { width, height } = Dimensions.get("window");
         style={styles.dropdownsd}
         >
           
-          <TouchableOpacity onPress={() => handleOptionSelects('Lost ')}>
+          <TouchableOpacity onPress={() => handleOptionSelects('lost')}>
             
    
             <Text style={{ padding: 10 }}>Lost </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleOptionSelects('Found ')}>
+          <TouchableOpacity onPress={() => handleOptionSelects('found')}>
             
             <Text style={{ padding: 10 }}>Found</Text>
           </TouchableOpacity>
@@ -493,12 +798,15 @@ const { width, height } = Dimensions.get("window");
                 placeholder={tr("Description")}
                 placeholderTextColor={Colors.grey}
                 selectionColor={Colors.primary}
+                maxLength={100}
                 style={{
                   ...Fonts.Medium16Black,
                   flex: 9.3,
                   marginHorizontal: Default.fixPadding,
                   textAlign: isRtl ? "right" : "left",
                 }}
+                value={formData.description}
+                onChangeText={(text) => handleInputChange('description', text)}
               />
               
             </View>
@@ -566,12 +874,12 @@ const { width, height } = Dimensions.get("window");
         style={styles.dropdown}
         >
           
-          <TouchableOpacity onPress={() => handleOptionSelectsd('Neighborhood ')}>
+          <TouchableOpacity onPress={() => handleOptionSelectsd('neighborhood')}>
             
    
             <Text style={{ padding: 10 }}>Neighborhood </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleOptionSelectsd('Connection ')}>
+          <TouchableOpacity onPress={() => handleOptionSelectsd('connection')}>
             
             <Text style={{ padding: 10 }}>Connection</Text>
           </TouchableOpacity>
@@ -622,7 +930,7 @@ const { width, height } = Dimensions.get("window");
           </View>
   
           <TouchableOpacity
-            onPress={() => navigation.navigate("LostPosted")}
+            onPress={() => handleSubmit()}
             style={{
               backgroundColor: Colors.primary,
               borderRadius: 10,
@@ -633,7 +941,7 @@ const { width, height } = Dimensions.get("window");
               marginHorizontal: Default.fixPadding * 2,
             }}
           >
-            <Text style={{ ...Fonts.SemiBold18white }}>{tr("Post")}</Text>
+            <Text style={{ ...Fonts.SemiBold18white }}>{updateHandle ? ("Update") : ("Post")}</Text>
           </TouchableOpacity>
           <Modal
         animationType="fade"

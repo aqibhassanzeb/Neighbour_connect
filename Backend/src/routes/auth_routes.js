@@ -9,12 +9,8 @@ import {
   forgotPass,
   userVerify,
   verifyForgotcode,
-  sendRequest,
-  acceptRequest,
-  Disconnect,
-  RejectRequest,
-  getConnections,
-  getRequests,
+  userPassUpdate,
+  userEmailUpdate,
 } from "../controllers/auth_controller.js";
 import { uploadMultiple, uploadSingle } from "../middleware/pic_upload.js";
 import { protect } from "../middleware/user_middleware.js";
@@ -23,7 +19,9 @@ import { uploadPicture, uploadPictures } from "../controllers/upload_pic.js";
 routes.post("/user_signup", userSignup);
 routes.put("/user_verify", userVerify);
 routes.put("/user_update/:_id", userUpdate);
-routes.get("/user_get", userGet);
+routes.get("/user_get", protect, userGet);
+routes.put("/user_passupdate", protect, userPassUpdate);
+routes.put("/user_emailupdate", protect, userEmailUpdate);
 routes.post("/user_login", userLogin);
 routes.put("/reset_password", forgotPass);
 routes.put("/reset_passcode", verifyForgotcode);

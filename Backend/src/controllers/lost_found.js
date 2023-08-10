@@ -5,16 +5,16 @@ dotenv.config();
 
 export const lostandfound_Create = async(req, res) => {
     const {title,description,category} = req.body
+     console.log("req body :",req.body,"req file :",req.files)
     if (!title || !description || !category ) {
         return res.status(422).json({ error: "please fill the field " })
     }
     try {
-        let gallary_images
-        if(req.files?.length > 0 ){
-            gallary_images=req.files.map(file => file.path)
-        }
-        
-        const lostfound = new lostandFound({...req.body,gallary_images,createdBy:req.user?._id})
+        // let gallary_images
+        // if(req.files?.length > 0 ){
+        //     gallary_images=req.files.map(file => file.path)
+        // }
+        const lostfound = new lostandFound({...req.body,createdBy:req.user?._id})
         let item = await lostfound.save()
         if(item){
             res.status(200).json({ message: "uploaded successfully" })
@@ -50,8 +50,13 @@ export const lostandfound_Get = async(req, res) => {
     if (req.query.title) {
         filter.title=req.query.title 
     }
+    if (req.query.createdBy) {
+        filter.createdBy=req.query.createdBy 
+    }
+
         try {
-            const result= await lostandFound.find(filter)
+            const result= await lostandFound.find(filter).populate("createdBy",'-password')
+            .populate("category")
             
                res.status(200).json({data:result,count:result.length})
         } catch (error) {
@@ -62,17 +67,19 @@ export const lostandfound_Get = async(req, res) => {
 }
 
 export const lostandfoundLoc_Get = async (req, res) => {
+    let {type }=req.query
     try {
         let {address_range,address}=req.user
         let {latitude,longitude}=address
 
-        const result = await lostandFound.find()
+        const result = await lostandFound.find({type}).populate("createdBy",'-password')
+// console.log("resulut :",result)
         const filteredData = result.filter(elm => {
             if (elm.visibility === "connections" && req.user.connections.includes(elm.createdBy)) {
                 return true; 
             }
-            const docLatitude = parseFloat(elm.location.latitude);
-            const docLongitude = parseFloat(elm.location.longitude);
+            const docLatitude = parseFloat(elm.createdBy.address.latitude);
+            const docLongitude = parseFloat(elm.createdBy.address.longitude);
 
             // Calculate the distance in kilometers between two points
             const distanceInKm = calculateDistanceInKm(latitude, longitude, docLatitude, docLongitude);
