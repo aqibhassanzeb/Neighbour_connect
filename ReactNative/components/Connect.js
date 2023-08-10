@@ -1,42 +1,41 @@
 import {
-    Text,
-    View,
-    TouchableOpacity,
-    Image, 
-    ScrollView,
-    Dimensions,
-    StyleSheet,
-    FlatList,
-    Modal,
-    SafeAreaView,
-  } from "react-native";
-  import React, { useState } from "react";
-  import { Colors, Default, Fonts } from "../constants/styles";
-  import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-  import Feather from "react-native-vector-icons/Feather";
-  import { useTranslation } from "react-i18next";
-  import Ionicons from "react-native-vector-icons/Ionicons";
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  Dimensions,
+  StyleSheet,
+  FlatList,
+  Modal,
+  SafeAreaView,
+} from "react-native";
+import React, { useState } from "react";
+import { Colors, Default, Fonts } from "../constants/styles";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import Feather from "react-native-vector-icons/Feather";
+import { useTranslation } from "react-i18next";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
-  import SnackbarToast from "./snackbarToast";
-  import Losted from "../screens/Losted";
-  const { width } = Dimensions.get("window");
-  
-  const OngoingTab = (props) => {
-    const { t, i18n } = useTranslation();
-  
-    const isRtl = i18n.dir() == "rtl";
-  
-    function tr(key) {
-      return t(`ongoingTab:${key}`);
-    }
-    const [cancelModal, setCancelModal] = useState(false);
-  
-    const [cancelToast, setCancelToast] = useState(false);
-    const onToggleSnackBarCancelToast = () => setCancelToast(false);
-  
-    
-    const [allClear, setAllClear] = useState(false);
-   
+import SnackbarToast from "./snackbarToast";
+import Losted from "../screens/Losted";
+const { width } = Dimensions.get("window");
+
+const OngoingTab = (props) => {
+  const { t, i18n } = useTranslation();
+
+  const isRtl = i18n.dir() == "rtl";
+
+  function tr(key) {
+    return t(`ongoingTab:${key}`);
+  }
+  const [cancelModal, setCancelModal] = useState(false);
+
+  const [cancelToast, setCancelToast] = useState(false);
+  const onToggleSnackBarCancelToast = () => setCancelToast(false);
+
+  const [allClear, setAllClear] = useState(false);
+
   const messageList = [
     {
       key: "1",
@@ -91,28 +90,32 @@ import {
       key: "8",
       title: "Annette Black",
       image: require("../assets/images/pic8.png"),
-      message: "Thank you for your patience. Our team is still investigating the issue and will update you as soon as possible",
+      message:
+        "Thank you for your patience. Our team is still investigating the issue and will update you as soon as possible",
       time: "12.00am",
     },
     {
       key: "9",
       title: "Jerome Bell",
       image: require("../assets/images/pic9.png"),
-      message: "I'm sorry, I don't understand what you mean. Could you please rephrase your question",
+      message:
+        "I'm sorry, I don't understand what you mean. Could you please rephrase your question",
       time: "3.00pm",
     },
     {
       key: "10",
       title: "Jerome Bell",
       image: require("../assets/images/pic10.png"),
-      message: "Could you please provide more information about the issue you are experiencing?",
+      message:
+        "Could you please provide more information about the issue you are experiencing?",
       time: "4.00am",
     },
     {
       key: "11",
       title: "Guy Hawkins",
       image: require("../assets/images/pic11.png"),
-      message: "I'm sorry, I can't help you with that. Is there anything else I can assist you with?",
+      message:
+        "I'm sorry, I can't help you with that. Is there anything else I can assist you with?",
       time: "11.00am",
     },
     {
@@ -134,7 +137,6 @@ import {
   const renderItemMessage = ({ item, index }) => {
     const isEnd = index === 0;
     return (
-      
       <View
         style={{
           borderTopColor: isEnd ? null : Colors.primary,
@@ -142,7 +144,6 @@ import {
           marginHorizontal: Default.fixPadding * 2,
         }}
       >
-       
         <TouchableOpacity
           onPress={() => props.navigation.navigate("chatScreen")}
           style={{
@@ -173,9 +174,8 @@ import {
                 numberOfLines={1}
                 style={{ ...Fonts.Medium16primary, overflow: "hidden" }}
               >
-              Annette Black
+                Annette Black
               </Text>
-             
             </View>
           </View>
           <View
@@ -189,9 +189,8 @@ import {
               numberOfLines={1}
               style={{ ...Fonts.Medium14grey, overflow: "hidden" }}
             >
-            <Ionicons name="chatbubble-outline" size={30} color="black" />
-
-          </TouchableOpacity>
+              <Ionicons name="chatbubble-outline" size={30} color="black" />
+            </TouchableOpacity>
           </View>
         </TouchableOpacity>
       </View>
@@ -200,18 +199,18 @@ import {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
-      <Text style={{ marginLeft:23, fontSize:19, color:Colors.grey}}>3 connections</Text>
+      <Text style={{ marginLeft: 23, fontSize: 19, color: Colors.grey }}>
+        3 connections
+      </Text>
       <View
         style={{
           borderTopColor: Colors.primary,
-          borderTopWidth:  0.2,
+          borderTopWidth: 0.2,
           marginHorizontal: Default.fixPadding * 2,
         }}
       >
-       
         <TouchableOpacity
-        
-      onPress={() => props.navigation.navigate("Profile3")}
+          onPress={() => props.navigation.navigate("Profile3")}
           style={{
             flexDirection: isRtl ? "row-reverse" : "row",
             paddingVertical: Default.fixPadding,
@@ -240,9 +239,8 @@ import {
                 numberOfLines={1}
                 style={{ ...Fonts.Medium16primary, overflow: "hidden" }}
               >
-        Laiba Shahbaz
+                Laiba Shahbaz
               </Text>
-             
             </View>
           </View>
           <View
@@ -253,45 +251,39 @@ import {
             }}
           >
             <TouchableOpacity
-            
-          onPress={() => props.navigation.navigate("chatScreen")}
+              onPress={() => props.navigation.navigate("chatScreen")}
               numberOfLines={1}
               style={{ ...Fonts.Medium14grey, overflow: "hidden" }}
             >
-            <Ionicons name="chatbubble-outline" size={30} color="black" />
-
-          </TouchableOpacity>
+              <Ionicons name="chatbubble-outline" size={30} color="black" />
+            </TouchableOpacity>
           </View>
         </TouchableOpacity>
-
-        
       </View>
-
-     </SafeAreaView>
-      
-
+    </SafeAreaView>
   );
 };
-  
-  export default OngoingTab;
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    tagContainer: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      backgroundColor: 'red',
-      padding: 5,
-      borderTopLeftRadius:30,
-      width:60
-    },
-    tag: {
-      color: 'white',
-      fontSize: 20,
-      fontWeight: 'bold',
-    },
-  });
+
+export default OngoingTab;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  tagContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    backgroundColor: "red",
+    padding: 5,
+    borderTopLeftRadius: 30,
+    width: 60,
+  },
+  tag: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+});
