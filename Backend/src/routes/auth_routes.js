@@ -17,6 +17,7 @@ import {
   RejectRequest,
   Disconnect,
   getConnections,
+  getMayKnow,
 } from "../controllers/auth_controller.js";
 import { uploadMultiple, uploadSingle } from "../middleware/pic_upload.js";
 import { protect } from "../middleware/user_middleware.js";
@@ -39,6 +40,7 @@ routes.post("/accept_request/:id", acceptRequest);
 routes.post("/reject_request/:id", RejectRequest);
 routes.post("/disconnect/:id", Disconnect);
 routes.get("/user_connections/:id", getConnections);
+routes.get("/neighbour-you-may-know/:userId", getMayKnow);
 
 // picture upload
 

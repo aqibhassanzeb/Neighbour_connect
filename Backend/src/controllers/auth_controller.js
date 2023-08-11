@@ -2,6 +2,7 @@ import { User } from "../models/user.js";
 import bycrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { sendMail } from "../middleware/email_send.js";
+import { calculateDistance } from "../utils/index.js";
 
 export const userSignup = async (req, res) => {
   const { status, email, password, name } = req.body;
@@ -405,5 +406,44 @@ export const getConnections = async (req, res) => {
     res.json({ success: true, data: user.connections });
   } catch (err) {
     res.status(500).json({ error: "Error fetching user's friends" });
+  }
+};
+
+// Neighbour May Know
+export const getMayKnow = async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const addressRange = parseFloat(user.address_rang) || 5;
+
+    // Fetch potential connections who are not in the user's connections
+    const potentialConnections = await User.find({
+      _id: {
+        $ne: userId,
+        $nin: user.connections,
+      },
+      "address.latitude": { $exists: true },
+      "address.longitude": { $exists: true },
+    });
+
+    const filteredConnections = potentialConnections.filter(
+      (u) =>
+        calculateDistance(
+          parseFloat(user.address.latitude),
+          parseFloat(user.address.longitude),
+          parseFloat(u.address.latitude),
+          parseFloat(u.address.longitude)
+        ) <= addressRange
+    );
+
+    res.json(filteredConnections);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

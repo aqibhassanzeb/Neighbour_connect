@@ -10,19 +10,23 @@ import {
   Modal,
   SafeAreaView,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Colors, Default, Fonts } from "../constants/styles";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Feather from "react-native-vector-icons/Feather";
 import { useTranslation } from "react-i18next";
 import Ionicons from "react-native-vector-icons/Ionicons";
-
 import SnackbarToast from "./snackbarToast";
 import Losted from "../screens/Losted";
+import { getConnections } from "../apis/apis";
 const { width } = Dimensions.get("window");
+import { useFocusEffect } from "@react-navigation/native";
 
 const OngoingTab = (props) => {
   const { t, i18n } = useTranslation();
+
+  const [conLoader, setConLoader] = useState(false);
+  const [connectionsData, setConnectionsData] = useState([]);
 
   const isRtl = i18n.dir() == "rtl";
 
@@ -197,10 +201,35 @@ const OngoingTab = (props) => {
     );
   };
 
+  const handleGetConnections = async () => {
+    console.log("HERE");
+    try {
+      setConLoader(true);
+      let result = await getConnections();
+      if (result.status == 200) {
+        setConnectionsData(result.data.data);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setConLoader(false);
+    }
+  };
+
+  // useEffect(() => {
+  //   handleGetConnections();
+  // }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      handleGetConnections();
+    }, [])
+  );
+
+  console.log(connectionsData);
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       <Text style={{ marginLeft: 23, fontSize: 19, color: Colors.grey }}>
-        3 connections
+        {connectionsData && connectionsData.length} connections
       </Text>
       <View
         style={{
@@ -209,56 +238,64 @@ const OngoingTab = (props) => {
           marginHorizontal: Default.fixPadding * 2,
         }}
       >
-        <TouchableOpacity
-          onPress={() => props.navigation.navigate("Profile3")}
-          style={{
-            flexDirection: isRtl ? "row-reverse" : "row",
-            paddingVertical: Default.fixPadding,
-            justifyContent: "center",
-          }}
-        >
-          <View
-            style={{
-              flex: 8,
-              flexDirection: isRtl ? "row-reverse" : "row",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              source={require("../assets/images/fo2.jpg")}
-              style={{ height: 50, width: 50, borderRadius: 25 }}
-            />
-            <View
+        {connectionsData &&
+          connectionsData.map((con) => (
+            <TouchableOpacity
+              key={con._id}
+              onPress={() =>
+                props.navigation.navigate("Profile3", { user: con })
+              }
               style={{
-                marginHorizontal: Default.fixPadding * 1.5,
-                alignItems: isRtl ? "flex-end" : "flex-start",
+                flexDirection: isRtl ? "row-reverse" : "row",
+                paddingVertical: Default.fixPadding,
                 justifyContent: "center",
               }}
             >
-              <Text
-                numberOfLines={1}
-                style={{ ...Fonts.Medium16primary, overflow: "hidden" }}
+              <View
+                style={{
+                  flex: 8,
+                  flexDirection: isRtl ? "row-reverse" : "row",
+                  alignItems: "center",
+                }}
               >
-                Laiba Shahbaz
-              </Text>
-            </View>
-          </View>
-          <View
-            style={{
-              flex: 2,
-              alignItems: isRtl ? "flex-start" : "flex-end",
-              marginTop: Default.fixPadding * 0.5,
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => props.navigation.navigate("chatScreen")}
-              numberOfLines={1}
-              style={{ ...Fonts.Medium14grey, overflow: "hidden" }}
-            >
-              <Ionicons name="chatbubble-outline" size={30} color="black" />
+                <Image
+                  source={{
+                    uri: con.image,
+                  }}
+                  style={{ height: 50, width: 50, borderRadius: 25 }}
+                />
+                <View
+                  style={{
+                    marginHorizontal: Default.fixPadding * 1.5,
+                    alignItems: isRtl ? "flex-end" : "flex-start",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text
+                    numberOfLines={1}
+                    style={{ ...Fonts.Medium16primary, overflow: "hidden" }}
+                  >
+                    {con.name}
+                  </Text>
+                </View>
+              </View>
+              <View
+                style={{
+                  flex: 2,
+                  alignItems: isRtl ? "flex-start" : "flex-end",
+                  marginTop: Default.fixPadding * 0.5,
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => props.navigation.navigate("chatScreen")}
+                  numberOfLines={1}
+                  style={{ ...Fonts.Medium14grey, overflow: "hidden" }}
+                >
+                  <Ionicons name="chatbubble-outline" size={30} color="black" />
+                </TouchableOpacity>
+              </View>
             </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
+          ))}
       </View>
     </SafeAreaView>
   );

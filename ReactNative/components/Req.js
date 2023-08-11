@@ -18,12 +18,25 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import Feather from "react-native-vector-icons/Feather";
 import { useTranslation } from "react-i18next";
 import SnackbarToast from "./snackbarToast";
-import { connectionRequests } from "../apis/apis";
+import {
+  NeighbourMayKnow,
+  acceptRequest,
+  connectionRequests,
+  rejectRequest,
+} from "../apis/apis";
+import { useDispatch, useSelector } from "react-redux";
+import { handleLoader } from "../redux/loanandfoundSlice";
+import { useFocusEffect } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 //import Founded from "../screens/Founded";
 const { width } = Dimensions.get("window");
 
 const OngoingTab = (props) => {
   const { t, i18n } = useTranslation();
+  const [reqLoader, setReqLoader] = useState(false);
+  const [requests, setRequests] = useState([]);
+  const [neighboursData, setNeighboursData] = useState([]);
+  const [id, setId] = useState("");
 
   const isRtl = i18n.dir() == "rtl";
   const [selectedValue, setSelectedValue] = useState("");
@@ -43,8 +56,20 @@ const OngoingTab = (props) => {
   }
   const [isVisible, setIsVisible] = useState(false);
 
-  const toggleModal = () => {
-    setIsVisible(true);
+  const toggleModal = async (sender_id) => {
+    try {
+      let accepted = await acceptRequest({ sender_id });
+      if (accepted.status == 200) {
+        setIsVisible(true);
+        handleGetRequests();
+      } else {
+        alert(accepted.data.error);
+      }
+    } catch (error) {
+      console.log(error);
+      alert("something went wrong!");
+    } finally {
+    }
 
     setTimeout(() => {
       setIsVisible(false);
@@ -72,8 +97,20 @@ const OngoingTab = (props) => {
 
   const [isVisibled, setIsVisibled] = useState(false);
 
-  const toggleModald = () => {
-    setIsVisibled(true);
+  const toggleModald = async (sender_id) => {
+    try {
+      let rejected = await rejectRequest({ sender_id });
+      if (rejected.status == 200) {
+        setIsVisibled(true);
+        handleGetRequests();
+      } else {
+        alert(rejected.data.error);
+      }
+    } catch (error) {
+      console.log(error);
+      alert("something went wrong!");
+    } finally {
+    }
 
     setTimeout(() => {
       setIsVisibled(false);
@@ -152,104 +189,208 @@ const OngoingTab = (props) => {
       index === services.length - 1 || index === services.length - 2;
   };
 
-  useEffect(() => {
-    const result = connectionRequests();
-    console.log(result);
-  }, []);
+  const handleGetRequests = async () => {
+    try {
+      setReqLoader(true);
+      let result = await connectionRequests();
+      console.log(result.data);
+      if (result.status == 200) {
+        setRequests(result.data.data);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setReqLoader(false);
+    }
+  };
+
+  const handleGetNeighbours = async () => {
+    try {
+      let result = await NeighbourMayKnow();
+      if (result.status == 200) {
+        setNeighboursData(result.data);
+      }
+    } catch (error) {
+      console.log(error);
+      alert(error.message);
+    } finally {
+    }
+  };
+
+  const countPending =
+    requests &&
+    requests.reduce((count, item) => {
+      if (item.status === "pending") {
+        return count + 1;
+      }
+      return count;
+    }, 0);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      handleGetRequests();
+    }, [])
+  );
+  useFocusEffect(
+    React.useCallback(() => {
+      handleGetNeighbours();
+    }, [])
+  );
+
+  const getId = async () => {
+    try {
+      const userData = await AsyncStorage.getItem("userData");
+      if (userData) {
+        let parseUserdata = JSON.parse(userData);
+        setId(parseUserdata.user._id);
+      }
+    } catch (error) {
+      console.log("assyn storage error", error.message);
+    }
+  };
+  getId();
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
-      <TouchableOpacity
-        onPress={() => props.navigation.navigate("Profile4")}
-        style={{
-          ...Default.shadow,
-          backgroundColor: Colors.white,
-          marginTop: 10,
-          marginHorizontal: 13,
-          marginBottom: 7,
-          borderRadius: 10,
-          // overflow: "hidden",
-          flexDirection: isRtl ? "row-reverse" : "row",
-          paddingVertical: Default.fixPadding,
-        }}
-      >
+      {countPending === 0 && (
         <View
           style={{
-            flex: 2,
-            //  paddingHorizontal: Default.fixPadding * 1.5,
-            justifyContent: "center",
-            alignItems: "center",
+            ...Default.shadow,
+            backgroundColor: Colors.white,
+            marginTop: 10,
+            marginHorizontal: 13,
+            marginBottom: 7,
+            borderRadius: 10,
+            // overflow: "hidden",
+            flexDirection: isRtl ? "row-reverse" : "row",
+            paddingVertical: Default.fixPadding,
           }}
         >
-          <Image
-            source={require("../assets/images/dpp1.jpeg")}
-            style={{ borderRadius: 5, height: 70, width: 70, marginLeft: 36 }}
-          />
-        </View>
-        <View
-          style={{
-            flex: 5,
-            justifyContent: "center",
-            alignItems: isRtl ? "flex-end" : "flex-start",
-          }}
-        >
-          <Text
-            numberOfLines={1}
-            style={{
-              ...Fonts.SemiBold15black,
-              overflow: "hidden",
-              marginLeft: 36,
-              marginTop: 20,
-              fontSize: 18,
-            }}
-          >
-            Alina Sheikh
+          <Text style={{ marginLeft: 23, fontSize: 19, color: Colors.grey }}>
+            No Requests
           </Text>
-          <Text
-            numberOfLines={1}
-            style={{
-              ...Fonts.SemiBold14grey,
-              overflow: "hidden",
-              marginLeft: 36,
-            }}
-          ></Text>
-          <View
-            style={{
-              marginVertical: Default.fixPadding * 0.3,
-              flexDirection: isRtl ? "row-reverse" : "row",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Text
-              numberOfLines={1}
-              style={{
-                ...Fonts.SemiBold14grey,
-
-                textAlign: isRtl ? "right" : "left",
-              }}
-            ></Text>
-          </View>
         </View>
-        <View>
-          <View style={styles.contain}>
-            <View style={styles.selectedButton}>
-              <TouchableOpacity onPress={toggleModal}>
-                <Ionicons
-                  name="md-checkmark-circle"
-                  size={39}
-                  color="#005D7A"
-                  marginRight={8}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={toggleModald}>
-                <Ionicons name="md-close-circle" size={39} color="#005D7A" />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </TouchableOpacity>
+      )}
+      {requests &&
+        requests.length > 0 &&
+        requests.map((req, index) => {
+          if (req.status === "pending") {
+            return (
+              <TouchableOpacity
+                key={index}
+                onPress={() =>
+                  props.navigation.navigate("Profile4", { user: req })
+                }
+                style={{
+                  ...Default.shadow,
+                  backgroundColor: Colors.white,
+                  marginTop: 10,
+                  marginHorizontal: 13,
+                  marginBottom: 7,
+                  borderRadius: 10,
+                  // overflow: "hidden",
+                  flexDirection: isRtl ? "row-reverse" : "row",
+                  paddingVertical: Default.fixPadding,
+                }}
+              >
+                <View
+                  style={{
+                    flex: 2,
+                    //  paddingHorizontal: Default.fixPadding * 1.5,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Image
+                    source={{
+                      uri: req.sender.image,
+                    }}
+                    style={{
+                      borderRadius: 5,
+                      height: 70,
+                      width: 70,
+                      marginLeft: 36,
+                    }}
+                  />
+                </View>
+                <View
+                  style={{
+                    flex: 5,
+                    justifyContent: "center",
+                    alignItems: isRtl ? "flex-end" : "flex-start",
+                  }}
+                >
+                  <Text
+                    numberOfLines={1}
+                    style={{
+                      ...Fonts.SemiBold15black,
+                      overflow: "hidden",
+                      marginLeft: 36,
+                      marginTop: 20,
+                      fontSize: 18,
+                    }}
+                  >
+                    {req.sender.name}
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    style={{
+                      ...Fonts.SemiBold14grey,
+                      overflow: "hidden",
+                      marginLeft: 36,
+                    }}
+                  ></Text>
+                  <View
+                    style={{
+                      marginVertical: Default.fixPadding * 0.3,
+                      flexDirection: isRtl ? "row-reverse" : "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        ...Fonts.SemiBold14grey,
 
+                        textAlign: isRtl ? "right" : "left",
+                      }}
+                    ></Text>
+                  </View>
+                </View>
+
+                {/* Accept Reject */}
+                <View>
+                  <View style={styles.contain}>
+                    <View style={styles.selectedButton}>
+                      <TouchableOpacity
+                        onPress={() => toggleModal(req.sender._id)}
+                      >
+                        <Ionicons
+                          name="md-checkmark-circle"
+                          size={39}
+                          color="#005D7A"
+                          marginRight={8}
+                        />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => toggleModald(req.sender._id)}
+                      >
+                        <Ionicons
+                          name="md-close-circle"
+                          size={39}
+                          color="#005D7A"
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            );
+          }
+        })}
+
+      {/* Modal For Success Accept */}
       <Modal
         visible={isVisible}
         animationType="fade"
@@ -313,7 +454,7 @@ const OngoingTab = (props) => {
                   marginBottom: 26,
                 }}
               >
-                You and Albert Flores are connected successfully.
+                You both are connected successfully.
               </Text>
             </View>
           </View>
@@ -474,114 +615,141 @@ const OngoingTab = (props) => {
           <View
             style={{
               width: width * 0.8,
-              //  backgroundColor: Colors.white,
+              backgroundColor: Colors.white,
               borderRadius: 10,
               justifyContent: "center",
               ...Default.shadow,
-              marginTop: 680,
             }}
           >
             <View
               style={{
-                marginLeft: 87,
+                marginLeft: 150,
+              }}
+            >
+              <Ionicons name="person-remove-outline" size={32} color="black" />
+            </View>
+
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: Default.fixPadding * 1,
               }}
             >
               <Text
                 style={{
-                  fontSize: 23,
-                  color: Colors.darkGrey,
+                  ...Fonts.SemiBold18primary,
+                  marginTop: 12,
+                  marginBottom: 26,
                 }}
               >
-                Request removed
+                Request Rejected
               </Text>
             </View>
           </View>
         </View>
       </Modal>
-
+      {/* Neighbors */}
       <Text style={{ marginLeft: 23, fontSize: 19, color: Colors.grey }}>
         Neighbors You May Know
       </Text>
-      <TouchableOpacity
-        onPress={() => props.navigation.navigate("Profile1")}
-        style={{
-          ...Default.shadow,
-          backgroundColor: Colors.white,
-          marginTop: 10,
-          marginHorizontal: 13,
-          marginBottom: 7,
-          borderRadius: 10,
-          // overflow: "hidden",
-          flexDirection: isRtl ? "row-reverse" : "row",
-          paddingVertical: Default.fixPadding,
-        }}
-      >
-        <View
-          style={{
-            flex: 2,
-            //  paddingHorizontal: Default.fixPadding * 1.5,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Image
-            source={require("../assets/images/aaa.jpeg")}
-            style={{ borderRadius: 5, height: 70, width: 70, marginLeft: 36 }}
-          />
-        </View>
-        <View
-          style={{
-            flex: 5,
-            justifyContent: "center",
-            alignItems: isRtl ? "flex-end" : "flex-start",
-          }}
-        >
-          <Text
-            numberOfLines={1}
-            style={{
-              ...Fonts.SemiBold15black,
-              overflow: "hidden",
-              marginLeft: 36,
-              marginTop: 20,
-              fontSize: 18,
-            }}
-          >
-            Eman Fatima
-          </Text>
-          <Text
-            numberOfLines={1}
-            style={{
-              ...Fonts.SemiBold14grey,
-              overflow: "hidden",
-              marginLeft: 36,
-            }}
-          ></Text>
-          <View
-            style={{
-              marginVertical: Default.fixPadding * 0.3,
-              flexDirection: isRtl ? "row-reverse" : "row",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Text
-              numberOfLines={1}
-              style={{
-                ...Fonts.SemiBold14grey,
+      {neighboursData &&
+        neighboursData.map((n) => {
+          if (n._id === id) {
+            return;
+          } else {
+            return (
+              <TouchableOpacity
+                key={n._id}
+                onPress={() =>
+                  props.navigation.navigate("Profile1", { user: n })
+                }
+                style={{
+                  ...Default.shadow,
+                  backgroundColor: Colors.white,
+                  marginTop: 10,
+                  marginHorizontal: 13,
+                  marginBottom: 7,
+                  borderRadius: 10,
+                  // overflow: "hidden",
+                  flexDirection: isRtl ? "row-reverse" : "row",
+                  paddingVertical: Default.fixPadding,
+                }}
+              >
+                <View
+                  style={{
+                    flex: 2,
+                    //  paddingHorizontal: Default.fixPadding * 1.5,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Image
+                    source={{ uri: n.image }}
+                    style={{
+                      borderRadius: 5,
+                      height: 70,
+                      width: 70,
+                      marginLeft: 36,
+                    }}
+                  />
+                </View>
+                <View
+                  style={{
+                    flex: 5,
+                    justifyContent: "center",
+                    alignItems: isRtl ? "flex-end" : "flex-start",
+                  }}
+                >
+                  <Text
+                    numberOfLines={1}
+                    style={{
+                      ...Fonts.SemiBold15black,
+                      overflow: "hidden",
+                      marginLeft: 36,
+                      marginTop: 20,
+                      fontSize: 18,
+                    }}
+                  >
+                    {n.name}
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    style={{
+                      ...Fonts.SemiBold14grey,
+                      overflow: "hidden",
+                      marginLeft: 36,
+                    }}
+                  ></Text>
+                  <View
+                    style={{
+                      marginVertical: Default.fixPadding * 0.3,
+                      flexDirection: isRtl ? "row-reverse" : "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        ...Fonts.SemiBold14grey,
 
-                textAlign: isRtl ? "right" : "left",
-              }}
-            ></Text>
-          </View>
-        </View>
-        <View>
-          <View>
-            <View style={styles.contain}>
-              <View style={{ marginLeft: 70 }}></View>
-            </View>
-          </View>
-        </View>
-      </TouchableOpacity>
+                        textAlign: isRtl ? "right" : "left",
+                      }}
+                    ></Text>
+                  </View>
+                </View>
+                <View>
+                  <View>
+                    <View style={styles.contain}>
+                      <View style={{ marginLeft: 70 }}></View>
+                    </View>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            );
+          }
+        })}
     </SafeAreaView>
   );
 };

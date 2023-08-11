@@ -48,7 +48,8 @@ const UserSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      default: "avatar.png",
+      default:
+        "https://res.cloudinary.com/dbdxsvxda/image/upload/v1691754909/niegbour_proj/w6jwmnvwmvgj76z11dmj.png",
     },
     isActive: {
       type: Boolean,

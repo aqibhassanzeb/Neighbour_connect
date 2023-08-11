@@ -18,6 +18,20 @@ const getData = async () => {
 };
 
 getData();
+
+let id;
+const getId = async () => {
+  try {
+    const userData = await AsyncStorage.getItem("userData");
+    if (userData) {
+      let parseUserdata = JSON.parse(userData);
+      id = parseUserdata.user._id;
+    }
+  } catch (error) {
+    console.log("assyn storage error", error.message);
+  }
+};
+getId();
 // console.log("assyn storage ",getData())
 const headers = {
   Accept: "application/json",
@@ -149,13 +163,6 @@ export const forgotPassVerify = async (data) => {
   return result;
 };
 
-export const connectionRequests = async (data) => {
-  let { _id } = data;
-  let result = await apiRequest("GET", `get_requests/${_id}`, headers);
-  console.log({ result });
-  return result;
-};
-
 // lost and found apis
 
 export const lostItemGetbyLoc = async (data) => {
@@ -208,6 +215,92 @@ export const lostandfoundUpdate = async (data) => {
     "PUT",
     `lostandfound_update/${_id}`,
     data,
+    headersWithToken
+  );
+  return result;
+};
+
+// connection api
+
+export const connectionRequests = async () => {
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "GET",
+    `get_requests/${id}`,
+    null,
+    headersWithToken
+  );
+  return result;
+};
+
+export const acceptRequest = async (data) => {
+  console.log("payload data ;", data);
+  let { sender_id } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "POST",
+    `accept_request/${id}`,
+    { sender_id },
+    headersWithToken
+  );
+  return result;
+};
+
+export const rejectRequest = async (data) => {
+  console.log("payload data ;", data);
+  let { sender_id } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "POST",
+    `reject_request/${id}`,
+    { sender_id },
+    headersWithToken
+  );
+  return result;
+};
+
+export const getConnections = async () => {
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "GET",
+    `user_connections/${id}`,
+    null,
+    headersWithToken
+  );
+  return result;
+};
+
+export const Disconnect = async (data) => {
+  console.log("payload data ;", data);
+  let { connection_id } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "POST",
+    `disconnect/${id}`,
+    { connection_id },
+    headersWithToken
+  );
+  return result;
+};
+
+export const NeighbourMayKnow = async (data) => {
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "GET",
+    `neighbour-you-may-know/${id}`,
+    null,
+    headersWithToken
+  );
+  return result;
+};
+
+export const sendRequest = async (data) => {
+  let { receiver_id } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "POST",
+    `send_request/${id}`,
+    { receiver_id },
     headersWithToken
   );
   return result;
