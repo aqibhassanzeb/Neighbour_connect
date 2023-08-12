@@ -203,6 +203,18 @@ export const userGet = async (req, res) => {
     res.status(400).json({ message: "something went wrong!" });
   }
 };
+export const userGetbyId = async (req, res) => {
+  let filter = { isActive: true };
+  if (req.query._id) {
+    filter._id = req.query._id.split(",");
+  }
+  try {
+    let result = await User.findById(filter).select("-password");
+    res.json({ success: true, data: result });
+  } catch (error) {
+    res.status(400).json({ message: "something went wrong!" });
+  }
+};
 
 //   forgot password
 

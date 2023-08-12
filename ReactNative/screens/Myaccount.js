@@ -8,7 +8,7 @@ import { View, TextInput, Button, StyleSheet,
 
     import { Colors, Default, Fonts } from "../constants/styles";
 import Loader from '../components/loader';
-import { userGet, userUpdate } from '../apis/apis';
+import { userGet, userGetbyId, userUpdate } from '../apis/apis';
 const MyAccountScreen = (props) => {
   const { width, height } = Dimensions.get("window");
   const [cancelModal, setCancelModal] = useState(false);
@@ -84,12 +84,11 @@ const MyAccountScreen = (props) => {
           setLoader(true)
           let paylaod={}
           paylaod._id= props.route.params.userData?._id
-          let result= await userGet(paylaod)
-          
+          let result= await userGetbyId(paylaod)
           if(result.status==200){
-            setUserData(result.data.data[0])
-            setFirstName(result.data?.data.length > 0 && result.data?.data[0].name)
-            setLastName(result.data?.data.length > 0 && result.data?.data[0].last_name)
+            setUserData(result.data.data)
+            setFirstName(result.data?.data?.name)
+            setLastName(result.data?.data?.last_name)
           }
           // console.log("result :",result)
         } catch (error) {

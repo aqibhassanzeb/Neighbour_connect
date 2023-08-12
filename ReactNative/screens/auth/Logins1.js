@@ -27,6 +27,8 @@ import Feather from "react-native-vector-icons/Feather";
   import { MaterialIcons } from '@expo/vector-icons';
 import { loginUser } from "../../apis/apis";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { handleSetUserinfo } from "../../redux/loanandfoundSlice";
+import { useDispatch } from "react-redux";
   
   const { width, height } = Dimensions.get("window");
   
@@ -44,7 +46,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
       return t(`loginScreen:${key}`);
     }
     const [loginLoader, setLoginLoader] = useState(false);
-  
+    const dispatch = useDispatch()
+
     const handleLogin = async() => {
 
         if(!email || !password ) 
@@ -58,8 +61,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
           let user= await loginUser(payload)
 
           if(user.status == 200){
+            dispatch(handleSetUserinfo(user.data));
             const userData = JSON.stringify(user.data);
-            
             await  AsyncStorage.setItem('userData', userData),
             setEmail("")
             setPassword("")

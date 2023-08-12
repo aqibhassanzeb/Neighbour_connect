@@ -26,7 +26,8 @@ import Stars from "react-native-stars";
   import Swiper from "react-native-swiper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Loader from "../components/loader";
-import { userGet } from "../apis/apis";
+import { userGet, userGetbyId } from "../apis/apis";
+import { useSelector } from "react-redux";
 
 const { width, height } = Dimensions.get("window");
 
@@ -43,6 +44,7 @@ const HomeScreen = ({ navigation,route }) => {
     setIsSidePanelOpen(!isSidePanelOpen);
   };
   
+  const {userInfo} = useSelector((state) => state.loanandfound)
 
   const { t, i18n } = useTranslation();
 
@@ -54,7 +56,8 @@ const HomeScreen = ({ navigation,route }) => {
 
 const handleLogout=async()=>{
    try {
-     await AsyncStorage.clear();
+  let logout=   await AsyncStorage.clear();
+     console.log("logout function ",logout)
      navigation.navigate("Logins1")
     } catch (error) {
       console.error('Error clearing AsyncStorage:', error);
@@ -66,12 +69,16 @@ const handleGetuser=async()=>{
   try {
     setLoader(true)
     let paylaod={}
-    let userData = await AsyncStorage.getItem("userData");
-   let userInfo= JSON.parse(userData);
-    paylaod._id= userInfo.user?._id
-    let result= await userGet(paylaod)
+    if(userInfo){
+      paylaod._id= userInfo.user?._id
+    }else{
+      let userData = await AsyncStorage.getItem("userData");
+      let userInformation= JSON.parse(userData);
+      paylaod._id= userInformation.user?._id
+    }
+      let result= await userGetbyId(paylaod)
     if(result.status==200){
-    return  result.data.data[0]
+    return  result.data.data
     }
   } catch (error) {
     console.log("error ;",error)

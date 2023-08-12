@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
+  userInfo:{},
   data: [],
   loader:false,
   searchKeyword: '',
@@ -30,11 +31,15 @@ export const loanandfoundSlice = createSlice({
     handleSearchData:(state,action)=>{
       state.searchKeyword = action.payload.trim(); 
 
+    },
+    handleSetUserinfo:(state,action)=>{
+      state.userInfo = action.payload; 
+
     }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const {updataData,handleLoader,updataDataforOne,handleLoaderforOne,handleSearchData } = loanandfoundSlice.actions
+export const {updataData,handleLoader,updataDataforOne,handleLoaderforOne,handleSearchData,handleSetUserinfo } = loanandfoundSlice.actions
 
 export default loanandfoundSlice.reducer

@@ -18,6 +18,7 @@ import {
   Disconnect,
   getConnections,
   getMayKnow,
+  userGetbyId,
 } from "../controllers/auth_controller.js";
 import { uploadMultiple, uploadSingle } from "../middleware/pic_upload.js";
 import { protect } from "../middleware/user_middleware.js";
@@ -27,6 +28,7 @@ routes.post("/user_signup", userSignup);
 routes.put("/user_verify", userVerify);
 routes.put("/user_update/:_id", userUpdate);
 routes.get("/user_get", protect, userGet);
+routes.get("/user_getbyid", protect, userGetbyId);
 routes.put("/user_passupdate", protect, userPassUpdate);
 routes.put("/user_emailupdate", protect, userEmailUpdate);
 routes.post("/user_login", userLogin);

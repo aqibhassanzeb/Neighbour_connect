@@ -147,6 +147,17 @@ export const userGet = async (data) => {
   );
   return result;
 };
+export const userGetbyId = async (data) => {
+  let queryString = data && new URLSearchParams(data).toString();
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "GET",
+    `user_getbyid?${queryString}`,
+    null,
+    headersWithToken
+  );
+  return result;
+};
 
 export const loginUser = async (data) => {
   let result = await apiRequest("POST", "user_login", data, headers);
@@ -260,6 +271,8 @@ export const rejectRequest = async (data) => {
 };
 
 export const getConnections = async () => {
+
+  console.log("id @@@@@@@@@@@@@@22",id)
   const headersWithToken = await getHeadersWithToken();
   let result = await apiRequest(
     "GET",
