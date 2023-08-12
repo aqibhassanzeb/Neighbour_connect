@@ -27,7 +27,9 @@ import Stars from "react-native-stars";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Loader from "../components/loader";
 import { userGet, userGetbyId } from "../apis/apis";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { handleSetUserinfo } from "../redux/loanandfoundSlice";
+
 
 const { width, height } = Dimensions.get("window");
 
@@ -49,13 +51,15 @@ const HomeScreen = ({ navigation,route }) => {
   const { t, i18n } = useTranslation();
 
   const isRtl = i18n.dir() == "rtl";
-
   function tr(key) {
     return t(`homeScreen:${key}`);
   }
+  const dispatch = useDispatch()
 
 const handleLogout=async()=>{
    try {
+    // dispatch(handleSetUserinfo({}));
+    // setUserData("")
   let logout=   await AsyncStorage.clear();
      console.log("logout function ",logout)
      navigation.navigate("Logins1")
@@ -69,7 +73,7 @@ const handleGetuser=async()=>{
   try {
     setLoader(true)
     let paylaod={}
-    if(userInfo){
+    if(userInfo?.user){
       paylaod._id= userInfo.user?._id
     }else{
       let userData = await AsyncStorage.getItem("userData");
@@ -105,7 +109,7 @@ const loadUserData = async () => {
 useEffect(() => {
   // Load user data from AsyncStorage when the component mounts
   loadUserData();
-}, [route]);
+}, [navigation]);
   return (
 
     <SafeAreaView

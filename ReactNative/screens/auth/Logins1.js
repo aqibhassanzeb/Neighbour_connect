@@ -66,7 +66,7 @@ import { useDispatch } from "react-redux";
             await  AsyncStorage.setItem('userData', userData),
             setEmail("")
             setPassword("")
-            navigation.navigate("bottomTab");
+            navigation.navigate("bottomTab",{userinfo2:user.data});
           }else{
             alert(user.data.error)
           }

@@ -62,7 +62,7 @@ const BottomTab = (props) => {
   useEffect(() => {
     // Load user data from AsyncStorage when the component mounts
     loadUserData();
-  }, []);
+  }, [props.route]);
 
   const loadUserData = async () => {
     try {
