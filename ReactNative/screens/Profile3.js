@@ -29,7 +29,6 @@ const { width } = Dimensions.get("window");
 const EditProfileScreen = (props) => {
   const [isConnected, setConnected] = useState(true);
   const connectionDetails = props.route.params?.user || {};
-  console.log({ connectionDetails });
 
   const handleConnectedPress = () => {
     setConnected(true);
@@ -262,6 +261,7 @@ const EditProfileScreen = (props) => {
               marginRight: 10,
             }}
             onPressOut={handleDisconnectTap}
+            disabled={!isConnected}
           >
             <View
               style={{

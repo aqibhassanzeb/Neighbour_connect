@@ -28,6 +28,7 @@ const { width } = Dimensions.get("window");
 
 const EditProfileScreen = (props) => {
   const [showFirstIcon, setShowFirstIcon] = useState(true);
+  const [already, setAlready] = useState(false);
   const connectionDetails = props.route.params?.user || {};
 
   const [isClicked, setIsClicked] = useState(false);
@@ -36,8 +37,9 @@ const EditProfileScreen = (props) => {
     try {
       let send = await sendRequest({ receiver_id: connectionDetails._id });
       if (send.status == 200) {
+        setAlready(true);
         setIsClicked(true);
-        setShowFirstIcon(!showFirstIcon);
+        setShowFirstIcon(false);
       } else {
         alert(send.data.error);
       }
@@ -591,6 +593,7 @@ const EditProfileScreen = (props) => {
             marginRight: 23,
           }}
           onPress={handleButtonClick}
+          disabled={isClicked}
         >
           <View
             style={{
@@ -614,7 +617,7 @@ const EditProfileScreen = (props) => {
             )}
 
             <Text style={{ ...Fonts.SemiBold18white }}>
-              {isClicked ? "pending" : "connect"}
+              {isClicked ? "Pending" : "Connect"}
             </Text>
           </View>
         </TouchableOpacity>
@@ -643,7 +646,7 @@ const EditProfileScreen = (props) => {
               paddingRight={7}
             />
 
-            <Text style={{ ...Fonts.SemiBold18white }}>{tr("message")}</Text>
+            <Text style={{ ...Fonts.SemiBold18white }}>{tr("Message")}</Text>
           </View>
         </TouchableOpacity>
       </View>

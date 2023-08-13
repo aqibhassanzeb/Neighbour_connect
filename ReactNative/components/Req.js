@@ -193,7 +193,7 @@ const OngoingTab = (props) => {
     try {
       setReqLoader(true);
       let result = await connectionRequests();
-      console.log(result.data);
+
       if (result.status == 200) {
         setRequests(result.data.data);
       }
@@ -208,7 +208,14 @@ const OngoingTab = (props) => {
     try {
       let result = await NeighbourMayKnow();
       if (result.status == 200) {
-        setNeighboursData(result.data);
+        const filteredYouKnow = [];
+
+        for (const user of result.data) {
+          if (!requests.some((request) => request.sender._id === user._id)) {
+            filteredYouKnow.push(user);
+          }
+        }
+        setNeighboursData(filteredYouKnow);
       }
     } catch (error) {
       console.log(error);
@@ -249,7 +256,6 @@ const OngoingTab = (props) => {
     }
   };
   getId();
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       {countPending === 0 && (

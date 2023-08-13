@@ -202,7 +202,6 @@ const OngoingTab = (props) => {
   };
 
   const handleGetConnections = async () => {
-    console.log("HERE");
     try {
       setConLoader(true);
       let result = await getConnections();
@@ -225,7 +224,6 @@ const OngoingTab = (props) => {
     }, [])
   );
 
-  console.log(connectionsData);
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       <Text style={{ marginLeft: 23, fontSize: 19, color: Colors.grey }}>

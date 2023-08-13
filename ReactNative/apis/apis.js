@@ -1,15 +1,14 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// export const baseUrl = `http://192.168.43.147:3333/api/v1/`;
-export const baseUrl = `http://192.168.10.6:3333/api/v1/`;
+export const baseUrl = `http://192.168.43.147:3333/api/v1/`;
+// export const baseUrl = `http://192.168.10.6:3333/api/v1/`;
 let token;
 const getData = async () => {
   try {
     const userData = await AsyncStorage.getItem("userData");
     if (userData) {
       let parseUserdata = JSON.parse(userData);
-      console.log("parseUserdata", parseUserdata.token);
       token = parseUserdata.token;
     }
   } catch (e) {
@@ -19,20 +18,26 @@ const getData = async () => {
 
 getData();
 
-let id;
-const getId = async () => {
+export const getId = async () => {
   try {
-    const userData = await AsyncStorage.getItem("userData");
-    if (userData) {
-      let parseUserdata = JSON.parse(userData);
-      id = parseUserdata.user._id;
+    const userJSON = await AsyncStorage.getItem("userData");
+    if (userJSON !== null) {
+      const user = JSON.parse(userJSON);
+      if (user.user.hasOwnProperty("_id")) {
+        return user.user._id;
+      } else {
+        console.log("ID not found in user object.");
+        return null;
+      }
+    } else {
+      console.log("User object not found in AsyncStorage.");
+      return null;
     }
   } catch (error) {
-    console.log("assyn storage error", error.message);
+    console.error("Error retrieving user object from AsyncStorage:", error);
+    return null;
   }
 };
-getId();
-// console.log("assyn storage ",getData())
 const headers = {
   Accept: "application/json",
   "Content-Type": "application/json",
@@ -59,6 +64,7 @@ const getHeadersWithToken = async () => {
   }
   return null;
 };
+
 const getHeadersWithTokenFormData = async () => {
   try {
     const userData = await AsyncStorage.getItem("userData");
@@ -219,7 +225,6 @@ export const lostandfoundCreate = async (data) => {
   return result;
 };
 export const lostandfoundUpdate = async (data) => {
-  console.log("payload data ;", data);
   let { _id } = data;
   const headersWithToken = await getHeadersWithToken();
   let result = await apiRequest(
@@ -234,6 +239,7 @@ export const lostandfoundUpdate = async (data) => {
 // connection api
 
 export const connectionRequests = async () => {
+  const id = await getId();
   const headersWithToken = await getHeadersWithToken();
   let result = await apiRequest(
     "GET",
@@ -245,7 +251,7 @@ export const connectionRequests = async () => {
 };
 
 export const acceptRequest = async (data) => {
-  console.log("payload data ;", data);
+  const id = await getId();
   let { sender_id } = data;
   const headersWithToken = await getHeadersWithToken();
   let result = await apiRequest(
@@ -258,7 +264,7 @@ export const acceptRequest = async (data) => {
 };
 
 export const rejectRequest = async (data) => {
-  console.log("payload data ;", data);
+  const id = await getId();
   let { sender_id } = data;
   const headersWithToken = await getHeadersWithToken();
   let result = await apiRequest(
@@ -271,8 +277,7 @@ export const rejectRequest = async (data) => {
 };
 
 export const getConnections = async () => {
-
-  console.log("id @@@@@@@@@@@@@@22",id)
+  const id = await getId();
   const headersWithToken = await getHeadersWithToken();
   let result = await apiRequest(
     "GET",
@@ -284,7 +289,7 @@ export const getConnections = async () => {
 };
 
 export const Disconnect = async (data) => {
-  console.log("payload data ;", data);
+  const id = await getId();
   let { connection_id } = data;
   const headersWithToken = await getHeadersWithToken();
   let result = await apiRequest(
@@ -297,6 +302,7 @@ export const Disconnect = async (data) => {
 };
 
 export const NeighbourMayKnow = async (data) => {
+  const id = await getId();
   const headersWithToken = await getHeadersWithToken();
   let result = await apiRequest(
     "GET",
@@ -308,12 +314,66 @@ export const NeighbourMayKnow = async (data) => {
 };
 
 export const sendRequest = async (data) => {
+  const id = await getId();
   let { receiver_id } = data;
   const headersWithToken = await getHeadersWithToken();
   let result = await apiRequest(
     "POST",
     `send_request/${id}`,
     { receiver_id },
+    headersWithToken
+  );
+  return result;
+};
+
+// skill hub api
+export const addSkill = async (data) => {
+  const id = await getId();
+  const headersWithToken = await getHeadersWithTokenFormData();
+  let result = await apiRequest(
+    "POST",
+    `add_skill`,
+    { ...data, posted_by: id },
+    headersWithToken
+  );
+  return result;
+};
+export const getSkillsByUser = async () => {
+  const id = await getId();
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest("GET", `skills/${id}`, null, headersWithToken);
+  return result;
+};
+export const updateSkill = async (data) => {
+  let { _id } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "PUT",
+    `update_skill/${_id}`,
+    data,
+    headersWithToken
+  );
+  return result;
+};
+
+export const updateImages = async (data) => {
+  let { _id } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "PUT",
+    `update_skill/${_id}`,
+    data.formData,
+    headersWithToken
+  );
+  return result;
+};
+
+export const deleteSkill = async (data) => {
+  const headersWithToken = await getHeadersWithTokenFormData();
+  let result = await apiRequest(
+    "DELETE",
+    `delete_skill/${data._id}`,
+    null,
     headersWithToken
   );
   return result;

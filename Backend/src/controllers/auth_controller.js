@@ -377,6 +377,7 @@ export const RejectRequest = async (req, res) => {
 
 // Disconnect a user
 export const Disconnect = async (req, res) => {
+  const { connection_id } = req.body;
   try {
     const user = await User.findById(req.params.id);
 
@@ -385,7 +386,7 @@ export const Disconnect = async (req, res) => {
     }
 
     const connectionIndex = user.connections.findIndex(
-      (connection) => connection.toString() === req.body.connection_id
+      (connection) => connection.toString() === connection_id
     );
 
     if (connectionIndex === -1) {
@@ -394,6 +395,23 @@ export const Disconnect = async (req, res) => {
 
     user.connections.splice(connectionIndex, 1);
     await user.save();
+
+    const connection_user = await User.findById(connection_id);
+
+    if (!connection_user) {
+      return res.status(404).json({ error: "Connection not found" });
+    }
+
+    const connection2Index = connection_user.connections.findIndex(
+      (connection) => connection.toString() === req.params.id
+    );
+
+    if (connection2Index === -1) {
+      return res.status(404).json({ error: "Connection not found" });
+    }
+
+    connection_user.connections.splice(connection2Index, 1);
+    await connection_user.save();
 
     res.json({ message: "User Disconnected" });
   } catch (err) {
@@ -456,6 +474,6 @@ export const getMayKnow = async (req, res) => {
     res.json(filteredConnections);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
