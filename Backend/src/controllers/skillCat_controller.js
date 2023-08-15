@@ -1,28 +1,37 @@
 import { SkillCategory } from "../models/skill_category.js";
+import { v2 as cloudinary } from "cloudinary";
 
-export const skillCatCreate = (req, res) => {
+export const skillCatCreate = async (req, res) => {
   const { name } = req.body;
-  if (!name) {
-    return res.status(422).json({ error: "please fill the name " });
-  }
-  SkillCategory.findOne({ name })
-    .then((already) => {
-      if (already) {
-        return res.status(422).json({ message: "already registered" });
-      }
-      const skillCat = new SkillCategory(req.body);
-      skillCat
-        .save()
-        .then((resp) => {
-          res.status(200).json({ message: "register successfully" });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    })
-    .catch((err) => {
-      console.log(err);
+  try {
+    const already = await SkillCategory.findOne({ name });
+    if (already) {
+      return res.status(422).json({ message: "already registered" });
+    }
+    const result = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { resource_type: "image" },
+        (error, result) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        }
+      );
+
+      uploadStream.end(req.file.buffer);
     });
+
+    const image_url = result.secure_url;
+    const category = new SkillCategory({ name, image: image_url });
+    await category.save();
+
+    res.status(200).json({ message: "updated successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Faild to create category" });
+  }
 };
 export const skillCatUpdate = async (req, res) => {
   const { _id } = req.params;

@@ -5,6 +5,11 @@ const skillCategorySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    image: {
+      type: String,
+      default:
+        "https://res.cloudinary.com/dbdxsvxda/image/upload/v1692023457/niegbour_proj/e5ff2ba2pxohexi7cnsx.png",
+    },
     is_active: {
       type: Boolean,
       default: true,

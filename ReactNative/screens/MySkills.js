@@ -226,7 +226,7 @@ const CategoryScreen = ({ navigation, route }) => {
                 }}
               >
                 <Image
-                  source={require(`../assets/images/${"Cooking"}.png`)}
+                  source={{ uri: skill.category.image }}
                   style={{
                     borderRadius: 5,
                     height: 70,
@@ -250,7 +250,7 @@ const CategoryScreen = ({ navigation, route }) => {
                     marginLeft: 36,
                   }}
                 >
-                  {skill.category}
+                  {skill.category.name}
                 </Text>
                 <Text
                   numberOfLines={1}

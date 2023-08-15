@@ -107,6 +107,7 @@ import ConnReq from "./screens/ConnReq";
 import HomeDecor from "./screens/HomeDecor";
 import BuyMy from "./screens/BuyMy";
 import Shared from "./screens/Shared";
+import CatShared from "./screens/CatShared";
 import Baby from "./screens/Baby";
 import Cooking from "./screens/Cooking";
 import Gardening from "./screens/Gardening";
@@ -390,6 +391,11 @@ const MainNavigation = (props) => {
         <Stack.Screen
           name="Shared"
           component={Shared}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="CatShared"
+          component={CatShared}
           options={{ headerShown: false }}
         />
         <Stack.Screen

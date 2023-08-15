@@ -1,8 +1,10 @@
-import streamifier from "streamifier";
 import { Skill } from "../models/skill.js";
+import { User } from "../models/user.js";
 import { v2 as cloudinary } from "cloudinary";
 
 export const addSkill = async (req, res) => {
+  console.log(req.body);
+  const location = JSON.parse(req.body.location);
   if (!req.files || req.files.length === 0) {
     return res.status(400).send("No files uploaded.");
   }
@@ -10,27 +12,31 @@ export const addSkill = async (req, res) => {
   try {
     const uploadedImages = [];
 
-    for (const file of req.files) {
-      const result = await new Promise((resolve, reject) => {
-        const upload_stream = cloudinary.uploader.upload_stream(
+    const uploadPromises = req.files.map((file) => {
+      return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          { resource_type: "auto" },
           (error, result) => {
             if (error) {
+              console.error("Error uploading to Cloudinary:", error);
               reject(error);
             } else {
-              resolve(result);
+              uploadedImages.push(result);
+              resolve();
             }
           }
         );
-        const buffer = file.buffer;
-        streamifier.createReadStream(buffer).pipe(upload_stream);
-      });
-      uploadedImages.push(result);
-    }
 
+        uploadStream.end(file.buffer);
+      });
+    });
+
+    await Promise.all(uploadPromises);
     const images = uploadedImages.map((item) => item.secure_url);
 
     const post = new Skill({
       ...req.body,
+      location,
       images,
     });
 
@@ -42,8 +48,8 @@ export const addSkill = async (req, res) => {
         .json({ message: "Posted Successfully", data: posted });
     }
   } catch (error) {
-    console.error("Error uploading images to Cloudinary:", error);
-    return res.status(500).send("Error uploading images.");
+    console.error(error);
+    return res.status(500).send("Error uploading post.");
   }
 };
 
@@ -63,35 +69,41 @@ export const updateImages = async (req, res) => {
   if (!req.files || req.files.length === 0) {
     return res.status(400).send("No files uploaded.");
   }
-  console.log(req.files);
   try {
     const uploadedImages = [];
 
-    for (const file of req.files) {
-      const result = await new Promise((resolve, reject) => {
-        const upload_stream = cloudinary.uploader.upload_stream(
+    const uploadPromises = req.files.map((file) => {
+      return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          { resource_type: "auto" },
           (error, result) => {
             if (error) {
+              console.error("Error uploading to Cloudinary:", error);
               reject(error);
             } else {
-              resolve(result);
+              uploadedImages.push(result);
+              resolve();
             }
           }
         );
-        const buffer = file.buffer;
-        streamifier.createReadStream(buffer).pipe(upload_stream);
+
+        uploadStream.end(file.buffer);
       });
-      uploadedImages.push(result);
-    }
+    });
 
-    const images = uploadedImages.map((item) => item.secure_url);
+    await Promise.all(uploadPromises);
+    const updated_images = uploadedImages.map((item) => item.secure_url);
 
-    const response = await Skill.findByIdAndUpdate({ _id }, images);
+    const response = await Skill.findByIdAndUpdate(
+      _id,
+      { $set: { images: updated_images } },
+      { new: true }
+    );
     if (response) {
       return res.status(200).json({ message: "updated successfully" });
     }
   } catch (error) {
-    console.error("Error uploading images to Cloudinary:", error);
+    console.error("Error updating :", error);
     return res.status(500).send("Error uploading images.");
   }
 };
@@ -110,20 +122,24 @@ export const deleteSkill = async (req, res) => {
 };
 
 export const getSkillsByCat = async (req, res) => {
-  const { category_name } = req.params;
+  const { _id } = req.params;
   const user_id = req.user._id;
 
   try {
     const posts = await Skill.find({
-      category: category_name,
+      category: _id,
       $or: [
-        { posted_by: user_id },
+        { posted_by: { $ne: user_id } },
         {
-          selected_visibility: "Connection",
-          posted_by: { $in: req.user.connections },
+          $and: [
+            { selected_visibility: "Connection" },
+            { posted_by: { $in: req.user.connections } },
+          ],
         },
       ],
-    });
+    })
+      .populate("category")
+      .populate("posted_by", "name image endorse_count endorsed_by");
     res.json(posts);
   } catch (error) {
     console.log(error);
@@ -135,12 +151,55 @@ export const getSkillsByUser = async (req, res) => {
   const { user_id } = req.params;
 
   try {
-    const posts = await Skill.find({ posted_by: user_id }).populate(
-      "posted_by",
-      "name"
-    );
+    const posts = await Skill.find({ posted_by: user_id })
+      .populate("posted_by", "name image endorse_count endorsed_by")
+      .populate("category");
     res.json(posts);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching posts by user" });
+    res.status(500).json({ error: "Error fetching posts by user" });
+  }
+};
+
+export const increaseEndorse = async (req, res) => {
+  const { _id } = req.params;
+  const user_id = req.user._id;
+  try {
+    const endorsed_user = await User.findById(_id);
+    if (!endorsed_user) {
+      return res.status(404).json({ eroor: "Endorsing user not found" });
+    }
+    endorsed_user.endorsed_by.push(user_id);
+    endorsed_user.endorse_count += 1;
+
+    await endorsed_user.save();
+
+    return res.status(200).json({ message: "Endorsement successful" });
+  } catch (error) {
+    console.error("Error endorsing user:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const UnEndorse = async (req, res) => {
+  const { _id } = req.params;
+  const user_id = req.user._id;
+
+  try {
+    const endorsed_user = await User.findById(_id);
+    if (!endorsed_user) {
+      return res.status(404).json({ eroor: "Endorsing user not found" });
+    }
+    const index = endorsed_user.endorsed_by.indexOf(user_id);
+    if (index !== -1) {
+      endorsed_user.endorsed_by.splice(index, 1);
+    }
+    endorsed_user.endorse_count -= 1;
+
+    await endorsed_user.save();
+
+    return res.status(200).json({ message: "UnEndorsement successful" });
+  } catch (error) {
+    console.error("Error endorsing user:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };

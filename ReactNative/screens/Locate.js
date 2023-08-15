@@ -12,18 +12,26 @@ import { Colors, Default, Fonts } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { useTranslation } from "react-i18next";
-import MapView, { Marker, Callout } from "react-native-maps";
+import MapView, { Marker, Callout, PROVIDER_GOOGLE } from "react-native-maps";
+import { useDispatch } from "react-redux";
+import { updateLocation } from "../redux/loanandfoundSlice";
 
 const { width, height } = Dimensions.get("window");
 
 const ASPECT_RATIO = width / height;
-const LATITUDE = 37.78825;
-const LONGITUDE = -122.4324;
+const LATITUDE = 33.5651;
+const LONGITUDE = 73.0169;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-const PickAddressScreen = ({ navigation }) => {
+const PickAddressScreen = ({ navigation, route }) => {
+  const title = route.params?.title || "";
+
   const { t, i18n } = useTranslation();
+
+  const [poi, setPoi] = useState(null);
+
+  const dispatch = useDispatch();
 
   const isRtl = i18n.dir() == "rtl";
 
@@ -48,16 +56,25 @@ const PickAddressScreen = ({ navigation }) => {
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   };
-  const [poi, setPoi] = useState(null);
 
   const onPoiClick = (e) => {
     const poi = e.nativeEvent;
     setPoi(poi);
+    dispatch(updateLocation(poi));
+  };
+
+  const handleButtonPress = () => {
+    if (title && title === "Edit_Skill") {
+      navigation.goBack(); // Go back if title is "Edit_Skill"
+    } else {
+      navigation.navigate("AddSkills");
+    }
   };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <MapView
+        provider={PROVIDER_GOOGLE}
         style={{ flex: 1 }}
         initialRegion={region}
         onPoiClick={onPoiClick}
@@ -73,13 +90,14 @@ const PickAddressScreen = ({ navigation }) => {
           </Marker>
         ) : (
           <Marker
-            coordinate={{ latitude: 37.78825, longitude: -122.4324 }}
+            coordinate={{ latitude: 33.5651, longitude: 73.0169 }}
             pinColor={Colors.steelBlue}
             draggable
           />
         )}
       </MapView>
 
+      {/* Search Area  */}
       <View
         style={{
           paddingVertical: Default.fixPadding * 1.6,
@@ -134,6 +152,8 @@ const PickAddressScreen = ({ navigation }) => {
           />
         </View>
       </View>
+
+      {/* Location Show and Button  */}
       <View
         style={{
           position: "absolute",
@@ -177,11 +197,11 @@ const PickAddressScreen = ({ navigation }) => {
               marginHorizontal: Default.fixPadding,
             }}
           >
-            2464 Royal Ln. Mesa, New Jersey 45463
+            {poi ? poi.name : "Rawalpindi"}
           </Text>
         </View>
         <TouchableOpacity
-          onPress={() => navigation.navigate("AddSkills")}
+          onPress={handleButtonPress}
           style={{
             backgroundColor: Colors.primary,
             borderRadius: 10,

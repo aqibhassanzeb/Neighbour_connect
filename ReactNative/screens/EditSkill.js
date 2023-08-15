@@ -29,9 +29,16 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import axios from "axios";
 import Loader from "../components/loader";
-import { addSkill, updateImages, updateSkill } from "../apis/apis";
+import {
+  addSkill,
+  getCategories,
+  updateImages,
+  updateSkill,
+} from "../apis/apis";
 import { extractDays, extractTime } from "../utils";
 import Swiper from "react-native-swiper";
+import { useSelector } from "react-redux";
+import { clearLocation } from "../redux/loanandfoundSlice";
 
 const { width, height } = Dimensions.get("window");
 const Checkbox = ({ label, onChange, checked }) => {
@@ -49,13 +56,13 @@ const Checkbox = ({ label, onChange, checked }) => {
 
 const PayPalScreen = ({ navigation, route }) => {
   const { data } = route.params;
-  console.log(data);
+  const { selectedLocation } = useSelector((state) => state.loanandfound);
 
   const [checkedValues, setCheckedValues] = useState([]);
   const [image, setImage] = useState(null);
   const [selectedImages, setSelectedImages] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState();
+  const [selectedOption, setSelectedOption] = useState(data.category.name);
   const [showCustomOption, setShowCustomOption] = useState(false);
   const [customOption, setCustomOption] = useState("");
   const [dropdownOpens, setDropdownOpens] = useState(false);
@@ -77,6 +84,7 @@ const PayPalScreen = ({ navigation, route }) => {
   const [calendarModal, setCalendarModel] = useState(false);
   const [finalDate, setFinalDate] = useState();
   const [description, setDescription] = useState();
+  const [Categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const { t, i18n } = useTranslation();
@@ -92,10 +100,10 @@ const PayPalScreen = ({ navigation, route }) => {
   const handleOptionSelect = (option) => {
     if (option === "Others") {
       setShowCustomOption(true); // Show the custom option TextInput
-      setSelectedOption(option);
+      setSelectedOption(option.name);
       setDropdownOpen(false);
     } else {
-      setSelectedOption(option);
+      setSelectedOption(option.name);
       setDropdownOpen(false); // Close the dropdown for other options
       setShowCustomOption(false); // Hide the custom option TextInput
     }
@@ -160,17 +168,22 @@ const PayPalScreen = ({ navigation, route }) => {
     }
   };
 
+  const dispatch = useDispatch();
+
   const handleUpdate = async () => {
     const newData = {
       _id: data._id,
-      category: selectedOption,
+      category: selectedOption._id,
       description: description,
       skill_level: selectedOptions,
       time: String(time),
       price_per_hour: pricePerHour,
       selected_day: checkedValues,
       selected_visibility: selectedOptionsd,
-      location: route.params?.address,
+      location: {
+        ...selectedLocation.coordinate,
+        name: selectedLocation.name,
+      },
     };
 
     try {
@@ -178,6 +191,7 @@ const PayPalScreen = ({ navigation, route }) => {
       let response = await updateSkill(newData);
 
       if (response.status === 200) {
+        dispatch(clearLocation());
         navigation.navigate("SkillUpdated");
       }
     } catch (error) {
@@ -192,15 +206,14 @@ const PayPalScreen = ({ navigation, route }) => {
     selectedImages.slice(0, 3).forEach((image, index) => {
       formData.append("images", {
         uri: image.uri,
-        type: image.type,
-        name: image.name,
+        type: "image/jpeg",
+        name: `image_${index}.jpg`,
       });
     });
 
     try {
       setIsLoading(true);
-      let response = await updateImages({ formData, _id: data._id });
-
+      let response = await updateImages({ formData, id: data._id });
       if (response.status === 200) {
         navigation.navigate("SkillUpdated");
       }
@@ -235,6 +248,22 @@ const PayPalScreen = ({ navigation, route }) => {
     let tempDate = date.toString().split(" ");
     return date !== "" ? `${tempDate[2]} ${tempDate[1]} ${tempDate[3]}` : "";
   };
+
+  const handleGetCategories = async () => {
+    try {
+      let result = await getCategories();
+      if (result.status == 200) {
+        setCategories(result.data.data);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+    }
+  };
+
+  useEffect(() => {
+    handleGetCategories();
+  }, []);
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       {isLoading && <Loader />}
@@ -261,7 +290,7 @@ const PayPalScreen = ({ navigation, route }) => {
             marginHorizontal: Default.fixPadding * 1.2,
           }}
         >
-          {"Add Skill"}
+          {"Edit Skill"}
         </Text>
       </View>
 
@@ -400,7 +429,7 @@ const PayPalScreen = ({ navigation, route }) => {
                       color: "black",
                     }}
                   >
-                    {data.category}
+                    {selectedOption}
                   </Text>
                   <View
                     style={{
@@ -422,50 +451,15 @@ const PayPalScreen = ({ navigation, route }) => {
           </View>
           {dropdownOpen && (
             <View style={styles.dropdownsd}>
-              <TouchableOpacity
-                onPress={() => handleOptionSelect("Electrician ")}
-              >
-                <Text style={{ padding: 10 }}>Electrician </Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleOptionSelect("Tutoring ")}>
-                <Text style={{ padding: 10 }}>Tutoring</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => handleOptionSelect("BabySitting")}
-              >
-                <Text style={{ padding: 10 }}>BabySitting</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleOptionSelect("Cooking")}>
-                <Text style={{ padding: 10 }}>Cooking</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleOptionSelect("Gardening")}>
-                <Text style={{ padding: 10 }}>Gardening</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => handleOptionSelect("Technology Assistance")}
-              >
-                <Text style={{ padding: 10 }}> Technology Assistance</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleOptionSelect("Tailoring")}>
-                <Text style={{ padding: 10 }}> Tailoring </Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleOptionSelect("Salon")}>
-                <Text style={{ padding: 10 }}> Salon </Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleOptionSelect("Painting ")}>
-                <Text style={{ padding: 10 }}> Painting </Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleOptionSelect("Plumber")}>
-                <Text style={{ padding: 10 }}> Plumber </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => handleOptionSelect("Arts And Crafts")}
-              >
-                <Text style={{ padding: 10 }}> Arts And Crafts</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleOptionSelect("Others")}>
-                <Text style={{ padding: 10 }}> Others </Text>
-              </TouchableOpacity>
+              {Categories.length > 0 &&
+                Categories.map((cat) => (
+                  <TouchableOpacity
+                    key={cat._id}
+                    onPress={() => handleOptionSelect(cat)}
+                  >
+                    <Text style={{ padding: 10 }}>{cat.name}</Text>
+                  </TouchableOpacity>
+                ))}
             </View>
           )}
           {showCustomOption && (
@@ -503,7 +497,9 @@ const PayPalScreen = ({ navigation, route }) => {
             }}
           >
             <TouchableOpacity
-              onPress={() => navigation.navigate("Locate")}
+              onPress={() =>
+                navigation.navigate("Locate", { title: "Edit_Skill" })
+              }
               style={{
                 flexDirection: isRtl ? "row-reverse" : "row",
                 alignItems: "center",
@@ -534,7 +530,9 @@ const PayPalScreen = ({ navigation, route }) => {
                     paddingLeft: 21,
                   }}
                 >
-                  Select new location
+                  {selectedLocation.name
+                    ? selectedLocation.name
+                    : "Select new location"}
                 </Text>
               </View>
             </TouchableOpacity>

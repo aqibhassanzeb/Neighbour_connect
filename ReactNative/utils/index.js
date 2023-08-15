@@ -56,3 +56,12 @@ export const extractDays = (inputDays) => {
 
   return processedArray.join(" ");
 };
+
+export const shortText = (text) => {
+  const words = text.split(/\s+/);
+  if (words.length <= 40) {
+    return words.join(" ");
+  } else {
+    return words.slice(0, 40).join(" ");
+  }
+};

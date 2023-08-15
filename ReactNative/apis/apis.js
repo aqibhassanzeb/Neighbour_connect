@@ -326,22 +326,38 @@ export const sendRequest = async (data) => {
   return result;
 };
 
+// skill categories
+export const getCategories = async () => {
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest("GET", "skill_cat", null, headersWithToken);
+  return result;
+};
+
 // skill hub api
 export const addSkill = async (data) => {
   const id = await getId();
+  data.append("posted_by", id);
   const headersWithToken = await getHeadersWithTokenFormData();
-  let result = await apiRequest(
-    "POST",
-    `add_skill`,
-    { ...data, posted_by: id },
-    headersWithToken
-  );
+  console.log(data);
+  let result = await apiRequest("POST", `add_skill`, data, headersWithToken);
   return result;
 };
 export const getSkillsByUser = async () => {
   const id = await getId();
   const headersWithToken = await getHeadersWithToken();
   let result = await apiRequest("GET", `skills/${id}`, null, headersWithToken);
+  return result;
+};
+
+export const getSkillsByCategory = async (data) => {
+  const { id } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "GET",
+    `skill_category/${id}`,
+    null,
+    headersWithToken
+  );
   return result;
 };
 export const updateSkill = async (data) => {
@@ -357,11 +373,10 @@ export const updateSkill = async (data) => {
 };
 
 export const updateImages = async (data) => {
-  let { _id } = data;
-  const headersWithToken = await getHeadersWithToken();
+  const headersWithToken = await getHeadersWithTokenFormData();
   let result = await apiRequest(
     "PUT",
-    `update_skill/${_id}`,
+    `update_images/${data.id}`,
     data.formData,
     headersWithToken
   );
@@ -374,6 +389,26 @@ export const deleteSkill = async (data) => {
     "DELETE",
     `delete_skill/${data._id}`,
     null,
+    headersWithToken
+  );
+  return result;
+};
+
+// Endorse Api
+export const addEndorse = async (data) => {
+  let { _id } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest("POST", `endorse/${_id}`, {}, headersWithToken);
+  return result;
+};
+
+export const removeEndorse = async (data) => {
+  let { _id } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "POST",
+    `unendorse/${_id}`,
+    {},
     headersWithToken
   );
   return result;

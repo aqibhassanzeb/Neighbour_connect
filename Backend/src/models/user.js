@@ -43,6 +43,13 @@ const UserSchema = new mongoose.Schema(
     roport_status: {
       type: String,
     },
+    endorse_count: {
+      type: Number,
+      default: 0,
+    },
+    endorsed_by: {
+      type: [],
+    },
     verification_code: {
       type: String,
     },
@@ -58,9 +65,7 @@ const UserSchema = new mongoose.Schema(
     detail: {
       type: String,
     },
-    connections: {
-      type: [],
-    },
+
     temp_email: {
       tyep: String,
     },

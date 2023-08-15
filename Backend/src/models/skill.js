@@ -7,16 +7,18 @@ const skillSchema = new mongoose.Schema(
       required: true,
     },
     category: {
-      // type: mongoose.Schema.Types.ObjectId,
-      // ref: "skill-category",
-      // required: true,
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "skill-category",
+      required: true,
     },
     location: {
       latitude: {
         type: String,
       },
       longitude: {
+        type: String,
+      },
+      name: {
         type: String,
       },
     },

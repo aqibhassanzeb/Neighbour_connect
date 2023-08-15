@@ -29,7 +29,9 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import axios from "axios";
 import Loader from "../components/loader";
-import { addSkill } from "../apis/apis";
+import { addSkill, getCategories } from "../apis/apis";
+import { useDispatch, useSelector } from "react-redux";
+import { clearLocation } from "../redux/loanandfoundSlice";
 
 const { width, height } = Dimensions.get("window");
 const Checkbox = ({ label, onChange, checked }) => {
@@ -46,6 +48,9 @@ const Checkbox = ({ label, onChange, checked }) => {
 };
 
 const PayPalScreen = ({ navigation, route }) => {
+  const { selectedLocation } = useSelector((state) => state.loanandfound);
+  console.log({ selectedLocation });
+
   const [checkedValues, setCheckedValues] = useState([]);
   const [image, setImage] = useState(null);
   const [selectedImages, setSelectedImages] = useState([]);
@@ -73,9 +78,11 @@ const PayPalScreen = ({ navigation, route }) => {
   const [calendarModal, setCalendarModel] = useState(false);
   const [finalDate, setFinalDate] = useState();
   const [description, setDescription] = useState("");
+  const [Categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const { t, i18n } = useTranslation();
+  const dispatch = useDispatch();
 
   const handleCheckboxChange = (value) => {
     if (checkedValues.includes(value)) {
@@ -126,6 +133,7 @@ const PayPalScreen = ({ navigation, route }) => {
   };
 
   const backAction = () => {
+    dispatch(clearLocation());
     navigation.goBack();
     return true;
   };
@@ -155,38 +163,46 @@ const PayPalScreen = ({ navigation, route }) => {
       alert("You did not select any image.");
     }
   };
-
   const handlePost = async () => {
-    const formData = new FormData();
-
-    selectedImages.slice(0, 3).forEach((image, index) => {
-      formData.append("images", {
-        uri: image.uri,
-        type: "image/jpeg", // Update with the correct image type
-        name: `image_${index}.jpg`,
+    if (selectedImages.length === 0) {
+      alert("Please fill all fields");
+    } else {
+      const formData = new FormData();
+      selectedImages.slice(0, 3).forEach((image, index) => {
+        formData.append("photos", {
+          uri: image.uri,
+          type: "image/jpeg",
+          name: `image_${index}.jpg`,
+        });
       });
-    });
 
-    formData.append("category", selectedOption);
-    formData.append("description", description);
-    formData.append("skill_level", selectedOptions);
-    formData.append("time", String(time));
-    formData.append("price_per_hour", pricePerHour);
-    formData.append("selected_day", checkedValues);
-    formData.append("selected_visibility", selectedOptionsd);
-    formData.append("location", route.params?.address);
+      formData.append("category", selectedOption._id);
+      formData.append("description", description);
+      formData.append("skill_level", selectedOptions);
+      formData.append("time", String(time));
+      formData.append("price_per_hour", pricePerHour);
+      formData.append("selected_day", checkedValues);
+      formData.append("selected_visibility", selectedOptionsd);
+      const mapLocation = {
+        ...selectedLocation.coordinate,
+        name: selectedLocation.name,
+      };
+      formData.append("location", JSON.stringify(mapLocation));
 
-    try {
-      setIsLoading(true);
-      let response = await addSkill(formData);
+      try {
+        setIsLoading(true);
+        let response = await addSkill(formData);
+        console.log(response);
 
-      if (response.status === 200) {
-        navigation.navigate("SkillPosted");
+        if (response.status === 200) {
+          dispatch(clearLocation());
+          navigation.navigate("SkillPosted");
+        }
+      } catch (error) {
+        console.log("Error uploading images", error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.log("Error uploading images", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -215,6 +231,23 @@ const PayPalScreen = ({ navigation, route }) => {
     let tempDate = date.toString().split(" ");
     return date !== "" ? `${tempDate[2]} ${tempDate[1]} ${tempDate[3]}` : "";
   };
+
+  const handleGetCategories = async () => {
+    try {
+      let result = await getCategories();
+      if (result.status == 200) {
+        setCategories(result.data.data);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+    }
+  };
+
+  useEffect(() => {
+    handleGetCategories();
+  }, []);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       {isLoading && <Loader />}
@@ -347,7 +380,7 @@ const PayPalScreen = ({ navigation, route }) => {
                       color: "grey",
                     }}
                   >
-                    {selectedOption}
+                    {selectedOption.name ? selectedOption.name : "Category"}
                   </Text>
                   <View
                     style={{
@@ -369,50 +402,15 @@ const PayPalScreen = ({ navigation, route }) => {
           </View>
           {dropdownOpen && (
             <View style={styles.dropdownsd}>
-              <TouchableOpacity
-                onPress={() => handleOptionSelect("Electrician ")}
-              >
-                <Text style={{ padding: 10 }}>Electrician </Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleOptionSelect("Tutoring ")}>
-                <Text style={{ padding: 10 }}>Tutoring</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => handleOptionSelect("BabySitting")}
-              >
-                <Text style={{ padding: 10 }}>BabySitting</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleOptionSelect("Cooking")}>
-                <Text style={{ padding: 10 }}>Cooking</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleOptionSelect("Gardening")}>
-                <Text style={{ padding: 10 }}>Gardening</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => handleOptionSelect("Technology Assistance")}
-              >
-                <Text style={{ padding: 10 }}> Technology Assistance</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleOptionSelect("Tailoring")}>
-                <Text style={{ padding: 10 }}> Tailoring </Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleOptionSelect("Salon")}>
-                <Text style={{ padding: 10 }}> Salon </Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleOptionSelect("Painting ")}>
-                <Text style={{ padding: 10 }}> Painting </Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleOptionSelect("Plumber")}>
-                <Text style={{ padding: 10 }}> Plumber </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => handleOptionSelect("Arts And Crafts")}
-              >
-                <Text style={{ padding: 10 }}> Arts And Crafts</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleOptionSelect("Others")}>
-                <Text style={{ padding: 10 }}> Others </Text>
-              </TouchableOpacity>
+              {Categories.length > 0 &&
+                Categories.map((cat) => (
+                  <TouchableOpacity
+                    key={cat._id}
+                    onPress={() => handleOptionSelect(cat)}
+                  >
+                    <Text style={{ padding: 10 }}>{cat.name}</Text>
+                  </TouchableOpacity>
+                ))}
             </View>
           )}
           {showCustomOption && (
@@ -482,7 +480,7 @@ const PayPalScreen = ({ navigation, route }) => {
                     paddingLeft: 21,
                   }}
                 >
-                  Location
+                  {selectedLocation?.name ? selectedLocation.name : "Location"}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -908,7 +906,6 @@ const PayPalScreen = ({ navigation, route }) => {
 
         {/* Post Button */}
         <TouchableOpacity
-          // onPress={() => navigation.navigate("SkillPosted")}
           onPress={handlePost}
           style={{
             backgroundColor: Colors.primary,

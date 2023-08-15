@@ -21,7 +21,7 @@ import SnackbarToast from "../components/snackbarToast";
 import Swiper from "react-native-swiper";
 import ChatScreen from "../screens/chatScreen";
 import { getId } from "../apis/apis";
-import { extractDays, extractTime } from "../utils";
+import { extractDays, extractTime, shortText } from "../utils";
 const { width, height } = Dimensions.get("window");
 
 const Losted = ({ navigation, route }) => {
@@ -73,7 +73,7 @@ const Losted = ({ navigation, route }) => {
 
   const [readMore, setReadMore] = useState(false);
 
-  const days = post.skill.selected_day;
+  const days = post.skill?.selected_day;
 
   const formattedDays = extractDays(days);
 
@@ -133,7 +133,7 @@ const Losted = ({ navigation, route }) => {
           }}
           loop={true}
         >
-          {post.skill.images.map((image) => (
+          {post.skill?.images.map((image) => (
             <View key={image}>
               <Image
                 source={{
@@ -165,7 +165,7 @@ const Losted = ({ navigation, route }) => {
                   marginTop: Default.fixPadding * 1.5,
                 }}
               >
-                {post.skill.posted_by.name}
+                {post.skill?.posted_by.name}
               </Text>
 
               <View
@@ -186,7 +186,7 @@ const Losted = ({ navigation, route }) => {
                     marginLeft: Default.fixPadding * 0.3,
                   }}
                 >
-                  {post.skill.location || "Westheimer Rd.USA"}
+                  {post.skill?.location.name}
                 </Text>
               </View>
 
@@ -205,10 +205,10 @@ const Losted = ({ navigation, route }) => {
                     overflow: "hidden",
                   }}
                 >
-                  {post.skill.skill_level} {post.skill.category}
+                  {post.skill?.skill_level} {post.skill?.category.name}
                 </Text>
               </View>
-              {!id === post.skill.posted_by._id && (
+              {!id === post.skill?.posted_by._id && (
                 <TouchableOpacity
                   style={{
                     backgroundColor: Colors.primary,
@@ -290,9 +290,7 @@ const Losted = ({ navigation, route }) => {
 
                 {readMore ? (
                   <Text style={{ ...Fonts.Medium14grey }}>
-                    {
-                      "Proficient in installing and wiring electrical systems in residential, commercial, and industrial settings. Experienced in reading blueprints, determining wiring layouts, and selecting appropriate materials and equipment.  Skilled in diagnosing electrical problems and providing effective solutions. Capable of identifying faulty wiring, circuit breakers, switches, and other components, and performing repairs to restore functionality."
-                    }
+                    {post.skill.description}
                     <Text
                       style={{ ...Fonts.Medium14primary }}
                       onPress={() => setReadMore((desc) => !desc)}
@@ -303,13 +301,12 @@ const Losted = ({ navigation, route }) => {
                   </Text>
                 ) : (
                   <Text style={{ ...Fonts.Medium14grey, paddingBottom: 20 }}>
-                    {
-                      "Proficient in installing and wiring electrical systems in residential, commercial, and industrial settings. Experienced in reading blueprints, determining wiring layouts, and selecting appropriate materials and equipment.  Skilled in diagnosing electrical problems and providing effective solutions. "
-                    }
+                    {shortText(post.skill.description)}
                     <Text
                       style={{ ...Fonts.Medium14primary }}
                       onPress={() => setReadMore((desc) => !desc)}
                     >
+                      {"   "}
                       {tr("readMore")}
                     </Text>
                   </Text>
@@ -325,7 +322,7 @@ const Losted = ({ navigation, route }) => {
                   {"Price"}
                 </Text>
                 <Text style={{ ...Fonts.Medium14grey, paddingBottom: 20 }}>
-                  RS:{post.skill.price_per_hour}/hr
+                  RS:{post.skill?.price_per_hour}/hr
                 </Text>
                 <Text
                   style={{
@@ -338,7 +335,7 @@ const Losted = ({ navigation, route }) => {
                   {"Availability"}
                 </Text>
                 <Text style={{ ...Fonts.Medium14grey }}>
-                  {extractTime(post.skill.time)}
+                  {extractTime(post.skill?.time)}
                 </Text>
 
                 <Text style={{ ...Fonts.Medium14grey }}>{formattedDays}</Text>
@@ -347,7 +344,7 @@ const Losted = ({ navigation, route }) => {
           </View>
         </View>
       </ScrollView>
-      {!id === post.skill.posted_by._id && (
+      {!id === post.skill?.posted_by._id && (
         <TouchableOpacity
           onPress={() => navigation.navigate("chatScreen")}
           style={{
