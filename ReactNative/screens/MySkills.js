@@ -26,6 +26,7 @@ const CategoryScreen = ({ navigation, route }) => {
 
   const [selectedValue, setSelectedValue] = useState("");
   const [dropdownOpend, setDropdownOpend] = useState(false);
+  const [setselectedSkillforEdit, setSetselectedSkillforEdit] = useState("")
 
   const [dropdownOpends, setDropdownOpends] = useState(false);
   const [dropdownOpendd, setDropdownOpendd] = useState(false);
@@ -197,7 +198,7 @@ const CategoryScreen = ({ navigation, route }) => {
 
       <ScrollView>
         {userSkills.length > 0 &&
-          userSkills.map((skill) => (
+          userSkills.map((skill,index) => (
             <TouchableOpacity
               key={skill._id}
               onPress={() =>
@@ -284,7 +285,7 @@ const CategoryScreen = ({ navigation, route }) => {
                 <View style={styles.contain}>
                   <TouchableOpacity
                     style={styles.selectedButton}
-                    onPress={() => setDropdownOpend(!dropdownOpend)}
+                    onPress={() =>{setSetselectedSkillforEdit(skill._id); setDropdownOpend(!dropdownOpend)}}
                   >
                     <Ionicons
                       name="ellipsis-vertical"
@@ -296,7 +297,7 @@ const CategoryScreen = ({ navigation, route }) => {
                     </Text>
                   </TouchableOpacity>
 
-                  {dropdownOpend && (
+                  {(dropdownOpend && setselectedSkillforEdit == skill._id) && (
                     <View style={styles.dropdown}>
                       <TouchableOpacity
                         style={[
