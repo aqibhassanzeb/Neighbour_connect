@@ -6,6 +6,7 @@ import "./config.js";
 import Auth from "./routes/auth_routes.js";
 import lostandFound from "./routes/lostfound_routes.js";
 import Skill from "./routes/skill_routes.js";
+import Watch from "./routes/watch_routes.js";
 import * as path from "path";
 import { fileURLToPath } from "url";
 
@@ -27,7 +28,7 @@ app.use(
 app.use(express.static("public"));
 
 //All APi's Endponits
-app.use("/api/v1", Auth, lostandFound, Skill);
+app.use("/api/v1", Auth, lostandFound, Skill, Watch);
 
 app.use("*", (req, res) => {
   return res.status(404).json({

@@ -204,10 +204,13 @@ const PayPalScreen = ({ navigation, route }) => {
     const formData = new FormData();
 
     selectedImages.slice(0, 3).forEach((image, index) => {
+      const extension = image.uri.split(".").pop();
+      const type = `${image.type}/${extension}`;
+      const name = image.uri.split("/").pop();
       formData.append("images", {
         uri: image.uri,
-        type: "image/jpeg",
-        name: `image_${index}.jpg`,
+        type,
+        name,
       });
     });
 

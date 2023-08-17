@@ -5,11 +5,11 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
-  
   Dimensions,
   StyleSheet,
   BackHandler,
-  Modal
+  Modal,
+  ScrollView,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Colors, Default, Fonts } from "../constants/styles";
@@ -17,22 +17,26 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Swiper from "react-native-swiper";
-import { Video } from 'expo-av';
-
-
-import CategorySkill from "../components/CategorySkill";
+import { Video } from "expo-av";
+import { deleteWatch, getWatchesByUser } from "../apis/apis";
+import Loader from "./loader";
+import { extractDate, extractTime } from "../utils";
 
 const CategoryScreen = ({ navigation, route }) => {
-
   const { t, i18n } = useTranslation();
 
   const isRtl = i18n.dir() == "rtl";
 
-  const [selectedValue, setSelectedValue] = useState('');
+  const [selectedValue, setSelectedValue] = useState("");
   const [dropdownOpend, setDropdownOpend] = useState(false);
 
   const [dropdownOpends, setDropdownOpends] = useState(false);
   const [dropdownOpendd, setDropdownOpendd] = useState(false);
+
+  const [myWatches, setMyWatches] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedId, setSelectedId] = useState("");
+
   const handleButtonPress = (buttonValue) => {
     setSelectedValue(buttonValue);
     setDropdownOpend(false);
@@ -42,12 +46,12 @@ const CategoryScreen = ({ navigation, route }) => {
 
   const [clicked, setClicked] = useState(false);
 
-    const handlePress = () => {
-      setClicked(!clicked);
-    };
+  const handlePress = () => {
+    setClicked(!clicked);
+  };
   const { width, height } = Dimensions.get("window");
   const [cancelModal, setCancelModal] = useState(false);
-    
+
   const [cancelToast, setCancelToast] = useState(false);
   const onToggleSnackBarCancelToast = () => setCancelToast(false);
 
@@ -65,319 +69,416 @@ const CategoryScreen = ({ navigation, route }) => {
       BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
 
-  const category = [
-    
-    {
-      key: "1",
-      title: "Electrician",
-      img: require("../assets/images/icon1.png"),
-      other: "(4)",
-      dollar: "$60/hr",
-      cleaner: "Skilled",
-      
-    },
-    {
-      key: "2",
-      title: "Cooking",
-      img: require("../assets/images/icon4.png"),
-      other: "(5)",
-      dollar: "$60/hr",
-      cleaner: "Semi Skilled",
-    },
-    {
-      key: "3",
-      title: "Gardening",
-      img: require("../assets/images/icon5.png"),
-      other: "(2)",
-      dollar: "$40/hr",
-      cleaner: "Skilled",
-      
-    },
-    
-  ];
-
-  const renderItemCategory = ({ item, index }) => {
-    const isFirst = index === 0;
-
-    return (
-      <CategorySkill
-        onClick={() =>
-          navigation.navigate("MySkillDetail", { name: item.cleaner })
-        }
-        marginTop={isFirst ? Default.fixPadding * 2 : 0}
-        marginHorizontal={Default.fixPadding * 2}
-        marginBottom={Default.fixPadding * 2}
-        img={item.img}
-        title={item.title}
-        
-        cleaner={item.cleaner}
-        Text={item.Text}
-      />
-    );
+  const handleGetWatches = async () => {
+    try {
+      setIsLoading(true);
+      let result = await getWatchesByUser();
+      if (result.status == 200) {
+        setMyWatches(result.data);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
- 
+  useEffect(() => {
+    handleGetWatches();
+  }, []);
+
+  async function handleDelete() {
+    try {
+      setCancelModal(false);
+      let result = await deleteWatch({ _id: selectedId });
+      console.log({ result });
+      if (result.status == 200) {
+        handleGetWatches();
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+    }
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
-    <View
-    style={{
-      backgroundColor: Colors.primary,
-      paddingBottom:12
-    }}>
-       <View
-      style={{
-        paddingVertical: Default.fixPadding * 1.2,
-        flexDirection: isRtl ? "row-reverse" : "row",
-        alignItems: "center",
-        backgroundColor: Colors.primary,
-        paddingHorizontal: Default.fixPadding * 2,
-      }}
-    >
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Ionicons
-          name={isRtl ? "arrow-forward" : "arrow-back"}
-          size={25}
-          color={Colors.white}
-        />
-      </TouchableOpacity>
-      <Text
-        style={{
-          ...Fonts.SemiBold18white,
-          marginHorizontal: Default.fixPadding * 1.2,
-        }}
-      >
-        {("My Activities")}
-      </Text>
-      
-    </View>
-    </View>
-
-     
-       
-   <View   style={{
-          ...Default.shadow,
-          backgroundColor: Colors.white,
-          borderRadius: 10,
-          marginLeft:12,
-          marginRight:12,
-          marginTop:23
-      
-        }}>
       <View
         style={{
-         
-          flexDirection: isRtl ? "row-reverse" : "row",
-       
+          backgroundColor: Colors.primary,
+          paddingBottom: 12,
         }}
       >
         <View
           style={{
-           // flex: 7,
+            paddingVertical: Default.fixPadding * 1.2,
             flexDirection: isRtl ? "row-reverse" : "row",
-         marginLeft:12
+            alignItems: "center",
+            backgroundColor: Colors.primary,
+            paddingHorizontal: Default.fixPadding * 2,
           }}
         >
-          <Image
-            source={require("../assets/images/fo4.jpg")}
-            style={{ height: 46, width: 66, borderRadius: 33, marginTop:9 }}
-            resizeMode="contain"
-          />
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons
+              name={isRtl ? "arrow-forward" : "arrow-back"}
+              size={25}
+              color={Colors.white}
+            />
+          </TouchableOpacity>
+          <Text
+            style={{
+              ...Fonts.SemiBold18white,
+              marginHorizontal: Default.fixPadding * 1.2,
+            }}
+          >
+            {"My Activities"}
+          </Text>
+        </View>
+      </View>
+      {isLoading && <Loader />}
+      {!isLoading && myWatches.length === 0 && (
+        <TouchableOpacity
+          style={{
+            ...Default.shadow,
+            backgroundColor: Colors.white,
+            marginTop: 30,
+            marginHorizontal: 13,
+            //    marginBottom: 27,
+            borderRadius: 10,
+            // overflow: "hidden",
+            flexDirection: isRtl ? "row-reverse" : "row",
+            paddingVertical: Default.fixPadding,
+          }}
+        >
           <View
             style={{
+              flex: 2,
+              //  paddingHorizontal: Default.fixPadding * 1.5,
               justifyContent: "center",
-              marginLeft:2,
-              alignItems: isRtl ? "flex-end" : "flex-start",
+              alignItems: "center",
             }}
           >
-            <Text
-              numberOfLines={1}
-              style={{ ...Fonts.SemiBold16black, overflow: "hidden" }}
-            >
-           Laiba Riaz
-            </Text>
-          
- 
+            <Text>{!isLoading && "No Activity"}</Text>
           </View>
-        
-        </View>
-       
-        </View>
-
-      <View>
-      <View style={styles.contain}>
-      <TouchableOpacity
-        onPress={() => setDropdownOpend(!dropdownOpend)}
-      >
-         <Ionicons name="ellipsis-vertical" size={24} color="black" marginLeft={310} bottom={5} position="absolute"/> 
-        <Text style={styles.selectedButtonText}>{selectedValue}</Text>
-      </TouchableOpacity>
-
-      {dropdownOpend && (
-        <View style={{marginLeft:280, top:10,  zIndex: 9999,position:"absolute" }}>
-          <TouchableOpacity
-            style={[
-              styles.dropdownButton,
-
-              selectedValue === 'button1' && styles.dropdownButtonSelected,
-            ]}
-            onPress={() =>   navigation.navigate("EditsSus")}
-          >
-              
-            <Ionicons name="create-outline" size={20} color="black" />
-            <Text style={styles.dropdownButtonText}>Edit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.dropdownButtons,
-            
-
-              selectedValue === 'button1' && styles.dropdownButtonSelected,
-            ]}
-            
-            onPress={() => {
-              setCancelModal(true);
-            //  setSelectedId(item.key);
-            }}
-          >
-            <Ionicons name="trash-outline" size={20} color="black" />
-            <Text style={styles.dropdownButtonText}>Delete</Text>
-          </TouchableOpacity>
-         
-        </View>
+        </TouchableOpacity>
       )}
-    </View>
-    </View>
-    
-    <Text   style={{
-              justifyContent: "center",
-              alignItems: isRtl ? "flex-end" : "flex-start",
-            
-              marginLeft:21,
-              marginRight:21,
-              marginBottom:4,
-              fontSize:18,
-              fontWeight:'bold',
-              width:300,
-            }}>I noticed a car parked outside my neighbor's house for hours
-            , and the windows are tinted so I can't see inside. It seems suspicious.
-        </Text>
-        <Text   style={{
-              justifyContent: "center",
-              alignItems: isRtl ? "flex-end" : "flex-start",
-              marginTop:4,
-              marginLeft:21,
-              marginRight:21,
-              marginBottom:12
-            }}>There was a car parked outside my house all night with its engine running. The driver never got out and it seemed 
-            like they were just waiting for something. It could be nothing, but it's definitely strange   </Text>
-             
-           
-  <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft:21 , marginTop:2, marginBottom:2}}>
-     <Text style={{  fontSize:18,
-              fontWeight:'bold'}}>Date:</Text>
-    <Text style={{ marginLeft: 1 ,fontSize:15, marginLeft:3}}>20 May 2023</Text>
-    </View>
-    <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft:21 , marginTop:2, marginBottom:2}}>
-      <Text  style={{  fontSize:18,
-              fontWeight:'bold'}}>Time:</Text>
-    <Text style={{ marginLeft: 1 ,fontSize:15, marginLeft:3}}>8:27 pm</Text>
-    </View>
-    <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft:21 , marginTop:2, marginBottom:2}}>
-      <MaterialCommunityIcons name="map-marker" size={24} color="#005D7A" />
-    <Text style={{ marginLeft: 1 ,fontSize:15,}}>3891 Ranchview Dr. Richardson, USA</Text>
-    
-  </View>
-        <View style={{ height: height / 2.8 }}>
-        <Swiper
-          dot={
+
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {myWatches.length > 0 &&
+          myWatches.map((post) => (
             <View
+              key={post._id}
               style={{
+                ...Default.shadow,
                 backgroundColor: Colors.white,
-                width: 10,
-                height: 10,
-                borderRadius: 5,
-                marginHorizontal: Default.fixPadding * 0.3,
+                borderRadius: 10,
+                marginLeft: 12,
+                marginRight: 12,
+                marginTop: 23,
               }}
-            />
-          }
-          activeDot={
-            <View
-              style={{
-                backgroundColor: Colors.primary,
-                width: 10,
-                height: 10,
-                borderRadius: 5,
-                marginHorizontal: Default.fixPadding * 0.3,
-              }}
-            />
-          }
-          paginationStyle={{
-            marginBottom: Default.fixPadding,
-            bottom: 0,
-          }}
-          loop={true}
-        >
-          <View>
-          <Video
-source={require('../assets/images/vid.mp4')}
-style={{ height: height / 2.8, width: 410 }}
-useNativeControls
-resizeMode="contain"
-/>
-          </View>
-          <View>
-            <Image
-              source={require("../assets/images/sper1.jpg")}
-              style={{ height: height / 2.8, width: width }}
-              resizeMode="cover"
-            />
-          </View>
-          <View>
-            <Image
-              source={require("../assets/images/sper2.jpg")}
-              style={{ height: height / 2.8, width: width }}
-              resizeMode="cover"
-            />
-          </View>
-        </Swiper>
-      </View>
- <Text style={{marginLeft:20, marginTop:10, fontSize:15}}>8 neighbors found its helpful</Text>
-       
-        <View style={{flexDirection:"row"}}>
-        <TouchableOpacity onPress={handlePress}>
-    <MaterialCommunityIcons
-      name="thumb-up"
-      size={24}
-      color={clicked ? '#005D7A' : 'black'}
-      marginLeft={21}
-      marginTop={12}
-    />
-    
-  </TouchableOpacity>
-  <Text   style={{
-                justifyContent: "center",
-                alignItems: isRtl ? "flex-end" : "flex-start",
-               marginTop:16,
-                marginLeft:10,
-                marginRight:21,
-                marginBottom:12,
-                fontSize:16,
-                fontWeight:'bold',
-              }}>Helpful
-          </Text> 
-  </View>
-  </View>
-     
-   <Modal
+            >
+              <View
+                style={{
+                  flexDirection: isRtl ? "row-reverse" : "row",
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: isRtl ? "row-reverse" : "row",
+                    marginLeft: 12,
+                    marginBottom: 10,
+                  }}
+                >
+                  <Image
+                    source={{ uri: post.posted_by.image }}
+                    style={{
+                      height: 56,
+                      width: 56,
+                      borderRadius: 75,
+                      marginTop: 9,
+                    }}
+                    resizeMode="contain"
+                  />
+                  <View
+                    style={{
+                      justifyContent: "center",
+                      marginLeft: 2,
+                      alignItems: isRtl ? "flex-end" : "flex-start",
+                    }}
+                  >
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        ...Fonts.SemiBold16black,
+                        overflow: "hidden",
+                        marginLeft: 10,
+                      }}
+                    >
+                      {post.posted_by.name}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+
+              <View>
+                <View style={styles.contain}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setSelectedId(post._id);
+                      setDropdownOpend(!dropdownOpend);
+                    }}
+                  >
+                    <Ionicons
+                      name="ellipsis-vertical"
+                      size={24}
+                      color="black"
+                      // marginLeft={310}
+                      bottom={20}
+                      position="absolute"
+                      style={{ right: 10 }}
+                    />
+                    <Text style={styles.selectedButtonText}>
+                      {selectedValue}
+                    </Text>
+                  </TouchableOpacity>
+
+                  {dropdownOpend && selectedId === post._id && (
+                    <View
+                      style={{
+                        marginLeft: 150,
+                        zIndex: 9999,
+                        position: "absolute",
+                        backgroundColor: "white",
+                        padding: 10,
+                        borderWidth: 0.5,
+                        borderColor: "gray",
+                      }}
+                    >
+                      <TouchableOpacity
+                        style={[
+                          styles.dropdownButton,
+
+                          selectedValue === "button1" &&
+                            styles.dropdownButtonSelected,
+                        ]}
+                        onPress={() =>
+                          navigation.navigate("EditsSus", { data: post })
+                        }
+                      >
+                        <Ionicons
+                          name="create-outline"
+                          size={20}
+                          color="black"
+                        />
+                        <Text style={styles.dropdownButtonText}>Edit</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[
+                          styles.dropdownButtons,
+
+                          selectedValue === "button1" &&
+                            styles.dropdownButtonSelected,
+                        ]}
+                        onPress={() => {
+                          setCancelModal(true);
+                          setSelectedId(post._id);
+                        }}
+                      >
+                        <Ionicons
+                          name="trash-outline"
+                          size={20}
+                          color="black"
+                        />
+                        <Text style={styles.dropdownButtonText}>Delete</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
+              </View>
+
+              <Text
+                style={{
+                  justifyContent: "center",
+                  alignItems: isRtl ? "flex-end" : "flex-start",
+
+                  marginLeft: 21,
+                  marginRight: 21,
+                  marginBottom: 4,
+                  fontSize: 18,
+                  fontWeight: "bold",
+                  width: 300,
+                }}
+              >
+                <Text style={{ fontWeight: 400, fontSize: 16 }}>
+                  {" "}
+                  {post.category.name}:
+                </Text>{" "}
+                {post.title}
+              </Text>
+              <Text
+                style={{
+                  justifyContent: "center",
+                  alignItems: isRtl ? "flex-end" : "flex-start",
+                  marginTop: 4,
+                  marginLeft: 21,
+                  marginRight: 21,
+                  marginBottom: 12,
+                }}
+              >
+                {post.description}
+              </Text>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginLeft: 21,
+                  marginTop: 2,
+                  marginBottom: 2,
+                }}
+              >
+                <Text style={{ fontSize: 18, fontWeight: "bold" }}>Date:</Text>
+                <Text style={{ marginLeft: 1, fontSize: 15, marginLeft: 3 }}>
+                  {extractDate(post.date)}
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginLeft: 21,
+                  marginTop: 2,
+                  marginBottom: 2,
+                }}
+              >
+                <Text style={{ fontSize: 18, fontWeight: "bold" }}>Time:</Text>
+                <Text style={{ marginLeft: 1, fontSize: 15, marginLeft: 3 }}>
+                  {extractTime(post.time)}
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginLeft: 21,
+                  marginTop: 2,
+                  marginBottom: 2,
+                }}
+              >
+                <MaterialCommunityIcons
+                  name="map-marker"
+                  size={24}
+                  color="#005D7A"
+                />
+                <Text style={{ marginLeft: 1, fontSize: 15, marginBottom: 10 }}>
+                  {post.location?.name}
+                </Text>
+              </View>
+              <View style={{ height: height / 2.8, marginHorizontal: 5 }}>
+                <Swiper
+                  dot={
+                    <View
+                      style={{
+                        backgroundColor: Colors.white,
+                        width: 10,
+                        height: 10,
+                        borderRadius: 5,
+                        marginHorizontal: Default.fixPadding * 0.3,
+                      }}
+                    />
+                  }
+                  activeDot={
+                    <View
+                      style={{
+                        backgroundColor: Colors.primary,
+                        width: 10,
+                        height: 10,
+                        borderRadius: 5,
+                        marginHorizontal: Default.fixPadding * 0.3,
+                      }}
+                    />
+                  }
+                  paginationStyle={{
+                    marginBottom: Default.fixPadding,
+                    bottom: 0,
+                  }}
+                  loop={true}
+                >
+                  {post.media.map((media) => {
+                    if (media.media_type === "video") {
+                      return (
+                        <View key={media.source}>
+                          <Video
+                            source={{ uri: media.source }}
+                            style={{ height: height / 2.8 }}
+                            useNativeControls
+                            resizeMode="contain"
+                          />
+                        </View>
+                      );
+                    } else {
+                      return (
+                        <View key={media.source}>
+                          <Image
+                            source={{ uri: media.source }}
+                            style={{ height: height / 2, width: width }}
+                            resizeMode="cover"
+                          />
+                        </View>
+                      );
+                    }
+                  })}
+                </Swiper>
+              </View>
+              <Text
+                style={{
+                  marginLeft: 20,
+                  marginTop: 10,
+                  fontSize: 15,
+                  marginBottom: 10,
+                }}
+              >
+                {post.helpful_count} neighbors found its helpful
+              </Text>
+
+              {/* <View style={{ flexDirection: "row" }}>
+                <TouchableOpacity onPress={handlePress}>
+                  <MaterialCommunityIcons
+                    name="thumb-up"
+                    size={24}
+                    color={clicked ? "#005D7A" : "black"}
+                    marginLeft={21}
+                    marginTop={12}
+                  />
+                </TouchableOpacity>
+                <Text
+                  style={{
+                    justifyContent: "center",
+                    alignItems: isRtl ? "flex-end" : "flex-start",
+                    marginTop: 16,
+                    marginLeft: 10,
+                    marginRight: 21,
+                    marginBottom: 12,
+                    fontSize: 16,
+                    fontWeight: "bold",
+                  }}
+                >
+                  Helpful
+                </Text>
+              </View> */}
+            </View>
+          ))}
+      </ScrollView>
+
+      <Modal
         animationType="fade"
         transparent={true}
         visible={cancelModal}
-       // onRequestClose={() => setCancelModal(false)}
+        // onRequestClose={() => setCancelModal(false)}
       >
         <TouchableOpacity
           activeOpacity={1}
-       onPressOut={() => setCancelModal(false)}
+          onPressOut={() => setCancelModal(false)}
           style={{ flex: 1 }}
         >
           <View
@@ -404,14 +505,13 @@ resizeMode="contain"
                   marginTop: Default.fixPadding * 2,
                 }}
               >
-               
                 <Text
                   style={{
                     ...Fonts.SemiBold18primary,
                     marginTop: Default.fixPadding,
                   }}
                 >
-                  {("Are you sure you want to delete this item?")}
+                  {"Are you sure you want to delete this item?"}
                 </Text>
                 <Text
                   numberOfLines={2}
@@ -422,9 +522,7 @@ resizeMode="contain"
                     marginTop: Default.fixPadding * 2,
                     overflow: "hidden",
                   }}
-                >
-
-                </Text>
+                ></Text>
               </View>
               <View
                 style={{
@@ -433,10 +531,7 @@ resizeMode="contain"
                 }}
               >
                 <TouchableOpacity
-                    
-               onPress={() => {
-                setCancelModal(false);
-              }}
+                  onPress={handleDelete}
                   style={{
                     ...Default.shadow,
                     backgroundColor: Colors.primary,
@@ -445,17 +540,13 @@ resizeMode="contain"
                     borderBottomLeftRadius: isRtl ? 0 : 10,
                     borderBottomRightRadius: isRtl ? 10 : 0,
                   }}
-                
-                   
-                 >
-                
+                >
                   <Text
                     style={{
                       ...Fonts.SemiBold18black,
                       textAlign: "center",
                     }}
                   >
-
                     {tr("Yes")}
                   </Text>
                 </TouchableOpacity>
@@ -468,15 +559,15 @@ resizeMode="contain"
                     borderBottomRightRadius: isRtl ? 0 : 10,
                     borderBottomLeftRadius: isRtl ? 10 : 0,
                   }}
-                 onPress={() => {
-                  //   deleteItem();
-                   setCancelModal(false);
-                  //   setCancelToast(true);
-                 }}
+                  onPress={() => {
+                    //   deleteItem();
+                    setCancelModal(false);
+                    //   setCancelToast(true);
+                  }}
                 >
                   <Text
                     style={{
-                    ...Fonts.SemiBold18black,
+                      ...Fonts.SemiBold18black,
                       marginHorizontal: Default.fixPadding * 1.5,
                       textAlign: "center",
                     }}
@@ -489,100 +580,91 @@ resizeMode="contain"
           </View>
         </TouchableOpacity>
       </Modal>
-      
     </SafeAreaView>
-
-
-
   );
 };
 
 export default CategoryScreen;
 
 const styles = StyleSheet.create({
-    container: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-     // paddingHorizontal: 10,
-      //marginTop:30,
-      //marginBottom:30,
+  container: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    // paddingHorizontal: 10,
+    //marginTop:30,
+    //marginBottom:30,
     //  height:190,
-   //   fontSize:10,
-   //   marginHorizontal: Default.fixPadding * 2,
-    },
-    buttonContainer: {
+    //   fontSize:10,
+    //   marginHorizontal: Default.fixPadding * 2,
+  },
+  buttonContainer: {
     // width: '120%',
     //  color:'white',
-     // padding: Default.fixPadding * 1.2,
-      borderRadius: 10,
-      
+    // padding: Default.fixPadding * 1.2,
+    borderRadius: 10,
+
     //  backgroundColor: Colors.primary,
-    },
-    contain: {
-     // flex: 1,
-     // alignItems: 'center',
-      justifyContent: 'center',
-      marginLeft:48,
-      
-    },
-    selectedButton: {
-        
-      flexDirection: 'row',
-      alignItems: 'center',
-      padding: 10,
-     // borderWidth: 1,
-      borderColor: 'gray',
-      marginLeft:296,
-      //borderRadius: 5,
-    },
-    selectedButtonText: {
-position:"absolute",
-   //   marginRight: 60,
-  
-    },
-    dropdown: {
+  },
+  contain: {
+    // flex: 1,
+    // alignItems: 'center',
+    zIndex: 2,
+    justifyContent: "center",
+    marginLeft: 48,
+  },
+  selectedButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    // borderWidth: 1,
+    borderColor: "gray",
+    marginLeft: 296,
+    //borderRadius: 5,
+  },
+  selectedButtonText: {
+    position: "absolute",
+    //   marginRight: 60,
+  },
+  dropdown: {
     //  position: 'absolute',
-      top: 1,
-      marginLeft:210,
-      marginRight:8,
-      backgroundColor: 'white',
-      width:122,
-      //height:82,
-      borderRadius: 5,
-      shadowColor: '#000',
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-      
+    top: 1,
+    marginLeft: 210,
+    marginRight: 8,
+    backgroundColor: "white",
+    width: 122,
+    //height:82,
+    borderRadius: 5,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
     },
-    dropdownButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-   //   padding: 10,
-     // borderWidth: 1,
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  dropdownButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    //   padding: 10,
+    // borderWidth: 1,
     //  borderColor: 'gray',
     //  borderBottomWidth: 1,
-    },
-    dropdownButtonSelected: {
-       
-      backgroundColor: 'gray',
-    },
-    dropdownButtonText: {
-        
-     marginRight: 10,
-    },
-    dropdownButtons: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        top:4,
-        height:42,
-     //   padding: 10,
-      //  borderWidth: 1,
-      //  borderColor: 'gray',
-      //  borderBottomWidth: 1,
-      },
-  });
+  },
+  dropdownButtonSelected: {
+    backgroundColor: "gray",
+  },
+  dropdownButtonText: {
+    marginRight: 10,
+  },
+  dropdownButtons: {
+    flexDirection: "row",
+    alignItems: "center",
+    top: 4,
+    height: 42,
+    //   padding: 10,
+    //  borderWidth: 1,
+    //  borderColor: 'gray',
+    //  borderBottomWidth: 1,
+  },
+});

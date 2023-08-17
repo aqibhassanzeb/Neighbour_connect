@@ -27,7 +27,7 @@ export const skillCatCreate = async (req, res) => {
     const category = new SkillCategory({ name, image: image_url });
     await category.save();
 
-    res.status(200).json({ message: "updated successfully" });
+    res.status(200).json({ message: "created successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Faild to create category" });

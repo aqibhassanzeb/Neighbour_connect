@@ -49,7 +49,6 @@ const Checkbox = ({ label, onChange, checked }) => {
 
 const PayPalScreen = ({ navigation, route }) => {
   const { selectedLocation } = useSelector((state) => state.loanandfound);
-  console.log({ selectedLocation });
 
   const [checkedValues, setCheckedValues] = useState([]);
   const [image, setImage] = useState(null);
@@ -152,7 +151,7 @@ const PayPalScreen = ({ navigation, route }) => {
     }
 
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 1,
     });
@@ -164,15 +163,25 @@ const PayPalScreen = ({ navigation, route }) => {
     }
   };
   const handlePost = async () => {
-    if (selectedImages.length === 0) {
+    if (
+      selectedImages.length === 0 ||
+      !selectedOption._id ||
+      !description ||
+      !checkedValues ||
+      !selectedOptions ||
+      !pricePerHour
+    ) {
       alert("Please fill all fields");
     } else {
       const formData = new FormData();
-      selectedImages.slice(0, 3).forEach((image, index) => {
+      selectedImages.slice(0, 3).forEach((image) => {
+        const extension = image.uri.split(".").pop();
+        const type = `${image.type}/${extension}`;
+        const name = image.uri.split("/").pop();
         formData.append("photos", {
           uri: image.uri,
-          type: "image/jpeg",
-          name: `image_${index}.jpg`,
+          type,
+          name,
         });
       });
 
@@ -199,7 +208,7 @@ const PayPalScreen = ({ navigation, route }) => {
           navigation.navigate("SkillPosted");
         }
       } catch (error) {
-        console.log("Error uploading images", error);
+        console.log("Error While Posting", error);
       } finally {
         setIsLoading(false);
       }

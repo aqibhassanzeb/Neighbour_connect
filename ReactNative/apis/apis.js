@@ -342,6 +342,7 @@ export const addSkill = async (data) => {
   let result = await apiRequest("POST", `add_skill`, data, headersWithToken);
   return result;
 };
+
 export const getSkillsByUser = async () => {
   const id = await getId();
   const headersWithToken = await getHeadersWithToken();
@@ -360,6 +361,7 @@ export const getSkillsByCategory = async (data) => {
   );
   return result;
 };
+
 export const updateSkill = async (data) => {
   let { _id } = data;
   const headersWithToken = await getHeadersWithToken();
@@ -408,6 +410,89 @@ export const removeEndorse = async (data) => {
   let result = await apiRequest(
     "POST",
     `unendorse/${_id}`,
+    {},
+    headersWithToken
+  );
+  return result;
+};
+
+// Neighbour Api
+export const getWatchCategories = async () => {
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest("GET", "watch_cat", null, headersWithToken);
+  return result;
+};
+
+export const addWatch = async (data) => {
+  const id = await getId();
+  data.append("posted_by", id);
+  const headersWithToken = await getHeadersWithTokenFormData();
+  console.log(data);
+  let result = await apiRequest("POST", "add_watch", data, headersWithToken);
+  return result;
+};
+
+export const updateWatch = async (data) => {
+  let { _id } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "PUT",
+    `update_watch/${_id}`,
+    data,
+    headersWithToken
+  );
+  console.log(result);
+  return result;
+};
+
+export const updateMedia = async (data) => {
+  const headersWithToken = await getHeadersWithTokenFormData();
+  let result = await apiRequest(
+    "PUT",
+    `update_media/${data.id}`,
+    data.formData,
+    headersWithToken
+  );
+  return result;
+};
+
+export const deleteWatch = async (data) => {
+  const headersWithToken = await getHeadersWithTokenFormData();
+  let result = await apiRequest(
+    "DELETE",
+    `delete_watch/${data._id}`,
+    null,
+    headersWithToken
+  );
+  return result;
+};
+
+export const getWatchesByUser = async () => {
+  const id = await getId();
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest("GET", `watch/${id}`, null, headersWithToken);
+  return result;
+};
+
+export const getAllWatches = async () => {
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest("GET", `all_watch`, null, headersWithToken);
+  return result;
+};
+
+export const addHelpful = async (data) => {
+  let { _id } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest("POST", `helpful/${_id}`, {}, headersWithToken);
+  return result;
+};
+
+export const removeHelpful = async (data) => {
+  let { _id } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "POST",
+    `un_helpfull/${_id}`,
     {},
     headersWithToken
   );

@@ -92,6 +92,8 @@ import PostsSell from "./screens/PostsSell";
 import BuyDetails from "./screens/BuyDetails";
 import Locat from "./screens/Locat";
 import AddSus from "./screens/AddSus";
+import AddedSus from "./screens/AddedSus";
+import SusUpdated from "./screens/SusUpdated";
 import Notify from "./screens/Notify";
 import AutoMotive from "./screens/AutoMotive";
 import Toy from "./screens/Toy";
@@ -601,6 +603,16 @@ const MainNavigation = (props) => {
         <Stack.Screen
           name="AddSus"
           component={AddSus}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AddedSus"
+          component={AddedSus}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SusUpdated"
+          component={SusUpdated}
           options={{ headerShown: false }}
         />
         <Stack.Screen

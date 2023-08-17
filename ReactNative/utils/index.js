@@ -10,6 +10,18 @@ export const extractTime = (input) => {
   return `${formattedHours}:${formattedMinutes} ${ampm}`;
 };
 
+export const extractDate = (inputDate) => {
+  const date = new Date(inputDate);
+  const options = {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  };
+  const extractedDate = date.toLocaleString("en-US", options);
+  return extractedDate.replace(/,/g, "");
+};
+
 export const extractDays = (inputDays) => {
   const daysOfWeek = [
     "Sunday",
