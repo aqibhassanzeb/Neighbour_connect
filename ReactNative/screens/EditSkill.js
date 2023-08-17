@@ -37,7 +37,7 @@ import {
 } from "../apis/apis";
 import { extractDays, extractTime } from "../utils";
 import Swiper from "react-native-swiper";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { clearLocation } from "../redux/loanandfoundSlice";
 
 const { width, height } = Dimensions.get("window");
