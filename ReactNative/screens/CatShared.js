@@ -34,6 +34,7 @@ const Losted = ({ navigation, route }) => {
   const [id, setId] = useState("");
   const [isEndorsed, setIsEndorsed] = useState(false);
   const [endLoading, setEndLoading] = useState(false);
+  const [loggedInUserId, setLoggedInUserId] = useState("");
 
   const handleButtonClick = async () => {
     if (isEndorsed) {
@@ -71,6 +72,14 @@ const Losted = ({ navigation, route }) => {
     navigation.goBack();
     return true;
   };
+
+  useEffect(() => {
+    const getUserId = async () => {
+      const id = await getId();
+      setLoggedInUserId(id);
+    };
+    getUserId();
+  }, []);
 
   useEffect(() => {
     async function getAsyncId() {
@@ -247,33 +256,36 @@ const Losted = ({ navigation, route }) => {
                   {post?.skill?.skill_level} {post?.skill?.category.name}
                 </Text>
               </View>
-
-              <TouchableOpacity
-                disable={isEndorsed === true}
-                style={{
-                  backgroundColor: Colors.primary,
-                  borderRadius: 10,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  margin: Default.fixPadding * 0.6,
-                  paddingVertical: Default.fixPadding * 0.5,
-                  paddingHorizontal: Default.fixPadding * 1.2,
-                }}
-                onPress={handleButtonClick}
-              >
-                {!endLoading && (
-                  <Text style={{ ...Fonts.SemiBold18white }}>
-                    {isEndorsed ? "Endorsed " : "Endore"}
-                  </Text>
-                )}
-                {endLoading && (
-                  <Ionicons
-                    name={"refresh-outline"}
-                    size={25}
-                    color={Colors.white}
-                  />
-                )}
-              </TouchableOpacity>
+              {loggedInUserId === post.skill.posted_by._id ? (
+                <></>
+              ) : (
+                <TouchableOpacity
+                  disable={isEndorsed === true}
+                  style={{
+                    backgroundColor: Colors.primary,
+                    borderRadius: 10,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    margin: Default.fixPadding * 0.6,
+                    paddingVertical: Default.fixPadding * 0.5,
+                    paddingHorizontal: Default.fixPadding * 1.2,
+                  }}
+                  onPress={handleButtonClick}
+                >
+                  {!endLoading && (
+                    <Text style={{ ...Fonts.SemiBold18white }}>
+                      {isEndorsed ? "Endorsed " : "Endore"}
+                    </Text>
+                  )}
+                  {endLoading && (
+                    <Ionicons
+                      name={"refresh-outline"}
+                      size={25}
+                      color={Colors.white}
+                    />
+                  )}
+                </TouchableOpacity>
+              )}
             </View>
             <View
               style={{
@@ -392,20 +404,33 @@ const Losted = ({ navigation, route }) => {
           </View>
         </View>
       </ScrollView>
-
-      <TouchableOpacity
-        onPress={() => navigation.navigate("chatScreen")}
-        style={{
-          backgroundColor: Colors.primary,
-          borderRadius: 10,
-          justifyContent: "center",
-          alignItems: "center",
-          margin: Default.fixPadding * 2,
-          paddingVertical: Default.fixPadding * 1.2,
-        }}
-      >
-        <Text style={{ ...Fonts.SemiBold18white }}>{"Message"}</Text>
-      </TouchableOpacity>
+      {/* Chat Screen */}
+      {loggedInUserId === post.skill.posted_by._id ? (
+        <></>
+      ) : (
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("ChattingScreen", {
+              user: {
+                recepientId: post.skill.posted_by._id,
+                recepientName: post.skill.posted_by.name,
+                recepientImage: post.skill.posted_by.image,
+                senderId: loggedInUserId,
+              },
+            })
+          }
+          style={{
+            backgroundColor: Colors.primary,
+            borderRadius: 10,
+            justifyContent: "center",
+            alignItems: "center",
+            margin: Default.fixPadding * 2,
+            paddingVertical: Default.fixPadding * 1.2,
+          }}
+        >
+          <Text style={{ ...Fonts.SemiBold18white }}>{"Message"}</Text>
+        </TouchableOpacity>
+      )}
 
       <SnackbarToast
         visible={likeAdd}

@@ -26,7 +26,7 @@ const CategoryScreen = ({ navigation, route }) => {
 
   const [selectedValue, setSelectedValue] = useState("");
   const [dropdownOpend, setDropdownOpend] = useState(false);
-  const [setselectedSkillforEdit, setSetselectedSkillforEdit] = useState("")
+  const [setselectedSkillforEdit, setSetselectedSkillforEdit] = useState("");
 
   const [dropdownOpends, setDropdownOpends] = useState(false);
   const [dropdownOpendd, setDropdownOpendd] = useState(false);
@@ -59,33 +59,6 @@ const CategoryScreen = ({ navigation, route }) => {
     return () =>
       BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
-
-  const category = [
-    {
-      key: "1",
-      title: "Electrician",
-      img: require("../assets/images/icon1.png"),
-      other: "(4)",
-      dollar: "$60/hr",
-      cleaner: "Skilled",
-    },
-    {
-      key: "2",
-      title: "Cooking",
-      img: require("../assets/images/icon4.png"),
-      other: "(5)",
-      dollar: "$60/hr",
-      cleaner: "Semi Skilled",
-    },
-    {
-      key: "3",
-      title: "Gardening",
-      img: require("../assets/images/icon5.png"),
-      other: "(2)",
-      dollar: "$40/hr",
-      cleaner: "Skilled",
-    },
-  ];
 
   const handleGetSkills = async () => {
     try {
@@ -198,7 +171,7 @@ const CategoryScreen = ({ navigation, route }) => {
 
       <ScrollView>
         {userSkills.length > 0 &&
-          userSkills.map((skill,index) => (
+          userSkills.map((skill, index) => (
             <TouchableOpacity
               key={skill._id}
               onPress={() =>
@@ -285,7 +258,10 @@ const CategoryScreen = ({ navigation, route }) => {
                 <View style={styles.contain}>
                   <TouchableOpacity
                     style={styles.selectedButton}
-                    onPress={() =>{setSetselectedSkillforEdit(skill._id); setDropdownOpend(!dropdownOpend)}}
+                    onPress={() => {
+                      setSetselectedSkillforEdit(skill._id);
+                      setDropdownOpend(!dropdownOpend);
+                    }}
                   >
                     <Ionicons
                       name="ellipsis-vertical"
@@ -297,7 +273,7 @@ const CategoryScreen = ({ navigation, route }) => {
                     </Text>
                   </TouchableOpacity>
 
-                  {(dropdownOpend && setselectedSkillforEdit == skill._id) && (
+                  {dropdownOpend && setselectedSkillforEdit == skill._id && (
                     <View style={styles.dropdown}>
                       <TouchableOpacity
                         style={[

@@ -66,9 +66,7 @@ const PickAddressScreen = ({ navigation, route }) => {
   const handleButtonPress = () => {
     if (title && title === "Edit_Skill") {
       navigation.goBack(); // Go back if title is "Edit_Skill"
-    } else if (title && title === "Watch") {
-      navigation.goBack(); // Go back if title is "Edit_Skill"
-    } else if (title && title === "Edit_Watch") {
+    } else if ((title && title === "Watch") || "Sell" || "Edit_Watch") {
       navigation.goBack(); // Go back if title is "Edit_Skill"
     } else {
       navigation.navigate("AddSkills");

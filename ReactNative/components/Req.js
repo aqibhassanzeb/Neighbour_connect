@@ -211,11 +211,11 @@ const OngoingTab = (props) => {
         const filteredYouKnow = [];
 
         for (const user of result.data) {
-        if(requests.length > 0 ){
-          if (!requests.some((request) => request.sender._id === user._id)) {
-            filteredYouKnow.push(user);
+          if (requests.length > 0) {
+            if (!requests.some((request) => request.sender._id === user._id)) {
+              filteredYouKnow.push(user);
+            }
           }
-        }
         }
         setNeighboursData(filteredYouKnow);
       }
@@ -243,7 +243,7 @@ const OngoingTab = (props) => {
   useFocusEffect(
     React.useCallback(() => {
       handleGetNeighbours();
-    }, [])
+    }, [requests])
   );
 
   const getId = async () => {

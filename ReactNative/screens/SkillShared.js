@@ -56,7 +56,6 @@ const CategoryScreen = ({ navigation, route }) => {
   useEffect(() => {
     handleGetSkillsByCategory();
   }, []);
-  console.log(catSkills);
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       {isLoading && <Loader />}

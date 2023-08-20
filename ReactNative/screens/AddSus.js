@@ -144,6 +144,8 @@ const PayPalScreen = ({ navigation }) => {
     handleGetCategories();
   }, []);
 
+  console.log({ categories });
+
   const dispatch = useDispatch();
   const handlePost = async () => {
     if (
@@ -334,6 +336,7 @@ const PayPalScreen = ({ navigation }) => {
 
                 //  alignItems: "center",
                 marginTop: Default.fixPadding * 3,
+                height: "auto",
               }}
             >
               <View>
@@ -895,7 +898,7 @@ const styles = StyleSheet.create({
   },
   dropdowns: {
     width: 390,
-    height: 120,
+    height: "auto",
     backgroundColor: "#fafafa",
     borderRadius: 5,
     borderWidth: 1,

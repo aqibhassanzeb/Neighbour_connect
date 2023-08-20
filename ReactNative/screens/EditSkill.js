@@ -29,12 +29,7 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import axios from "axios";
 import Loader from "../components/loader";
-import {
-  addSkill,
-  getCategories,
-  updateImages,
-  updateSkill,
-} from "../apis/apis";
+import { getCategories, updateImages, updateSkill } from "../apis/apis";
 import { extractDays, extractTime } from "../utils";
 import Swiper from "react-native-swiper";
 import { useDispatch, useSelector } from "react-redux";
@@ -66,14 +61,16 @@ const PayPalScreen = ({ navigation, route }) => {
   const [showCustomOption, setShowCustomOption] = useState(false);
   const [customOption, setCustomOption] = useState("");
   const [dropdownOpens, setDropdownOpens] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState();
+  const [selectedOptions, setSelectedOptions] = useState(data.skill_level);
   const [dropdownOpensds, setDropdownOpensds] = useState(false);
   const [selectedOptionsds, setSelectedOptionsds] = useState();
   const [dropdownOpensd, setDropdownOpensd] = useState(false);
-  const [selectedOptionsd, setSelectedOptionsd] = useState();
+  const [selectedOptionsd, setSelectedOptionsd] = useState(
+    data.selected_visibility
+  );
   const [checked, setChecked] = useState(false);
   const [selectedValue, setSelectedValue] = useState("");
-  const [pricePerHour, setPricePerHour] = useState();
+  const [pricePerHour, setPricePerHour] = useState(data.price_per_hour);
   const [modalVisible, setModalVisible] = useState(false);
   const [email, setEmail] = useState();
   const [timeModal, setTimeModal] = useState(false);
@@ -83,7 +80,7 @@ const PayPalScreen = ({ navigation, route }) => {
   const [date, setDate] = useState();
   const [calendarModal, setCalendarModel] = useState(false);
   const [finalDate, setFinalDate] = useState();
-  const [description, setDescription] = useState();
+  const [description, setDescription] = useState(data.description);
   const [Categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -180,11 +177,13 @@ const PayPalScreen = ({ navigation, route }) => {
       price_per_hour: pricePerHour,
       selected_day: checkedValues,
       selected_visibility: selectedOptionsd,
-      location: {
+    };
+    if (selectedLocation.name) {
+      newData.location = {
         ...selectedLocation.coordinate,
         name: selectedLocation.name,
-      },
-    };
+      };
+    }
 
     try {
       setIsLoading(true);
@@ -200,6 +199,7 @@ const PayPalScreen = ({ navigation, route }) => {
       setIsLoading(false);
     }
   };
+
   const handleUpdateImages = async () => {
     const formData = new FormData();
 
@@ -226,6 +226,7 @@ const PayPalScreen = ({ navigation, route }) => {
       setIsLoading(false);
     }
   };
+
   const handleImageRemove = (index) => {
     const updatedImages = selectedImages.filter((uri, i) => i !== index);
     setSelectedImages(updatedImages);
@@ -617,7 +618,7 @@ const PayPalScreen = ({ navigation, route }) => {
                       color: "black",
                     }}
                   >
-                    {data.skill_level}
+                    {selectedOptions}
                   </Text>
                   <View
                     style={{
@@ -671,7 +672,7 @@ const PayPalScreen = ({ navigation, route }) => {
             />
             <TextInput
               placeholder={tr("description")}
-              value={data.description}
+              value={description}
               onChangeText={(text) => setDescription(text)}
               placeholderTextColor={Colors.black}
               selectionColor={Colors.primary}
@@ -747,7 +748,7 @@ const PayPalScreen = ({ navigation, route }) => {
             <TextInput
               keyboardType="numeric"
               onChangeText={handlePriceChange}
-              value={data.price_per_hour}
+              value={pricePerHour}
               placeholder="Price per hour"
               placeholderTextColor={Colors.black}
               selectionColor={Colors.primary}
@@ -920,7 +921,7 @@ const PayPalScreen = ({ navigation, route }) => {
                       color: "black",
                     }}
                   >
-                    {data.selected_visibility}
+                    {selectedOptionsd}
                   </Text>
                   <View
                     style={{

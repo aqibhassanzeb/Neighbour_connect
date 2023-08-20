@@ -22,7 +22,7 @@ import { BottomSheet } from "react-native-btr";
 import { Camera } from "expo-camera";
 import SnackbarToast from "../components/snackbarToast";
 import CameraModule from "../components/cameraModule";
-import { Disconnect } from "../apis/apis";
+import { Disconnect, getId } from "../apis/apis";
 
 const { width } = Dimensions.get("window");
 
@@ -75,11 +75,7 @@ const EditProfileScreen = (props) => {
       BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
 
-  const [update, setUpdate] = useState(false);
-
-  const [name, onChangeName] = useState("Esther howard");
-  const [email, onChangeTextEmail] = useState("estherhoward@example.com");
-  const [number, onChangeTextNumber] = useState("9876543210");
+  const [loggedInUserId, setLoggedInUserId] = useState("");
 
   const [uploadImage, setUploadImage] = useState(false);
 
@@ -146,6 +142,14 @@ const EditProfileScreen = (props) => {
       setCancelModal(true);
     }
   }
+  useEffect(() => {
+    async function getAsyncId() {
+      const id = await getId();
+      setLoggedInUserId(id);
+    }
+    getAsyncId();
+  }, []);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       <View
@@ -281,7 +285,16 @@ const EditProfileScreen = (props) => {
             </View>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => props.navigation.navigate("chatScreen")}
+            onPress={() =>
+              props.navigation.navigate("ChattingScreen", {
+                user: {
+                  recepientId: connectionDetails._id,
+                  recepientName: connectionDetails.name,
+                  recepientImage: connectionDetails.image,
+                  senderId: loggedInUserId,
+                },
+              })
+            }
             style={{
               backgroundColor: Colors.primary,
               borderRadius: 10,

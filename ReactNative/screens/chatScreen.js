@@ -2,7 +2,9 @@ import {
   Text,
   View,
   SafeAreaView,
-  TouchableOpacity,Button,image,
+  TouchableOpacity,
+  Button,
+  image,
   Image,
   BackHandler,
   KeyboardAvoidingView,
@@ -14,19 +16,19 @@ import {
   Send,
   InputToolbar,
 } from "react-native-gifted-chat";
-import * as ImagePicker from 'expo-image-picker';
+import * as ImagePicker from "expo-image-picker";
 import { Colors, Default, Fonts } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 const ChatScreen = (props) => {
-  
   useEffect(() => {
     (async () => {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        alert('Sorry, we need camera roll permissions to make this work!');
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        alert("Sorry, we need camera roll permissions to make this work!");
       }
     })();
   }, []);
@@ -113,44 +115,50 @@ const ChatScreen = (props) => {
   const renderSend = (props) => {
     return (
       <Send {...props}>
-        <View   style={{
+        <View
+          style={{
             height: 40,
             width: 90,
             backgroundColor: Colors.white,
             justifyContent: "center",
             alignItems: "center",
-            flexDirection: 'row'
-        
-          }}>
-        <View
-          style={{
-            borderRadius:3,
-            marginRight:20,
-
-        
+            flexDirection: "row",
           }}
         >
-          
-          <Ionicons name="camera-outline" size={28} color="black" onPress={pickImage} />
-     
-     {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
+          <View
+            style={{
+              borderRadius: 3,
+              marginRight: 20,
+            }}
+          >
+            <Ionicons
+              name="camera-outline"
+              size={28}
+              color="black"
+              onPress={pickImage}
+            />
+
+            {image && (
+              <Image
+                source={{ uri: image }}
+                style={{ width: 200, height: 200 }}
+              />
+            )}
           </View>
           <View
-          style={{
-            marginRight:9,
-           
-            borderRadius: 30,
-             padding:3,
-            borderWidth: 2,
-            borderColor: 140,
-          }}
-        >
-           <Ionicons name="send" size={20} color={Colors.primary} />
+            style={{
+              marginRight: 9,
 
-    </View>
-    </View>
+              borderRadius: 30,
+              padding: 3,
+              borderWidth: 2,
+              borderColor: 140,
+            }}
+          >
+            <Ionicons name="send" size={20} color={Colors.primary} />
+          </View>
+        </View>
       </Send>
-      
     );
   };
 
@@ -253,7 +261,8 @@ const ChatScreen = (props) => {
               ...Fonts.SemiBold18white,
               marginHorizontal: Default.fixPadding * 1.2,
             }}
-          >Message
+          >
+            Message
           </Text>
         </View>
 
@@ -262,55 +271,43 @@ const ChatScreen = (props) => {
             flex: 1,
             marginHorizontal: isRtl ? Default.fixPadding * 2 : 0,
           }}
-        >
-        </View>
+        ></View>
       </View>
 
       <View style={{ flex: 1 }}>
-        
         <GiftedChat
-         
           placeholder={tr("typeHere")}
           messages={messages}
           onSend={(messages) => onSend(messages)}
           user={{
             _id: 1,
           }}
-          
           renderBubble={renderBubble}
           alwaysShowSend
           renderSend={renderSend}
           scrollToBottom
           scrollToBottomComponent={scrollToBottomComponent}
           renderAvatar={() => (
-
-            <TouchableOpacity onPress={() => props.navigation.navigate('Profile3')}>
-
-            <Image
-            
-              source={require("../assets/images/pn.jpeg")}
-              
-              style={{
-                
-                height: 48,
-                width: 48,
-                borderRadius: 24,
-                top: -Default.fixPadding * 9,
-                zIndex: 2,
-              }}
-            />
+            <TouchableOpacity
+              onPress={() => props.navigation.navigate("Profile3")}
+            >
+              <Image
+                source={require("../assets/images/pn.jpeg")}
+                style={{
+                  height: 48,
+                  width: 48,
+                  borderRadius: 24,
+                  top: -Default.fixPadding * 9,
+                  zIndex: 2,
+                }}
+              />
             </TouchableOpacity>
           )}
-          
-          
           showAvatarForEveryMessage={true}
-          
           listViewProps={{
             showsVerticalScrollIndicator: false,
           }}
-          
           renderInputToolbar={(props) => (
-            
             <InputToolbar
               {...props}
               scrollToBottomComponent
@@ -322,19 +319,14 @@ const ChatScreen = (props) => {
                 padding: Default.fixPadding * 0.5,
                 borderTopColor: Colors.white,
               }}
-              
             />
-            
           )}
         />
-        
+
         {Platform.OS === "android" && (
-          
           <KeyboardAvoidingView behavior="position" />
         )}
-        
       </View>
-      
     </SafeAreaView>
   );
 };

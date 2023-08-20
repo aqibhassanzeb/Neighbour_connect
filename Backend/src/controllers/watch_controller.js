@@ -143,13 +143,33 @@ export const getWatchByUser = async (req, res) => {
 };
 
 export const getAllWatch = async (req, res) => {
+  const user_id = req.user._id;
+  const user = await User.findById(user_id);
+  const connections = user.connections;
+
   try {
+    // const query = {
+    //   $or: [
+    //     { selected_visibility: "Connection", posted_by: { $in: connections } },
+    //     { selected_visibility: { $ne: "Connection" } },
+    //   ],
+    // };
+
     const posts = await Watch.find()
       .sort({ createdAt: -1 })
       .populate("posted_by", "name image helpful_count")
       .populate("category");
-    res.json(posts);
+
+    const filtered_array = posts.filter((item) => {
+      if (item.selected_visibility === "Connections ") {
+        return connections.includes(item.posted_by._id);
+      }
+      return true;
+    });
+
+    res.json(filtered_array);
   } catch (error) {
+    console.log("Error fetching posts", error);
     res.status(500).json({ error: "Error fetching posts" });
   }
 };

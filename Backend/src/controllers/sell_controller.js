@@ -1,9 +1,8 @@
-import { Skill } from "../models/skill.js";
+import { Sell } from "../models/sell.js";
 import { User } from "../models/user.js";
 import { v2 as cloudinary } from "cloudinary";
 
-export const addSkill = async (req, res) => {
-  console.log(req.body);
+export const addSell = async (req, res) => {
   const location = JSON.parse(req.body.location);
   if (!req.files || req.files.length === 0) {
     return res.status(400).send("No files uploaded.");
@@ -34,14 +33,13 @@ export const addSkill = async (req, res) => {
     await Promise.all(uploadPromises);
     const images = uploadedImages.map((item) => item.secure_url);
 
-    const post = new Skill({
+    const post = new Sell({
       ...req.body,
       location,
       images,
     });
 
     const posted = await post.save();
-    console.log(posted);
     if (posted) {
       return res
         .status(200)
@@ -53,11 +51,11 @@ export const addSkill = async (req, res) => {
   }
 };
 
-export const updateSkill = async (req, res) => {
+export const updateSell = async (req, res) => {
   const { _id } = req.params;
 
   try {
-    await Skill.findByIdAndUpdate({ _id }, req.body);
+    await Sell.findByIdAndUpdate({ _id }, req.body);
     res.status(200).json({ message: "updated successfully" });
   } catch (error) {
     res.status(400).json({ error: "something went wrong!" });
@@ -94,7 +92,7 @@ export const updateImages = async (req, res) => {
     await Promise.all(uploadPromises);
     const updated_images = uploadedImages.map((item) => item.secure_url);
 
-    const response = await Skill.findByIdAndUpdate(
+    const response = await Sell.findByIdAndUpdate(
       _id,
       { $set: { images: updated_images } },
       { new: true }
@@ -108,12 +106,12 @@ export const updateImages = async (req, res) => {
   }
 };
 
-export const deleteSkill = async (req, res) => {
+export const deleteSell = async (req, res) => {
   const { _id } = req.params;
   console.log(_id);
 
   try {
-    await Skill.findByIdAndDelete({ _id });
+    await Sell.findByIdAndDelete({ _id });
     res.status(200).json({ message: "deleted successfully" });
   } catch (error) {
     console.log(error);
@@ -121,17 +119,17 @@ export const deleteSkill = async (req, res) => {
   }
 };
 
-export const getSkillsByCat = async (req, res) => {
+export const getSellsByCat = async (req, res) => {
   const { _id } = req.params;
   const user_id = req.user._id;
   const user = await User.findById(user_id);
   const connections = user.connections;
 
   try {
-    const posts = await Skill.find({ category: _id })
+    const items = await Sell.find({ category: _id })
       .populate("category")
-      .populate("posted_by", "name image endorse_count endorsed_by");
-    const filtered_array = posts.filter((item) => {
+      .populate("posted_by", "name image");
+    const filtered_array = items.filter((item) => {
       if (item.selected_visibility === "Connections ") {
         return connections.includes(item.posted_by._id);
       }
@@ -140,15 +138,16 @@ export const getSkillsByCat = async (req, res) => {
     res.json(filtered_array);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Error fetching posts by category" });
+    res.status(500).json({ error: "Error fetching items by category" });
   }
 };
 
-export const getSkillsByUser = async (req, res) => {
+export const getSellsByUser = async (req, res) => {
   const { user_id } = req.params;
 
   try {
-    const posts = await Skill.find({ posted_by: user_id })
+    const posts = await Sell.find({ posted_by: user_id })
+      .sort({ createdAt: -1 })
       .populate("posted_by", "name image endorse_count endorsed_by")
       .populate("category");
     res.json(posts);
@@ -157,46 +156,44 @@ export const getSkillsByUser = async (req, res) => {
   }
 };
 
-export const increaseEndorse = async (req, res) => {
+export const markSolded = async (req, res) => {
   const { _id } = req.params;
-  const user_id = req.user._id;
   try {
-    const endorsed_user = await User.findById(_id);
-    if (!endorsed_user) {
-      return res.status(404).json({ eroor: "Endorsing user not found" });
+    const solded = await Sell.findByIdAndUpdate(
+      _id,
+      { is_sold: true },
+      { new: true }
+    );
+    if (solded) {
+      return res.status(200).json(solded);
     }
-    endorsed_user.endorsed_by.push(user_id);
-    endorsed_user.endorse_count += 1;
-
-    await endorsed_user.save();
-
-    return res.status(200).json({ message: "Endorsement successful" });
   } catch (error) {
-    console.error("Error endorsing user:", error);
+    console.error("Error Solding:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
 
-export const UnEndorse = async (req, res) => {
-  const { _id } = req.params;
+export const getAllItems = async (req, res) => {
   const user_id = req.user._id;
+  const user = await User.findById(user_id);
+  const connections = user.connections;
 
   try {
-    const endorsed_user = await User.findById(_id);
-    if (!endorsed_user) {
-      return res.status(404).json({ eroor: "Endorsing user not found" });
-    }
-    const index = endorsed_user.endorsed_by.indexOf(user_id);
-    if (index !== -1) {
-      endorsed_user.endorsed_by.splice(index, 1);
-    }
-    endorsed_user.endorse_count -= 1;
+    const items = await Sell.find()
+      .sort({ createdAt: -1 })
+      .populate("posted_by", "name image")
+      .populate("category");
 
-    await endorsed_user.save();
+    const filtered_array = items.filter((item) => {
+      if (item.selected_visibility === "Connections ") {
+        return connections.includes(item.posted_by._id);
+      }
+      return true;
+    });
 
-    return res.status(200).json({ message: "UnEndorsement successful" });
+    res.json(filtered_array);
   } catch (error) {
-    console.error("Error endorsing user:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.log("Error fetching posts", error);
+    res.status(500).json({ error: "Error fetching posts" });
   }
 };

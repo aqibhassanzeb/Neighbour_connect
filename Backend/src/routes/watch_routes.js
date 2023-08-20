@@ -34,7 +34,7 @@ routes.put("/update_watch/:_id", updateWatch);
 routes.put("/update_media/:_id", upload.array("media", 3), updateMedia);
 routes.delete("/delete_watch/:_id", deleteWatch);
 routes.get("/watch/:user_id", getWatchByUser);
-routes.get("/all_watch", getAllWatch);
+routes.get("/all_watch", protect, getAllWatch);
 
 // helpful
 routes.post("/helpful/:_id", protect, increaseHelpful);

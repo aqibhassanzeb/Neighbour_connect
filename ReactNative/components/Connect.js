@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import SnackbarToast from "./snackbarToast";
 import Losted from "../screens/Losted";
-import { getConnections } from "../apis/apis";
+import { getConnections, getId } from "../apis/apis";
 const { width } = Dimensions.get("window");
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -27,6 +27,7 @@ const OngoingTab = (props) => {
 
   const [conLoader, setConLoader] = useState(false);
   const [connectionsData, setConnectionsData] = useState([]);
+  const [loggedInUserId, setLoggedInUserId] = useState("");
 
   const isRtl = i18n.dir() == "rtl";
 
@@ -224,6 +225,14 @@ const OngoingTab = (props) => {
     }, [])
   );
 
+  useEffect(() => {
+    async function getAsyncId() {
+      const id = await getId();
+      setLoggedInUserId(id);
+    }
+    getAsyncId();
+  }, []);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       <Text style={{ marginLeft: 23, fontSize: 19, color: Colors.grey }}>
@@ -285,7 +294,17 @@ const OngoingTab = (props) => {
                 }}
               >
                 <TouchableOpacity
-                  onPress={() => props.navigation.navigate("chatScreen")}
+                  // onPress={() => props.navigation.navigate("chatScreen")}
+                  onPress={() =>
+                    props.navigation.navigate("ChattingScreen", {
+                      user: {
+                        recepientId: con._id,
+                        recepientName: con.name,
+                        recepientImage: con.image,
+                        senderId: loggedInUserId,
+                      },
+                    })
+                  }
                   numberOfLines={1}
                   style={{ ...Fonts.Medium14grey, overflow: "hidden" }}
                 >

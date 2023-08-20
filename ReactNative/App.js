@@ -14,8 +14,8 @@ import { Provider } from "react-native-paper";
 import VerificationScreen from "./screens/auth/verificationScreen";
 import BottomTab from "./components/bottomTab";
 import ChatScreen from "./screens/chatScreen";
+import ChattingScreen from "./screens/ChattingScreen";
 import EditProfileScreen from "./screens/editProfileScreen";
-
 import Address from "./screens/Address";
 import Mesaagess from "./screens/Mesaagess";
 import SeeAll from "./screens/SeeAll";
@@ -88,7 +88,9 @@ import CatsSkill from "./screens/CatsSkill";
 import Duplicate from "./screens/Duplicate";
 import Cradius from "./screens/Cradius";
 import AddBuy from "./screens/AddBuy";
+import EditBuy from "./screens/EditBuy";
 import PostsSell from "./screens/PostsSell";
+import SellCatItems from "./screens/SellCatItems";
 import BuyDetails from "./screens/BuyDetails";
 import Locat from "./screens/Locat";
 import AddSus from "./screens/AddSus";
@@ -151,6 +153,11 @@ const MainNavigation = (props) => {
         <Stack.Screen
           name="chatScreen"
           component={ChatScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ChattingScreen"
+          component={ChattingScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
@@ -319,6 +326,11 @@ const MainNavigation = (props) => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name="EditBuy"
+          component={EditBuy}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
           name="PostsSell"
           component={PostsSell}
           options={{ headerShown: false }}
@@ -326,6 +338,11 @@ const MainNavigation = (props) => {
         <Stack.Screen
           name="BuyDetails"
           component={BuyDetails}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SellCatItems"
+          component={SellCatItems}
           options={{ headerShown: false }}
         />
 

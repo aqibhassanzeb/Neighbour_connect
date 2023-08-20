@@ -56,9 +56,9 @@ const HomeScreen = ({ navigation, route }) => {
     try {
       // dispatch(handleSetUserinfo({}));
       // setUserData("")
-      let logout = await AsyncStorage.clear();
+      // await AsyncStorage.removeItem("userData");
+      await AsyncStorage.clear();
       setCancelModal(false);
-      console.log("logout function ", logout);
       navigation.navigate("Logins1");
     } catch (error) {
       console.error("Error clearing AsyncStorage:", error);

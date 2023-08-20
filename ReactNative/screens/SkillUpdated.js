@@ -11,7 +11,9 @@ import { Colors, Default, Fonts } from "../constants/styles";
 
 import { useTranslation } from "react-i18next";
 
-const SuccessScreen = ({ navigation }) => {
+const SuccessScreen = ({ navigation, route }) => {
+  const title = route.params?.title || "";
+
   const { t } = useTranslation();
 
   function tr(key) {
@@ -29,7 +31,7 @@ const SuccessScreen = ({ navigation }) => {
   }, []);
 
   setTimeout(() => {
-    navigation.navigate("SkillSharing");
+    navigation.navigate(title === "Sell" ? "BuySell" : "SkillSharing");
   }, 2000);
 
   return (
@@ -63,7 +65,7 @@ const SuccessScreen = ({ navigation }) => {
             textAlign: "center",
           }}
         >
-          Your Skill has successfully Updated.
+          Your {title === "Sell" ? "Sell" : "Skill"} has successfully Updated.
         </Text>
         <Text
           style={{

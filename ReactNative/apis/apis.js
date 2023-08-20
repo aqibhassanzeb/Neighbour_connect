@@ -2,6 +2,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const baseUrl = `http://192.168.43.147:3333/api/v1/`;
+
 // export const baseUrl = `http://192.168.10.6:3333/api/v1/`;
 let token;
 const getData = async () => {
@@ -494,6 +495,120 @@ export const removeHelpful = async (data) => {
     "POST",
     `un_helpfull/${_id}`,
     {},
+    headersWithToken
+  );
+  return result;
+};
+
+// Sell Hub
+export const getSellCategories = async () => {
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest("GET", "sell_cat", null, headersWithToken);
+  return result;
+};
+
+export const addSell = async (data) => {
+  const id = await getId();
+  data.append("posted_by", id);
+  const headersWithToken = await getHeadersWithTokenFormData();
+  console.log(data);
+  let result = await apiRequest("POST", `add_sell`, data, headersWithToken);
+  return result;
+};
+
+export const getSellsByUser = async () => {
+  const id = await getId();
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest("GET", `sells/${id}`, null, headersWithToken);
+  return result;
+};
+
+export const getSellsByCategory = async (data) => {
+  const { id } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "GET",
+    `sell_category/${id}`,
+    null,
+    headersWithToken
+  );
+  return result;
+};
+
+export const updateSell = async (data) => {
+  let { _id } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "PUT",
+    `update_sell/${_id}`,
+    data,
+    headersWithToken
+  );
+  return result;
+};
+
+export const updateSellImages = async (data) => {
+  const headersWithToken = await getHeadersWithTokenFormData();
+  let result = await apiRequest(
+    "PUT",
+    `update_images/${data.id}`,
+    data.formData,
+    headersWithToken
+  );
+  return result;
+};
+
+export const deleteSell = async (data) => {
+  const headersWithToken = await getHeadersWithTokenFormData();
+  let result = await apiRequest(
+    "DELETE",
+    `delete_sell/${data._id}`,
+    null,
+    headersWithToken
+  );
+  return result;
+};
+
+export const handleSold = async (data) => {
+  let { _id } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest("POST", `solded/${_id}`, {}, headersWithToken);
+  return result;
+};
+
+export const getAllItems = async () => {
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest("GET", `all_items`, null, headersWithToken);
+  return result;
+};
+
+// Chat Apis
+
+export const getMessages = async (data) => {
+  const { userId, recepientId } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "GET",
+    `/messages/${userId}/${recepientId}`,
+    null,
+    headersWithToken
+  );
+  return result;
+};
+
+export const postMessage = async (data) => {
+  const headersWithToken = await getHeadersWithTokenFormData();
+  console.log(data);
+  let result = await apiRequest("POST", "messages", data, headersWithToken);
+  return result;
+};
+
+export const deleteMessages = async (data) => {
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "POST",
+    "delete_messages",
+    data,
     headersWithToken
   );
   return result;
