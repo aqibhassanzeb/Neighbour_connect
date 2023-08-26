@@ -1,5 +1,6 @@
 import { Message } from "../models/message.js";
 import { v2 as cloudinary } from "cloudinary";
+import { User } from "../models/user.js";
 
 export const postMessage = async (req, res) => {
   console.log(req.body);
@@ -90,5 +91,69 @@ export const deleteMessages = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal Server" });
+  }
+};
+
+export const deleteChat = async (req, res) => {
+  try {
+    const senderId = req.params.senderId;
+    const recepientId = req.params.recepientId;
+
+    const deleteResult = await Message.deleteMany({
+      $or: [
+        { senderId: senderId, recepientId: recepientId },
+        { senderId: recepientId, recepientId: senderId },
+      ],
+    });
+
+    res.json({
+      message: `${deleteResult.deletedCount} messages deleted`,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const getFriends = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    // Fetch the user's connections
+    const user = await User.findById(userId).populate({
+      path: "connections",
+      select: "name image",
+      model: User,
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const connectionsWithMessages = [];
+
+    for (const connection of user.connections) {
+      const lastMessage = await Message.findOne({
+        $or: [
+          { senderId: user._id, recepientId: connection._id },
+          { senderId: connection._id, recepientId: user._id },
+        ],
+      })
+        .sort({ timeStamp: -1 })
+        .limit(1);
+
+      connectionsWithMessages.push({
+        name: connection.name,
+        _id: connection._id,
+        image: connection.image,
+        lastMessage: lastMessage ? lastMessage.message : "Empty Chat, Join Now",
+        timeStamp: lastMessage ? lastMessage.timeStamp : null,
+      });
+    }
+
+    res.json(connectionsWithMessages);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };

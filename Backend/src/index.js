@@ -9,8 +9,7 @@ import Skill from "./routes/skill_routes.js";
 import Watch from "./routes/watch_routes.js";
 import Sell from "./routes/sell_routes.js";
 import Message from "./routes/message_routes.js";
-import * as path from "path";
-import { fileURLToPath } from "url";
+import Forum from "./routes/forum_routes.js";
 
 const app = express();
 dotenv.config();
@@ -30,7 +29,7 @@ app.use(
 app.use(express.static("public"));
 
 //All APi's Endponits
-app.use("/api/v1", Auth, lostandFound, Skill, Watch, Sell, Message);
+app.use("/api/v1", Auth, lostandFound, Skill, Watch, Sell, Message, Forum);
 
 app.use("*", (req, res) => {
   return res.status(404).json({

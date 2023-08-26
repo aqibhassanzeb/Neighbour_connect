@@ -17,6 +17,7 @@ import {
   skillCatCreate,
   skillCatDelete,
   skillCatGet,
+  skillCatSearch,
   skillCatUpdate,
 } from "../controllers/skillCat_controller.js";
 
@@ -32,6 +33,7 @@ routes.post(
 routes.put("/skill_cat_update/:_id", protect, skillCatUpdate);
 routes.get("/skill_cat", protect, skillCatGet);
 routes.delete("/skill_cat_delete/:_id", protect, skillCatDelete);
+routes.get("/skill_cat_search", skillCatSearch);
 
 // skill hub
 routes.post("/add_skill", upload.array("photos", 3), addSkill);

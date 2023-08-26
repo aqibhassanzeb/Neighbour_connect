@@ -65,3 +65,18 @@ export const skillCatDelete = async (req, res) => {
     res.status(400).json({ error: "something went wrong!" });
   }
 };
+
+export const skillCatSearch = async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    const searchResult = await SkillCategory.find({
+      name: { $regex: query, $options: "i" },
+      is_active: true,
+    }).exec();
+
+    res.json(searchResult);
+  } catch (error) {
+    res.status(500).json({ error: "An error occurred" });
+  }
+};
