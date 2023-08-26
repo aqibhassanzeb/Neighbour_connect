@@ -6,88 +6,36 @@ import {
   TouchableOpacity,
   Image,
   FlatList,
+  ScrollView,
+  Pressable,
+  BackHandler,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { Colors, Default, Fonts } from "../constants/styles";
 import { useTranslation } from "react-i18next";
+import { deleteChat, getChats } from "../apis/apis";
+import { useEffect } from "react";
+import Loader from "../components/loader";
+import { extractTime } from "../utils";
+import { useFocusEffect } from "@react-navigation/native";
 
-const MessagesScreen = ({ navigation }) => {
+const MessagesScreen = ({ navigation, route }) => {
   const { t, i18n } = useTranslation();
+  const { userId } = route.params;
 
   const isRtl = i18n.dir() == "rtl";
   const [selectedMessages, setSelectedMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [chatList, setChatList] = useState([]);
+
+  console.log({ selectedMessages });
 
   function tr(key) {
     return t(`messagesScreen:${key}`);
   }
- 
-  const [messageList, setMessageList] = useState([
-    {
-      key: "1",
-      title: "Alina Khan",
-      image: require("../assets/images/dp1.jpg"),
-      message: "Did you get the suspicious post",
-      time: "2.00am",
-    },
-    {
-      key: "2",
-      title: "Madiha Sarfaraz",
-      image: require("../assets/images/dp2.jpg"),
-      message: "Can i see the camera recording",
-      time: "2.00am",
-    },
-    {
-      key: "3",
-      title: "Nisa Sami",
-      image: require("../assets/images/dp3.jpg"),
-      message: "I posted a new skill",
-      time: "2.00am",
-    },
-    {
-      key: "4",
-      title: "Laiba Shahbaz",
-      image: require("../assets/images/dp5.jpg"),
-      message: "Waiting for the past 3 hours",
-      time: "2.00am",
-    },
-    {
-      key: "5",
-      title: "Mahnoor Riaz",
-      image: require("../assets/images/dp4.jpg"),
-      message: "Did you get the final result",
-      time: "2.00am",
-    },
-    {
-      key: "6",
-      title: "Laraib khan",
-      image: require("../assets/images/dp10.jpg"),
-      message: "I wanted to sell plant basket. can you help!",
-      time: "2.00am",
-    },
-    {
-      key: "7",
-      title: "Sana Butt",
-      image: require("../assets/images/dp7.jpg"),
-      message: "Did you get my post?",
-      time: "2.00am",
-    },
-    {
-      key: "8",
-      title: "Sania Mirza",
-      image: require("../assets/images/dp8.jpg"),
-      message: "Done with your questions.",
-      time: "2.00am",
-    },
-    {
-      key: "9",
-      title: "Linta Malik",
-      image: require("../assets/images/dp9.jpg"),
-      message: "I wanted your geyser. can you low the cost of the item.",
-      time: "2.00am",
-    },
- 
-  ]);
+
+  const [messageList, setMessageList] = useState([]);
 
   const toggleSelectMessage = (message) => {
     const index = selectedMessages.findIndex(
@@ -106,21 +54,21 @@ const MessagesScreen = ({ navigation }) => {
     }
   };
 
-  const deleteSelectedMessages = () => {
-  const updatedMessageList = messageList.filter(
-    (message) => !selectedMessages.some(
-      (selectedMessage) => selectedMessage.key === message.key
-    )
-  );
-  setSelectedMessages([]);
-  setMessageList(updatedMessageList);
-};
+  const backAction = () => {
+    navigation.goBack();
+    return true;
+  };
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", backAction);
 
+    return () =>
+      BackHandler.removeEventListener("hardwareBackPress", backAction);
+  }, []);
 
   const renderItemMessage = ({ item, index }) => {
     const isEnd = index === 0;
     const isSelected = selectedMessages.some(
-      (selectedMessage) => selectedMessage.key === item.key
+      (selectedMessage) => selectedMessage._id === item._id
     );
 
     return (
@@ -132,7 +80,16 @@ const MessagesScreen = ({ navigation }) => {
         }}
       >
         <TouchableOpacity
-          onPress={() => navigation.navigate("chatScreen")}
+          onPress={() =>
+            navigation.navigate("ChattingScreen", {
+              user: {
+                recepientId: item._id,
+                recepientName: item.name,
+                recepientImage: item.image,
+                senderId: userId,
+              },
+            })
+          }
           onLongPress={() => toggleSelectMessage(item)}
           style={{
             flexDirection: isRtl ? "row-reverse" : "row",
@@ -156,7 +113,7 @@ const MessagesScreen = ({ navigation }) => {
               />
             )}
             <Image
-              source={item.image}
+              source={{ uri: item.image }}
               style={{ height: 50, width: 50, borderRadius: 25 }}
             />
             <View
@@ -170,7 +127,7 @@ const MessagesScreen = ({ navigation }) => {
                 numberOfLines={1}
                 style={{ ...Fonts.Medium16primary, overflow: "hidden" }}
               >
-                {item.title}
+                {item.name}
               </Text>
               <Text
                 numberOfLines={1}
@@ -180,7 +137,7 @@ const MessagesScreen = ({ navigation }) => {
                   overflow: "hidden",
                 }}
               >
-                {item.message}
+                {item.lastMessage}
               </Text>
             </View>
           </View>
@@ -195,13 +152,39 @@ const MessagesScreen = ({ navigation }) => {
               numberOfLines={1}
               style={{ ...Fonts.Medium14grey, overflow: "hidden" }}
             >
-              {item.time}
+              {item.lastMessage === "Empty Chat, Join Now"
+                ? ""
+                : extractTime(item.timeStamp)}
             </Text>
           </View>
         </TouchableOpacity>
       </View>
     );
   };
+
+  const handleGetChats = async () => {
+    try {
+      setIsLoading(true);
+      let result = await getChats();
+      if (result.status == 200) {
+        setMessageList(result.data);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // useEffect(() => {
+  //   handleGetChats();
+  // }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      handleGetChats();
+    }, [])
+  );
 
   const renderSelectDeleteBar = () => {
     return (
@@ -215,7 +198,7 @@ const MessagesScreen = ({ navigation }) => {
           backgroundColor: Colors.lightGrey,
         }}
       >
-        <TouchableOpacity onPress={deleteSelectedMessages}>
+        <TouchableOpacity onPress={handleDeleteMessages}>
           <Ionicons name="trash" size={24} color={Colors.danger} />
         </TouchableOpacity>
         <Text style={{ ...Fonts.Regular16black }}>
@@ -226,8 +209,26 @@ const MessagesScreen = ({ navigation }) => {
     );
   };
 
+  const handleDeleteMessages = async () => {
+    try {
+      const response = await deleteChat({
+        recepientId: selectedMessages[0]._id,
+      });
+
+      if (response.status === 200) {
+        handleGetChats();
+        setSelectedMessages([]);
+      } else {
+        console.log("error deleting messages", response.status);
+      }
+    } catch (error) {
+      console.log("error deleting messages", error);
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
+      {isLoading && <Loader />}
       <View
         style={{
           paddingVertical: Default.fixPadding * 1.2,
@@ -265,7 +266,7 @@ const MessagesScreen = ({ navigation }) => {
       <FlatList
         data={messageList}
         renderItem={renderItemMessage}
-        keyExtractor={(item) => item.key}
+        keyExtractor={(item) => item._id}
         showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>

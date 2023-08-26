@@ -15,14 +15,18 @@ import { useTranslation } from "react-i18next";
 import Losted from "../screens/Losted";
 import { getAllItems } from "../apis/apis";
 import { useFocusEffect } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+import { setItems, setSearchResults } from "../redux/globalSlice";
+import { debounce } from "../utils";
 const { width } = Dimensions.get("window");
 
 const OngoingTab = (props) => {
+  const { filteredSellZoneItems } = useSelector((state) => state.global);
+
   const [cancelModal, setCancelModal] = useState(false);
   const [cancelToast, setCancelToast] = useState(false);
   const onToggleSnackBarCancelToast = () => setCancelToast(false);
   const [allClear, setAllClear] = useState(false);
-  const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const { t, i18n } = useTranslation();
@@ -31,12 +35,15 @@ const OngoingTab = (props) => {
     return t(`ongoingTab:${key}`);
   }
 
+  const dispatch = useDispatch();
+
   const handleGetItems = async () => {
     try {
       setIsLoading(true);
       let result = await getAllItems();
       if (result.status == 200) {
-        setItems(result.data);
+        dispatch(setItems(result.data));
+        dispatch(setSearchResults(""));
       }
     } catch (error) {
       console.log(error);
@@ -50,11 +57,37 @@ const OngoingTab = (props) => {
       handleGetItems();
     }, [])
   );
-
+  console.log({ filteredSellZoneItems });
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
+      {filteredSellZoneItems.length === 0 && (
+        <TouchableOpacity
+          style={{
+            ...Default.shadow,
+            backgroundColor: Colors.white,
+            marginTop: 30,
+            marginHorizontal: 13,
+            //    marginBottom: 27,
+            borderRadius: 10,
+            // overflow: "hidden",
+            flexDirection: isRtl ? "row-reverse" : "row",
+            paddingVertical: Default.fixPadding,
+          }}
+        >
+          <View
+            style={{
+              flex: 2,
+              //  paddingHorizontal: Default.fixPadding * 1.5,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text>No Result Found</Text>
+          </View>
+        </TouchableOpacity>
+      )}
       <FlatList
-        data={items}
+        data={filteredSellZoneItems || []}
         numColumns={2}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (

@@ -93,9 +93,6 @@ const PayPalScreen = ({ navigation, route }) => {
     return () =>
       BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
-  const [email, setEmail] = useState();
-
-  const [value, setValue] = useState(0);
 
   const [date, setDate] = useState();
   const [calendarModal, setCalendarModel] = useState(false);
@@ -138,8 +135,6 @@ const PayPalScreen = ({ navigation, route }) => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
     });
 
     if (!result.canceled) {

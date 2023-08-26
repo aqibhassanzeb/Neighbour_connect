@@ -77,3 +77,8 @@ export const shortText = (text) => {
     return words.slice(0, 40).join(" ");
   }
 };
+
+export const debounce = (func, delay) => {
+  clearTimeout(debounceTimeout);
+  debounceTimeout = setTimeout(func, delay);
+};

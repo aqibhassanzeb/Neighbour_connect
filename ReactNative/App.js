@@ -33,6 +33,7 @@ import policy from "./screens/policy";
 import terns from "./screens/terns";
 import Messages from "./screens/Messages";
 import Form2 from "./screens/Form2";
+import EditForm from "./screens/EditForm";
 import Replies from "./screens/Replies";
 import MyDis from "./screens/MyDis";
 import Replis from "./screens/Replis";
@@ -54,6 +55,7 @@ import YourList from "./screens/YourList";
 import lostTabt from "./screens/lostTabt";
 import Location from "./screens/Location";
 import Fpos from "./screens/Fpos";
+import Upos from "./screens/Upos";
 import EditsSus from "./screens/EditsSus";
 import EditSuccess from "./screens/EditSuccess";
 import Report from "./screens/Report";
@@ -602,6 +604,11 @@ const MainNavigation = (props) => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name="EditForm"
+          component={EditForm}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
           name="Replies"
           component={Replies}
           options={{ headerShown: false }}
@@ -610,6 +617,11 @@ const MainNavigation = (props) => {
         <Stack.Screen
           name="Fpos"
           component={Fpos}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Upos"
+          component={Upos}
           options={{ headerShown: false }}
         />
         <Stack.Screen
