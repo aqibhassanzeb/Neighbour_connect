@@ -82,3 +82,9 @@ export const debounce = (func, delay) => {
   clearTimeout(debounceTimeout);
   debounceTimeout = setTimeout(func, delay);
 };
+
+export const generateRoomId = (userId1, userId2) => {
+  const sortedUserIds = [userId1, userId2].sort();
+  const roomId = sortedUserIds.join("_");
+  return roomId;
+};
