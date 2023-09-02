@@ -19,8 +19,8 @@ const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-const PickAddressScreen = ({ navigation,route}) => {
-  const {user,lostandfoundCreate}=route.params
+const PickAddressScreen = ({ navigation, route }) => {
+  const { user, lostandfoundCreate } = route.params;
   const [region, setRegion] = useState(null);
   const [poi, setPoi] = useState(null);
   const [search, setSearch] = useState("");
@@ -108,15 +108,14 @@ const PickAddressScreen = ({ navigation,route}) => {
 
   const handlePickLocation = () => {
     if (poi) {
-      if(lostandfoundCreate){
+      if (lostandfoundCreate) {
         navigation.navigate("ListItem", {
           address: {
             latitude: poi.coordinate.latitude,
             longitude: poi.coordinate.longitude,
           },
         });
-        
-      }else{
+      } else {
         navigation.navigate("Radius", {
           user,
           address: {
@@ -124,7 +123,6 @@ const PickAddressScreen = ({ navigation,route}) => {
             longitude: poi.coordinate.longitude,
           },
         });
-        
       }
     }
   };

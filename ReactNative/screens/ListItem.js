@@ -37,9 +37,13 @@ import {
 import { FontAwesome5 } from "@expo/vector-icons";
 import Loader from "../components/loader";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { clearLocation } from "../redux/loanandfoundSlice";
 
 const { width, height } = Dimensions.get("window");
 const PayPalScreen = ({ navigation, route }) => {
+  const { selectedLocation } = useSelector((state) => state.loanandfound);
+
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState({
     name: "Category",
@@ -50,10 +54,8 @@ const PayPalScreen = ({ navigation, route }) => {
   const [setselectedImages, setSetselectedImages] = useState(null);
   const [handleLoading, setHandleLoading] = useState(false);
   const [selectedImages, setSelectedImages] = useState([]);
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-  });
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [updateHandle, setUpdateHandle] = useState(false);
 
   const [dropdownOpens, setDropdownOpens] = useState(false);
@@ -148,15 +150,13 @@ const PayPalScreen = ({ navigation, route }) => {
     const updatedImages = selectedImages.filter((uri, i) => i !== index);
     setSelectedImages(updatedImages);
   };
-  const handleInputChange = (key, value) => {
-    setFormData({
-      ...formData,
-      [key]: value,
-    });
-  };
 
   const validateForm = () => {
-    if (formData.title.trim() === "") {
+    if (selectedImages.length === 0) {
+      alert("Please select at least one picture.");
+      return false;
+    }
+    if (title.trim() === "") {
       alert("Please enter a title.");
       return false;
     }
@@ -168,19 +168,10 @@ const PayPalScreen = ({ navigation, route }) => {
       alert("Please select date.");
       return false;
     }
-    // if(!route.params?.address){
-    //   alert( 'Please select the location.');
-    //   return false;
-
-    // }
-    if (formData.description.trim() == "") {
+    if (description.trim() == "") {
       alert("Please enter a description.");
       return false;
     }
-    // if(selectedImages.length ==0){
-    //   alert( 'Please select atleast one image.');
-    //   return false;
-    // }
     if (selectedOptions == "Type") {
       alert("Please select a type.");
       return false;
@@ -189,180 +180,86 @@ const PayPalScreen = ({ navigation, route }) => {
       alert("Please select a visibility.");
       return false;
     }
-
     return true;
   };
-
-  const selectedImageToFile = async (selectedImage) => {
-    // Get the file name from the URI
-    const fileName = selectedImage.uri.split("/").pop();
-
-    // Create a File object with the URI and type 'image/jpeg' (you can change the type as needed)
-    const file = {
-      uri: selectedImage.uri,
-      name: fileName,
-      type: "image/jpeg", // Change the type as needed based on the image format
-    };
-
-    return file;
-  };
-
-  const uploadImagesToCloudinary = async (selectedImages) => {
-    try {
-      const cloudName = "dbdxsvxda"; // Replace with your Cloudinary cloud name
-      // const uploadPreset = 'YOUR_UPLOAD_PRESET'; // Replace with your Cloudinary upload preset
-
-      const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
-
-      const uploadPromises = selectedImages.map(async (selectedImage) => {
-        console.log("selectedImage  :", selectedImage);
-        const response = await fetch(selectedImage.uri);
-        console.log("selectedImage  2:", response);
-        const blob = await response.blob();
-
-        const formData = new FormData();
-        formData.append("file", blob);
-        // formData.append('upload_preset', uploadPreset);
-
-        const uploadResponse = await fetch(uploadUrl, {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!uploadResponse.ok) {
-          throw new Error("Failed to upload image to Cloudinary");
-        }
-
-        const uploadResult = await uploadResponse.json();
-        return uploadResult.secure_url;
-      });
-
-      const uploadedImageUrls = await Promise.all(uploadPromises);
-      return uploadedImageUrls;
-    } catch (error) {
-      console.error("Error uploading images to Cloudinary:", error);
-      throw error;
-    }
-  };
-
+  const dispatch = useDispatch();
   const handleSubmit = async () => {
     if (validateForm()) {
-      let picurl = [
-        "https://res.cloudinary.com/dbdxsvxda/image/upload/v1690110912/niegbour_proj/vsmzv4fseavk4b8zoql5.png",
-        "https://res.cloudinary.com/dbdxsvxda/image/upload/v1690110914/niegbour_proj/bmkuc68k8jnqp9vqvxqp.png",
-      ];
-
-      let payload = {
-        title: formData.title,
-        description: formData.description,
-        type: selectedOptions,
-        visibility: selectedOptionsd,
-        gallary_images: picurl,
-        location: route.params?.address,
-        notify: checked,
-        date: date,
-        category: selectedOption._id,
+      const formData = new FormData();
+      selectedImages.slice(0, 3).forEach((media) => {
+        const extension = media.uri.split(".").pop();
+        const type = `${media.type}/${extension}`;
+        const name = media.uri.split("/").pop();
+        formData.append("photos", {
+          uri: media.uri,
+          type,
+          name,
+        });
+      });
+      formData.append("title", title);
+      formData.append("category", selectedOption._id);
+      formData.append("description", description);
+      formData.append("date", String(finalDate));
+      const mapLocation = {
+        ...selectedLocation.coordinate,
+        name: selectedLocation.name,
       };
+      formData.append("location", JSON.stringify(mapLocation));
+      formData.append("type", selectedOptions);
+      formData.append("visibility", selectedOptionsd);
+      formData.append("notify", checked);
 
-      let payload2 = {
-        _id: route.params?.itemId,
-        title: formData.title,
-        description: formData.description,
-        type: selectedOptions,
-        visibility: selectedOptionsd,
-        gallary_images: picurl,
-        location: route.params.address,
-        notify: checked,
-        date: date,
-        category: selectedOption._id,
-      };
-
-      //       let formData2 = new FormData();
-      // formData2.append('title', payload.title);
-      // formData2.append('description', payload.description);
-      // formData2.append('type', payload.type);
-      // formData2.append('visibility', payload.visibility);
-      // formData2.append('notify', payload.notify);
-      // formData2.append('location', payload.location);
-      // formData2.append('category', payload.category);
-      // formData2.append('gallary_images',picurl)
-      // formData2.append('date',confirmDate())
-
-      // Append selectedImages array as individual files with a unique key
-
-      // for (let index = 0; index < selectedImages.length; index++) {
-      //   const selectedImage = selectedImages[index];
-      //   const fileName = selectedImage.uri.split('/').pop();
-      //   const file = {
-      //     uri: selectedImage.uri,
-      //     name: fileName,
-      //     type: 'image/jpeg', // Change the type as needed based on the image format
-      //   };
-      //   formData2.append(`files[${index}]`, file);
-      // }
       try {
         setHandleLoading(true);
-        // console.log("form Data :",formData2)
-        console.log("submited 1");
-        let result;
-        if (updateHandle) {
-          result = await lostandfoundUpdate(payload2);
-        } else {
-          result = await lostandfoundCreate(payload);
-        }
-        console.log("submited 2", result);
-        if (result.status == 200) {
-          updateHandle
-            ? alert("updated successfully")
-            : navigation.navigate("LostPosted");
-        } else {
-          alert(result.data.error);
+        let response = await lostandfoundCreate(formData);
+        if (response.status === 200) {
+          dispatch(clearLocation());
+          navigation.navigate("LostPosted");
         }
       } catch (error) {
-        alert("something went wrong!");
-        console.log("errror 2:", error);
+        console.log("Error While Posting...", error);
       } finally {
         setHandleLoading(false);
       }
-    } else {
-      console.log("not submitted :");
     }
   };
-  const handleGetfoundandlostItem = async () => {
-    try {
-      setHandleLoading(true);
-      let paylaod = {};
-      paylaod._id = route.params.itemId;
-      let result = await lostItemGet(paylaod);
 
-      if (result.status == 200) {
-        let itemData = result.data.data[0];
-        console.log("item data :", itemData);
-        setUpdateHandle(true);
-        setFormData({
-          ...formData,
-          title: itemData.title,
-          description: itemData.description,
-        });
-        handleOptionSelect({
-          name: itemData.category?.name,
-          _id: itemData.category?._id,
-        });
-        handleOptionSelects(itemData.type);
-        handleOptionSelectsd(itemData.visibility);
-        setChecked(itemData.notify);
-        setDate(itemData.date);
-        // setData(result.data.data[0])
-      }
-    } catch (error) {
-      alert("something went wrong!");
-    } finally {
-      setHandleLoading(false);
-    }
-  };
-  useEffect(() => {
-    !!route.params?.itemId && handleGetfoundandlostItem();
-  }, [route.params]);
+  // const handleGetfoundandlostItem = async () => {
+  //   try {
+  //     setHandleLoading(true);
+  //     let paylaod = {};
+  //     paylaod._id = route.params.itemId;
+  //     let result = await lostItemGet(paylaod);
+
+  //     if (result.status == 200) {
+  //       let itemData = result.data.data[0];
+  //       console.log("item data :", itemData);
+  //       setUpdateHandle(true);
+  //       setFormData({
+  //         ...formData,
+  //         title: itemData.title,
+  //         description: itemData.description,
+  //       });
+  //       handleOptionSelect({
+  //         name: itemData.category?.name,
+  //         _id: itemData.category?._id,
+  //       });
+  //       handleOptionSelects(itemData.type);
+  //       handleOptionSelectsd(itemData.visibility);
+  //       setChecked(itemData.notify);
+  //       setDate(itemData.date);
+  //       // setData(result.data.data[0])
+  //     }
+  //   } catch (error) {
+  //     alert("something went wrong!");
+  //   } finally {
+  //     setHandleLoading(false);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   !!route.params?.itemId && handleGetfoundandlostItem();
+  // }, [route.params]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
@@ -496,8 +393,8 @@ const PayPalScreen = ({ navigation, route }) => {
                 marginHorizontal: Default.fixPadding,
                 textAlign: isRtl ? "right" : "left",
               }}
-              value={formData.title}
-              onChangeText={(text) => handleInputChange("title", text)}
+              value={title}
+              onChangeText={(text) => setTitle(text)}
             />
           </View>
 
@@ -635,7 +532,7 @@ const PayPalScreen = ({ navigation, route }) => {
                   color={Colors.grey}
                   style={{ flex: 1.5 }}
                 />
-                <View style={{ flex: 23.5 }}>
+                <View style={{ flex: 23.5, paddingLeft: 8 }}>
                   {date ? (
                     <Text
                       //   numberOfLines={1}
@@ -678,10 +575,8 @@ const PayPalScreen = ({ navigation, route }) => {
             }}
           >
             <TouchableOpacity
-              onPress={
-                () =>
-                  navigation.navigate("Address", { lostandfoundCreate: true })
-                // navigation.navigate("Location")
+              onPress={() =>
+                navigation.navigate("Locate", { title: "LostAndFound" })
               }
               style={{
                 flexDirection: isRtl ? "row-reverse" : "row",
@@ -692,9 +587,11 @@ const PayPalScreen = ({ navigation, route }) => {
                 name="location-pin"
                 size={18}
                 color={Colors.grey}
-                style={{
-                  flex: 0.3,
-                }}
+                style={
+                  {
+                    //  flex: 0.6,
+                  }
+                }
               />
 
               <View
@@ -704,15 +601,15 @@ const PayPalScreen = ({ navigation, route }) => {
                 }}
               >
                 <Text
-                  numberOfLines={1}
+                  numberOfLines={2}
                   style={{
                     ...Fonts.SemiBold14grey,
                     overflow: "hidden",
                     textAlign: isRtl ? "right" : "left",
-                    paddingLeft: 0,
+                    paddingLeft: 21,
                   }}
                 >
-                  Location
+                  {selectedLocation?.name ? selectedLocation.name : "Location"}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -759,6 +656,7 @@ const PayPalScreen = ({ navigation, route }) => {
                     style={{
                       marginTop: 3,
                       color: "grey",
+                      textTransform: "capitalize",
                     }}
                   >
                     {selectedOptions}
@@ -822,8 +720,8 @@ const PayPalScreen = ({ navigation, route }) => {
                 marginHorizontal: Default.fixPadding,
                 textAlign: isRtl ? "right" : "left",
               }}
-              value={formData.description}
-              onChangeText={(text) => handleInputChange("description", text)}
+              value={description}
+              onChangeText={(text) => setDescription(text)}
             />
           </View>
           <View
@@ -868,6 +766,7 @@ const PayPalScreen = ({ navigation, route }) => {
                     style={{
                       marginTop: 3,
                       color: "grey",
+                      textTransform: "capitalize",
                     }}
                   >
                     {selectedOptionsd}

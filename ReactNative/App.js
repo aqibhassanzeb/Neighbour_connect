@@ -53,6 +53,7 @@ import ListItem from "./screens/ListItem";
 import LostPosted from "./screens/LostPosted";
 import YourList from "./screens/YourList";
 import lostTabt from "./screens/lostTabt";
+import EditLostAndFound from "./screens/EditLostAndFound";
 import Location from "./screens/Location";
 import Fpos from "./screens/Fpos";
 import Upos from "./screens/Upos";
@@ -171,6 +172,12 @@ const MainNavigation = (props) => {
         <Stack.Screen
           name="Losted"
           component={Losted}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name="EditLostAndFound"
+          component={EditLostAndFound}
           options={{ headerShown: false }}
         />
         <Stack.Screen

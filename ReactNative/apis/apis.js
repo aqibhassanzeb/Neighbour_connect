@@ -217,11 +217,21 @@ export const lostandfoundCategGet = async () => {
   return result;
 };
 export const lostandfoundCreate = async (data) => {
-  const headersWithToken = await getHeadersWithToken();
+  const headersWithToken = await getHeadersWithTokenFormData();
   let result = await apiRequest(
     "POST",
     `lostandfound_create`,
     data,
+    headersWithToken
+  );
+  return result;
+};
+export const updateLAndFImages = async (data) => {
+  const headersWithToken = await getHeadersWithTokenFormData();
+  let result = await apiRequest(
+    "PUT",
+    `update_landf_images/${data.id}`,
+    data.formData,
     headersWithToken
   );
   return result;
