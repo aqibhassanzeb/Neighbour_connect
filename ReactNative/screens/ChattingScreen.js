@@ -46,7 +46,7 @@ const ChatMessagesScreen = ({ route }) => {
   const [message, setMessage] = useState("");
   const [socket, setSocket] = useState(null);
   const [imageLoading, setImageLoading] = useState(false);
-  const [progress, setProgress] = useState();
+  const [progress, setProgress] = useState(0);
   const scrollViewRef = useRef(null);
   const roomId = generateRoomId(userId, recepientId);
 

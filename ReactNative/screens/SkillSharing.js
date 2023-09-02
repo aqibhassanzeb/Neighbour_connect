@@ -24,7 +24,7 @@ const ServicesScreen = ({ navigation }) => {
   const { t, i18n } = useTranslation();
 
   const [Categories, setCategories] = useState([]);
-  const [filteredCategories, setFilteredCategories] = useState();
+  const [filteredCategories, setFilteredCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState("");
 

@@ -15,6 +15,9 @@ import { useTranslation } from "react-i18next";
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from "react-native-maps";
 import { useDispatch } from "react-redux";
 import { updateLocation } from "../redux/loanandfoundSlice";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import { GOOGLE_APIKEY } from "../config";
+import axios from "axios";
 
 const { width, height } = Dimensions.get("window");
 
@@ -30,6 +33,8 @@ const PickAddressScreen = ({ navigation, route }) => {
   const { t, i18n } = useTranslation();
 
   const [poi, setPoi] = useState(null);
+  const [search, setSearch] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
 
   const dispatch = useDispatch();
 
@@ -48,7 +53,6 @@ const PickAddressScreen = ({ navigation, route }) => {
     return () =>
       BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
-  const [search, setSearch] = useState();
 
   let region = {
     latitude: LATITUDE,
@@ -77,6 +81,75 @@ const PickAddressScreen = ({ navigation, route }) => {
     }
   };
 
+  const getPlaceName = () => {
+    axios
+      .get(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${poi.coordinate.latitude},${poi.coordinate.longitude}&key=`
+      )
+      .then((response) => {
+        // console.log(response.data);
+        // const result = response.data.results[0];
+        // const placeName = result.formatted_address;
+      })
+      .catch((error) => {
+        console.error("Error fetching location:", error);
+      });
+  };
+
+  const handleSearch = async (searchText) => {
+    setSearch(searchText);
+    try {
+      const apiKey = GOOGLE_APIKEY;
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchText}&types=geocode&key=${apiKey}`
+      );
+      console.log(response.data);
+      if (response.data && response.data.predictions) {
+        setSearchResults(response.data.predictions);
+      }
+    } catch (error) {
+      console.log("Error fetching search results:", error);
+    }
+  };
+
+  const handleSelectLocation = (placeId) => {
+    try {
+      const apiKey = GOOGLE_APIKEY;
+      axios
+        .get(
+          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=geometry&key=${apiKey}`
+        )
+        .then((response) => {
+          console.log(response.data);
+          // if (
+          //   response.data &&
+          //   response.data.result &&
+          //   response.data.result.geometry &&
+          //   response.data.result.geometry.location
+          // ) {
+          //   const { location } = response.data.result.geometry;
+          //   setRegion({
+          //     latitude: location.lat,
+          //     longitude: location.lng,
+          //     latitudeDelta: LATITUDE_DELTA,
+          //     longitudeDelta: LONGITUDE_DELTA,
+          //   });
+          //   setPoi({
+          //     coordinate: {
+          //       latitude: location.lat,
+          //       longitude: location.lng,
+          //     },
+          //   });
+          // }
+        })
+        .catch((error) => {
+          console.log("Error fetching location details:", error);
+        });
+    } catch (error) {
+      console.log("Error fetching location details:", error);
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <MapView
@@ -84,6 +157,7 @@ const PickAddressScreen = ({ navigation, route }) => {
         style={{ flex: 1 }}
         initialRegion={region}
         onPoiClick={onPoiClick}
+        // onPress={onPoiClick}
         showsUserLocation={true}
       >
         {poi ? (
@@ -102,8 +176,7 @@ const PickAddressScreen = ({ navigation, route }) => {
           />
         )}
       </MapView>
-
-      {/* Search Area  */}
+      {/* Search Area */}
       <View
         style={{
           paddingVertical: Default.fixPadding * 1.6,
@@ -150,7 +223,7 @@ const PickAddressScreen = ({ navigation, route }) => {
               textAlign: isRtl ? "right" : "left",
               marginHorizontal: Default.fixPadding * 0.8,
             }}
-            onChangeText={(searchItem) => setSearch(searchItem)}
+            onChangeText={(searchItem) => handleSearch(searchItem)}
             value={search}
             placeholder={tr("search")}
             placeholderTextColor={Colors.grey}
@@ -159,6 +232,17 @@ const PickAddressScreen = ({ navigation, route }) => {
         </View>
       </View>
 
+      {/* <GooglePlacesAutocomplete
+        placeholder="Search"
+        onPress={(data, details = null) => {
+          // 'details' is provided when fetchDetails = true
+          console.log(data, details);
+        }}
+        query={{
+          key: "",
+          language: "en",
+        }}
+      /> */}
       {/* Location Show and Button  */}
       <View
         style={{
@@ -225,3 +309,87 @@ const PickAddressScreen = ({ navigation, route }) => {
 };
 
 export default PickAddressScreen;
+
+// import React, { useState } from "react";
+// import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+// import MapView, { Marker } from "react-native-maps";
+
+// const PickAddressScreen = () => {
+//   const [selectedLocation, setSelectedLocation] = useState(null);
+//   console.log(selectedLocation);
+
+//   const handleMapPress = (event) => {
+//     const { coordinate } = event.nativeEvent;
+//     setSelectedLocation(coordinate);
+//   };
+
+//   return (
+//     <View style={styles.container}>
+//       <MapView
+//         style={styles.map}
+//         initialRegion={{
+//           latitude: 37.78825,
+//           longitude: -122.4324,
+//           latitudeDelta: 0.0922,
+//           longitudeDelta: 0.0421,
+//         }}
+//         onPress={handleMapPress}
+//       >
+//         {selectedLocation && (
+//           <Marker
+//             coordinate={selectedLocation}
+//             title="Selected Location"
+//             description="This is the selected location."
+//           />
+//         )}
+//       </MapView>
+//       <View style={styles.textContainer}>
+//         {selectedLocation && (
+//           <Text>
+//             Latitude: {selectedLocation.latitude.toFixed(6)}, Longitude:{" "}
+//             {selectedLocation.longitude.toFixed(6)}
+//           </Text>
+//         )}
+//       </View>
+//       <TouchableOpacity
+//         style={styles.button}
+//         onPress={() => {
+//           // Handle the selected location as needed
+//           if (selectedLocation) {
+//             console.log("Selected Location:", selectedLocation);
+//             // You can save the selected location to your state or perform other actions here.
+//           } else {
+//             console.log("No location selected.");
+//           }
+//         }}
+//       >
+//         <Text style={styles.buttonText}>Save Location</Text>
+//       </TouchableOpacity>
+//     </View>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//   },
+//   map: {
+//     flex: 1,
+//   },
+//   textContainer: {
+//     alignItems: "center",
+//     justifyContent: "center",
+//     padding: 10,
+//   },
+//   button: {
+//     backgroundColor: "blue",
+//     alignItems: "center",
+//     padding: 15,
+//   },
+//   buttonText: {
+//     color: "white",
+//     fontSize: 18,
+//   },
+// });
+
+// export default PickAddressScreen;

@@ -1,3 +1,6 @@
+import axios from "axios";
+import { CLOUD_NAME, UPLOAD_PRESET } from "../config";
+
 export const extractTime = (input) => {
   const date = new Date(input);
   const hours = date.getHours();
@@ -87,4 +90,34 @@ export const generateRoomId = (userId1, userId2) => {
   const sortedUserIds = [userId1, userId2].sort();
   const roomId = sortedUserIds.join("_");
   return roomId;
+};
+
+export const uploadImageToCloudinary = async (image) => {
+  try {
+    const formData = new FormData();
+    const extension = image.uri.split(".").pop();
+    const type = `${image.type}/${extension}`;
+    const name = image.uri.split("/").pop();
+    formData.append("file", {
+      uri: image.uri,
+      type,
+      name,
+    });
+    formData.append("upload_preset", UPLOAD_PRESET);
+    formData.append("cloud_name", CLOUD_NAME);
+    const response = await axios.post(
+      `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/raw/upload`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    console.log(response.data.secure_url);
+    return response.data.secure_url;
+  } catch (error) {
+    console.error("Error uploading image:", error);
+  } finally {
+  }
 };
