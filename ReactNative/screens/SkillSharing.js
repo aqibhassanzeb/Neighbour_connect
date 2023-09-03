@@ -10,6 +10,8 @@ import {
   Image,
   TextInput,
   FlatList,
+  KeyboardAvoidingView,
+  Keyboard,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Colors, Default, Fonts } from "../constants/styles";
@@ -22,7 +24,9 @@ const ServicesScreen = ({ navigation }) => {
   const { t, i18n } = useTranslation();
 
   const [Categories, setCategories] = useState([]);
+  const [filteredCategories, setFilteredCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [search, setSearch] = useState("");
 
   const isRtl = i18n.dir() == "rtl";
 
@@ -47,6 +51,7 @@ const ServicesScreen = ({ navigation }) => {
       let result = await getCategories();
       if (result.status == 200) {
         setCategories(result.data.data);
+        setFilteredCategories(result.data.data);
       }
     } catch (error) {
       console.log(error);
@@ -58,13 +63,52 @@ const ServicesScreen = ({ navigation }) => {
   useEffect(() => {
     handleGetCategories();
   }, []);
+
+  const handleSearch = (text) => {
+    setSearch(text);
+
+    if (text === "") {
+      setFilteredCategories(Categories); // Reset to the original list
+    } else {
+      const filtered = Categories.filter((category) =>
+        category.name.toLowerCase().includes(text.toLowerCase())
+      );
+      setFilteredCategories(filtered);
+    }
+  };
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       {isLoading && <Loader />}
 
       <View>
+        {filteredCategories.length === 0 && (
+          <TouchableOpacity
+            style={{
+              ...Default.shadow,
+              backgroundColor: Colors.white,
+              marginTop: 30,
+              marginHorizontal: 13,
+              //    marginBottom: 27,
+              borderRadius: 10,
+              // overflow: "hidden",
+              flexDirection: isRtl ? "row-reverse" : "row",
+              paddingVertical: Default.fixPadding,
+            }}
+          >
+            <View
+              style={{
+                flex: 2,
+                //  paddingHorizontal: Default.fixPadding * 1.5,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text>No Result Found</Text>
+            </View>
+          </TouchableOpacity>
+        )}
         <FlatList
-          data={Categories && Categories}
+          data={filteredCategories && filteredCategories}
           keyExtractor={(item) => item._id}
           numColumns={2}
           ListHeaderComponent={() => (
@@ -100,7 +144,7 @@ const ServicesScreen = ({ navigation }) => {
                     {"Skills Hub"}
                   </Text>
                 </View>
-                <TouchableOpacity
+                <View
                   style={{
                     ...Default.shadow,
                     backgroundColor: Colors.white,
@@ -111,14 +155,20 @@ const ServicesScreen = ({ navigation }) => {
                   }}
                 >
                   <Ionicons name="search" size={20} color={Colors.grey} />
-                  <TextInput
-                    placeholder="Search"
-                    style={{
-                      ...Fonts.SemiBold16grey,
-                      marginHorizontal: Default.fixPadding * 0.8,
-                    }}
-                  />
-                </TouchableOpacity>
+                  <KeyboardAvoidingView>
+                    <TextInput
+                      placeholder="Search"
+                      style={{
+                        ...Fonts.SemiBold16grey,
+                        marginHorizontal: Default.fixPadding * 0.8,
+                        width: 300,
+                        flex: 1,
+                      }}
+                      value={search}
+                      onChangeText={(text) => handleSearch(text)}
+                    />
+                  </KeyboardAvoidingView>
+                </View>
               </View>
               <View style={styles.container}>
                 <View style={styles.buttonContainer}>

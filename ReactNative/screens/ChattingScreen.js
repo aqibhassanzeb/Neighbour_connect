@@ -8,6 +8,7 @@ import {
   Pressable,
   Image,
   TouchableOpacity,
+  BackHandler,
 } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
 import { Feather } from "@expo/vector-icons";
@@ -19,28 +20,55 @@ import EmojiSelector from "react-native-emoji-selector";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { deleteMessages, getMessages, postMessage } from "../apis/apis";
+import ImageLoading from "../assets/images/image_loading.jpeg";
+import {
+  deleteMessages,
+  getMessages,
+  postMessage,
+  socketUrl,
+} from "../apis/apis";
 import { useTranslation } from "react-i18next";
 import { Colors, Default, Fonts } from "../constants/styles";
+import { generateRoomId } from "../utils";
+import io from "socket.io-client";
+import axios from "axios";
+import { UPLOAD_PRESET, CLOUD_NAME } from "../config";
 
 const ChatMessagesScreen = ({ route }) => {
   const { user } = route.params;
   const { senderId: userId, recepientId, recepientName, recepientImage } = user;
-  const [showEmojiSelector, setShowEmojiSelector] = useState(false);
+  // const [showEmojiSelector, setShowEmojiSelector] = useState(false);
   const [selectedMessages, setSelectedMessages] = useState([]);
   const [messages, setMessages] = useState([]);
   const [recepientData, setRecepientData] = useState();
   const navigation = useNavigation();
   const [selectedImage, setSelectedImage] = useState("");
   const [message, setMessage] = useState("");
+  const [socket, setSocket] = useState(null);
+  const [imageLoading, setImageLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const scrollViewRef = useRef(null);
+  const roomId = generateRoomId(userId, recepientId);
+
+  //TR
   const { t, i18n } = useTranslation();
-
   const isRtl = i18n.dir() == "rtl";
-
   function tr(key) {
     return t(`chatScreen:${key}`);
   }
+
+  useEffect(() => {
+    const newSocket = io(socketUrl);
+    newSocket.emit("join", roomId);
+    setSocket(newSocket);
+    newSocket.on("message", (newMessage) => {
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    });
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
+
   useEffect(() => {
     scrollToBottom();
   }, []);
@@ -55,9 +83,9 @@ const ChatMessagesScreen = ({ route }) => {
     scrollToBottom();
   };
 
-  const handleEmojiPress = () => {
-    setShowEmojiSelector(!showEmojiSelector);
-  };
+  // const handleEmojiPress = () => {
+  //   setShowEmojiSelector(!showEmojiSelector);
+  // };
 
   const fetchMessages = async () => {
     try {
@@ -77,34 +105,62 @@ const ChatMessagesScreen = ({ route }) => {
     fetchMessages();
   }, []);
 
-  const handleSend = async (messageType, image) => {
+  async function uploadImageToCloudinary(image) {
+    setImageLoading(true);
     try {
       const formData = new FormData();
-      formData.append("senderId", userId);
-      formData.append("recepientId", recepientId);
+      const extension = image.uri.split(".").pop();
+      const type = `${image.type}/${extension}`;
+      const name = image.uri.split("/").pop();
+      formData.append("file", {
+        uri: image.uri,
+        type,
+        name,
+      });
+      formData.append("upload_preset", UPLOAD_PRESET);
+      formData.append("cloud_name", CLOUD_NAME);
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/raw/upload`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          onUploadProgress: (data) =>
+            setProgress(Math.round((data.loaded / data.total) * 100)),
+        }
+      );
+      console.log(response.data.secure_url);
+      return response.data.secure_url;
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    } finally {
+      setImageLoading(false);
+    }
+  }
 
-      if (messageType === "image") {
-        formData.append("messageType", "image");
-        const extension = image.uri.split(".").pop();
-        const type = `${image.type}/${extension}`;
-        const name = image.uri.split("/").pop();
-        formData.append("imageFile", {
-          uri: image.uri,
-          name,
-          type,
-        });
-      } else {
-        formData.append("messageType", "text");
-        formData.append("messageText", message);
-      }
-
-      const response = await postMessage(formData);
-      console.log({ response });
-
-      if (response.status === 200) {
-        setMessage("");
-        setSelectedImage("");
-        fetchMessages();
+  const handleSend = async (messageType, image) => {
+    try {
+      if (socket) {
+        if (messageType === "image") {
+          const imageUrl = await uploadImageToCloudinary(image);
+          const socketMessage = {
+            senderId: userId,
+            recepientId: recepientId,
+            messageType: "image",
+            imageUrl,
+          };
+          socket.emit("message", roomId, socketMessage);
+        } else {
+          const socketMessage = {
+            senderId: userId,
+            recepientId: recepientId,
+            messageType,
+            messageText: message,
+          };
+          socket.emit("message", roomId, socketMessage);
+          setMessage("");
+        }
       }
     } catch (error) {
       console.log("error in sending the message", error);
@@ -141,7 +197,6 @@ const ChatMessagesScreen = ({ route }) => {
       allowsEditing: true,
     });
 
-    console.log(result);
     if (!result.canceled) {
       handleSend("image", result.assets[0]);
     }
@@ -162,6 +217,18 @@ const ChatMessagesScreen = ({ route }) => {
       ]);
     }
   };
+
+  const backAction = () => {
+    navigation.goBack();
+    return true;
+  };
+
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", backAction);
+
+    return () =>
+      BackHandler.removeEventListener("hardwareBackPress", backAction);
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F0F0F0" }}>
@@ -319,6 +386,42 @@ const ChatMessagesScreen = ({ route }) => {
             );
           }
         })}
+        {imageLoading && (
+          <View
+            style={{
+              alignSelf: "flex-end",
+              backgroundColor: "#DCF8C6",
+              padding: 8,
+              maxWidth: "60%",
+              borderRadius: 7,
+              margin: 10,
+            }}
+          >
+            <Image
+              style={{
+                width: 200,
+                height: 200,
+                borderRadius: 7,
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
+              }}
+              source={ImageLoading}
+            />
+            <Text
+              style={{
+                fontSize: 15,
+                color: "white",
+                position: "absolute",
+                left: "50%",
+                top: "50%",
+                transform: [{ translateX: -30 }, { translateY: -10 }],
+              }}
+            >
+              Uploading {progress} %
+            </Text>
+          </View>
+        )}
       </ScrollView>
 
       <View
@@ -329,16 +432,16 @@ const ChatMessagesScreen = ({ route }) => {
           paddingVertical: 10,
           borderTopWidth: 1,
           borderTopColor: "#dddddd",
-          marginBottom: showEmojiSelector ? 0 : 25,
+          marginBottom: 25,
         }}
       >
-        <Entypo
+        {/* <Entypo
           onPress={handleEmojiPress}
           style={{ marginRight: 5 }}
           name="emoji-happy"
           size={24}
           color="gray"
-        />
+        /> */}
 
         <TextInput
           value={message}
@@ -380,14 +483,14 @@ const ChatMessagesScreen = ({ route }) => {
         </TouchableOpacity>
       </View>
 
-      {showEmojiSelector && (
+      {/* {showEmojiSelector && (
         <EmojiSelector
           onEmojiSelected={(emoji) => {
             setMessage((prevMessage) => prevMessage + emoji);
           }}
           style={{ height: 250 }}
         />
-      )}
+      )} */}
     </SafeAreaView>
   );
 };

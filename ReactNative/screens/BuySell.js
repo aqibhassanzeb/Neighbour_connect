@@ -9,24 +9,37 @@ import {
   Button,
   StyleSheet,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Colors, Default, Fonts } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import Sell from "../components/Sell";
 import Buy from "../components/Buy";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import { useDispatch, useSelector } from "react-redux";
+import { debounce } from "../utils";
+import { setSearchResults } from "../redux/globalSlice";
 
 const Tab = createMaterialTopTabNavigator();
 
 const CustomTabBar = ({ state, descriptors, navigation, position }) => {
+  const { sellZoneItems, filteredSellZoneItems } = useSelector(
+    (state) => state.global
+  );
+  const [searchQuery, setSearchQuery] = useState("");
+
   const { t, i18n } = useTranslation();
-
   const isRtl = i18n.dir() == "rtl";
-
   function tr(key) {
     return t(`bookingScreen:${key}`);
   }
+  const dispatch = useDispatch();
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    dispatch(setSearchResults(query)); // Dispatch the search query to Redux
+  };
+
   return (
     <SafeAreaView style={{ backgroundColor: Colors.extraLightGrey }}>
       <ScrollView>
@@ -84,9 +97,11 @@ const CustomTabBar = ({ state, descriptors, navigation, position }) => {
                 textAlign: isRtl ? "right" : "left",
                 marginHorizontal: Default.fixPadding * 0.8,
               }}
-              placeholder={"search Items"}
+              placeholder={"Search Items"}
               placeholderTextColor={Colors.grey}
               selectionColor={Colors.primary}
+              onChangeText={handleSearch}
+              value={searchQuery}
             />
           </TouchableOpacity>
         </View>

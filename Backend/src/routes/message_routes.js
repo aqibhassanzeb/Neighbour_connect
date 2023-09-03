@@ -3,8 +3,10 @@ const routes = express.Router();
 import multer from "multer";
 import { protect } from "../middleware/user_middleware.js";
 import {
+  deleteChat,
   deleteMessages,
   fetchMessages,
+  getFriends,
   postMessage,
   userDetails,
 } from "../controllers/message_controller.js";
@@ -23,5 +25,9 @@ routes.get("/messages/:senderId/:recepientId", fetchMessages);
 
 //endpoint to delete the messages!
 routes.post("/delete_messages", deleteMessages);
+routes.delete("/delete_chat/:senderId/:recepientId", deleteChat);
+
+//endpoint to access all the friends of the logged in user!
+routes.get("/accepted-friends/:userId", getFriends);
 
 export default routes;

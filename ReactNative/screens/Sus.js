@@ -38,6 +38,8 @@ const ServicesScreen = ({ navigation }) => {
   const [click, setClick] = useState(false);
 
   const [posts, setPosts] = useState([]);
+  const [filter, setFilter] = useState(posts);
+  const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState("");
 
@@ -142,10 +144,19 @@ const ServicesScreen = ({ navigation }) => {
     }
   };
 
+  useEffect(() => {
+    const filteredPosts = posts.filter((post) =>
+      post.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilter(filteredPosts);
+  }, [searchTerm, posts]);
+
+  console.log({ posts });
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       <ScrollView>
         {isLoading && <Loader />}
+
         <View
           style={{
             backgroundColor: Colors.primary,
@@ -177,7 +188,7 @@ const ServicesScreen = ({ navigation }) => {
               {"Neighbor Watch"}
             </Text>
           </View>
-          <TouchableOpacity
+          <View
             //  onPress={() => navigation.navigate("searchScreen")}
             style={{
               ...Default.shadow,
@@ -192,11 +203,14 @@ const ServicesScreen = ({ navigation }) => {
             <TextInput
               style={{
                 ...Fonts.SemiBold16grey,
+                flex: 1,
                 marginHorizontal: Default.fixPadding * 0.8,
               }}
               placeholder="Search"
+              value={searchTerm}
+              onChangeText={(text) => setSearchTerm(text)}
             />
-          </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.conta}>
@@ -240,10 +254,35 @@ const ServicesScreen = ({ navigation }) => {
             Suspicious Activities
           </Text>
         </View>
-
+        {filter.length === 0 && (
+          <TouchableOpacity
+            style={{
+              ...Default.shadow,
+              backgroundColor: Colors.white,
+              marginTop: 30,
+              marginHorizontal: 13,
+              //    marginBottom: 27,
+              borderRadius: 10,
+              // overflow: "hidden",
+              flexDirection: isRtl ? "row-reverse" : "row",
+              paddingVertical: Default.fixPadding,
+            }}
+          >
+            <View
+              style={{
+                flex: 2,
+                //  paddingHorizontal: Default.fixPadding * 1.5,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text>No Result Found</Text>
+            </View>
+          </TouchableOpacity>
+        )}
         <ScrollView showsVerticalScrollIndicator={false}>
-          {posts.length > 0 &&
-            posts.map((post) => (
+          {filter.length > 0 &&
+            filter.map((post) => (
               <View
                 key={post._id}
                 style={{

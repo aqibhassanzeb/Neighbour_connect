@@ -12,24 +12,30 @@ import {
   StyleSheet,
   BackHandler,
 } from "react-native";
-import React, { useState, useCallback, useEffect } from "react";
-
-import * as ImagePicker from "expo-image-picker";
+import React, { useState, useEffect } from "react";
 import { Colors, Default, Fonts } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { getAllTopics } from "../apis/apis";
+import Loader from "../components/loader";
+import { useDispatch, useSelector } from "react-redux";
+import { setFilterTopics, setTopics } from "../redux/globalSlice";
 
 const { width } = Dimensions.get("window");
 const ChatScreen = (props) => {
   const [selectedId, setSelectedId] = useState("");
+  const { filteredTopics } = useSelector((state) => state.global);
   const [selectedValue, setSelectedValue] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
   const [dropdownOpens, setDropdownOpens] = useState(false);
   const [dropdownOpend, setDropdownOpend] = useState(false);
-
   const [dropdownOpendd, setDropdownOpendd] = useState(false);
+  // const [topics, setTopics] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const dispatch = useDispatch();
+
   const handleButtonPress = (buttonValue) => {
     setSelectedValue(buttonValue);
     setDropdownOpen(false);
@@ -60,8 +66,33 @@ const ChatScreen = (props) => {
     return t(`SkillShared:${key}`);
   }
 
+  const handleGetTopics = async () => {
+    try {
+      setIsLoading(true);
+      let result = await getAllTopics();
+      if (result.status == 200) {
+        dispatch(setTopics(result.data));
+        dispatch(setFilterTopics(""));
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    handleGetTopics();
+  }, []);
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    dispatch(setFilterTopics(query)); // Dispatch the search query to Redux
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
+      {isLoading && <Loader />}
       <View
         style={{
           backgroundColor: Colors.primary,
@@ -93,7 +124,7 @@ const ChatScreen = (props) => {
             {"Neighbor Forum"}
           </Text>
         </View>
-        <TouchableOpacity
+        <View
           style={{
             ...Default.shadow,
             backgroundColor: Colors.white,
@@ -107,11 +138,14 @@ const ChatScreen = (props) => {
           <TextInput
             placeholder="Search"
             style={{
+              flex: 1,
               ...Fonts.SemiBold16grey,
               marginHorizontal: Default.fixPadding * 0.8,
             }}
+            onChangeText={handleSearch}
+            value={searchQuery}
           />
-        </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -154,541 +188,172 @@ const ChatScreen = (props) => {
             Recent Discussions
           </Text>
         </View>
-        <View
-          style={{
-            ...Default.shadow,
-            backgroundColor: Colors.white,
-            borderRadius: 10,
-            marginLeft: 12,
-            marginRight: 12,
-            marginTop: 20,
-          }}
-        >
-          <View
+        {filteredTopics.length === 0 && (
+          <TouchableOpacity
             style={{
+              ...Default.shadow,
+              backgroundColor: Colors.white,
+              marginTop: 30,
+              marginHorizontal: 13,
+              //    marginBottom: 27,
+              borderRadius: 10,
+              // overflow: "hidden",
               flexDirection: isRtl ? "row-reverse" : "row",
+              paddingVertical: Default.fixPadding,
             }}
           >
             <View
               style={{
-                // flex: 7,
-                flexDirection: isRtl ? "row-reverse" : "row",
-                marginLeft: 12,
+                flex: 2,
+                //  paddingHorizontal: Default.fixPadding * 1.5,
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
-              <Image
-                source={require("../assets/images/fo3.jpg")}
-                style={{
-                  height: 46,
-                  width: 66,
-                  borderRadius: 33,
-                  marginTop: 9,
-                }}
-                resizeMode="contain"
-              />
+              <Text>No Result Found</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+        {filteredTopics.length > 0 &&
+          filteredTopics.map((topic) => (
+            <View
+              key={topic._id}
+              style={{
+                ...Default.shadow,
+                backgroundColor: Colors.white,
+                borderRadius: 10,
+                marginLeft: 12,
+                marginRight: 12,
+                marginTop: 20,
+              }}
+            >
               <View
                 style={{
-                  justifyContent: "center",
-                  marginLeft: 2,
-                  alignItems: isRtl ? "flex-end" : "flex-start",
+                  flexDirection: isRtl ? "row-reverse" : "row",
                 }}
               >
-                <Text
-                  numberOfLines={1}
-                  style={{ ...Fonts.SemiBold16black, overflow: "hidden" }}
+                <View
+                  style={{
+                    // flex: 7,
+                    flexDirection: isRtl ? "row-reverse" : "row",
+                    marginLeft: 12,
+                  }}
                 >
-                  Laraib Khan
-                </Text>
+                  <Image
+                    source={{ uri: topic.posted_by.image }}
+                    style={{
+                      height: 46,
+                      width: 46,
+                      borderRadius: 75,
+                      marginTop: 9,
+                      marginRight: 10,
+                    }}
+                    resizeMode="contain"
+                  />
+                  <View
+                    style={{
+                      justifyContent: "center",
+                      marginLeft: 2,
+                      alignItems: isRtl ? "flex-end" : "flex-start",
+                    }}
+                  >
+                    <Text
+                      numberOfLines={1}
+                      style={{ ...Fonts.SemiBold16black, overflow: "hidden" }}
+                    >
+                      {topic.posted_by.name}
+                    </Text>
+                  </View>
+                </View>
+                <View>
+                  <TouchableOpacity
+                    onPress={() => setDropdownOpendd(!dropdownOpendd)}
+                  >
+                    <Ionicons
+                      name="ellipsis-vertical"
+                      size={24}
+                      color="black"
+                      marginLeft={193}
+                      marginTop={10}
+                    />
+                  </TouchableOpacity>
+                  {dropdownOpendd && (
+                    <View style={styles.dropdown}>
+                      <TouchableOpacity
+                        style={[
+                          styles.dropdownButton,
+
+                          selectedValue === "button1" &&
+                            styles.dropdownButtonSelected,
+                        ]}
+                        onPress={() => props.navigation.navigate("Report")}
+                      >
+                        <Ionicons name="flag-outline" size={20} color="black" />
+                        <Text style={styles.dropdownButtonText}>Report</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
               </View>
-            </View>
-            <View>
+              <Text
+                style={{
+                  justifyContent: "center",
+                  alignItems: isRtl ? "flex-end" : "flex-start",
+                  marginTop: 12,
+                  marginLeft: 21,
+                  marginRight: 21,
+                  marginBottom: 4,
+                  fontSize: 18,
+                  fontWeight: "bold",
+                }}
+              >
+                {topic.topic}
+              </Text>
+              <Text
+                style={{
+                  justifyContent: "center",
+                  alignItems: isRtl ? "flex-end" : "flex-start",
+                  marginTop: 4,
+                  marginLeft: 21,
+                  marginRight: 21,
+                  marginBottom: 12,
+                }}
+              >
+                {topic.description}
+              </Text>
               <TouchableOpacity
-                onPress={() => setDropdownOpendd(!dropdownOpendd)}
+                onPress={() =>
+                  props.navigation.navigate("Replies", {
+                    topic,
+                  })
+                }
               >
-                <Ionicons
-                  name="ellipsis-vertical"
-                  size={24}
-                  color="black"
-                  marginLeft={193}
-                  marginTop={10}
-                />
-              </TouchableOpacity>
-              {dropdownOpendd && (
-                <View style={styles.dropdown}>
-                  <TouchableOpacity
-                    style={[
-                      styles.dropdownButton,
-
-                      selectedValue === "button1" &&
-                        styles.dropdownButtonSelected,
-                    ]}
-                    onPress={() => props.navigation.navigate("Report")}
+                <View style={{ flexDirection: "row" }}>
+                  <Ionicons
+                    name="md-chatbox-outline"
+                    size={23}
+                    color="#000"
+                    marginLeft={20}
+                  />
+                  <Text
+                    style={{
+                      justifyContent: "center",
+                      alignItems: isRtl ? "flex-end" : "flex-start",
+                      // marginTop:4,
+                      marginLeft: 10,
+                      marginRight: 21,
+                      marginBottom: 12,
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      marginTop: 1,
+                    }}
                   >
-                    <Ionicons name="flag-outline" size={20} color="black" />
-                    <Text style={styles.dropdownButtonText}>Report</Text>
-                  </TouchableOpacity>
+                    {topic.replies.length} Replies
+                  </Text>
                 </View>
-              )}
-            </View>
-          </View>
-          <Text
-            style={{
-              justifyContent: "center",
-              alignItems: isRtl ? "flex-end" : "flex-start",
-              marginTop: 12,
-              marginLeft: 21,
-              marginRight: 21,
-              marginBottom: 4,
-              fontSize: 18,
-              fontWeight: "bold",
-            }}
-          >
-            Can anyone recommend a good family-friendly restaurant within
-            walking distance?
-          </Text>
-          <Text
-            style={{
-              justifyContent: "center",
-              alignItems: isRtl ? "flex-end" : "flex-start",
-              marginTop: 4,
-              marginLeft: 21,
-              marginRight: 21,
-              marginBottom: 12,
-            }}
-          >
-            I'm eager to hear recommendations and personal experiences from my
-            neighbors who have celebrated birthdays or special occasions at
-            family-friendly restaurants nearby.{" "}
-          </Text>
-          <TouchableOpacity
-            onPress={() => props.navigation.navigate("Replies")}
-          >
-            <View style={{ flexDirection: "row" }}>
-              <Ionicons
-                name="md-chatbox-outline"
-                size={23}
-                color="#000"
-                marginLeft={20}
-              />
-              <Text
-                style={{
-                  justifyContent: "center",
-                  alignItems: isRtl ? "flex-end" : "flex-start",
-                  // marginTop:4,
-                  marginLeft: 10,
-                  marginRight: 21,
-                  marginBottom: 12,
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  marginTop: 1,
-                }}
-              >
-                4 Replies
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            ...Default.shadow,
-            backgroundColor: Colors.white,
-            borderRadius: 10,
-            marginLeft: 12,
-            marginRight: 12,
-            marginTop: 25,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: isRtl ? "row-reverse" : "row",
-            }}
-          >
-            <View
-              style={{
-                // flex: 7,
-                flexDirection: isRtl ? "row-reverse" : "row",
-                marginLeft: 12,
-              }}
-            >
-              <Image
-                source={require("../assets/images/fo2.jpg")}
-                style={{
-                  height: 46,
-                  width: 66,
-                  borderRadius: 33,
-                  marginTop: 9,
-                }}
-                resizeMode="contain"
-              />
-              <View
-                style={{
-                  justifyContent: "center",
-                  marginLeft: 2,
-                  alignItems: isRtl ? "flex-end" : "flex-start",
-                }}
-              >
-                <Text
-                  numberOfLines={1}
-                  style={{ ...Fonts.SemiBold16black, overflow: "hidden" }}
-                >
-                  Nisa Waheed
-                </Text>
-              </View>
-            </View>
-            <View>
-              <TouchableOpacity
-                onPress={() => setDropdownOpens(!dropdownOpens)}
-              >
-                <Ionicons
-                  name="ellipsis-vertical"
-                  size={24}
-                  color="black"
-                  marginLeft={179}
-                  marginTop={10}
-                />
               </TouchableOpacity>
-              {dropdownOpens && (
-                <View style={styles.dropdowns}>
-                  <TouchableOpacity
-                    style={[
-                      styles.dropdownButton,
-
-                      selectedValue === "button1" &&
-                        styles.dropdownButtonSelected,
-                    ]}
-                    onPress={() => props.navigation.navigate("Report")}
-                  >
-                    <Ionicons name="flag-outline" size={20} color="black" />
-                    <Text style={styles.dropdownButtonText}>Report</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
             </View>
-          </View>
-          <Text
-            style={{
-              justifyContent: "center",
-              alignItems: isRtl ? "flex-end" : "flex-start",
-              marginTop: 12,
-              marginLeft: 21,
-              marginRight: 21,
-              marginBottom: 4,
-              fontSize: 18,
-              fontWeight: "bold",
-            }}
-          >
-            Has anyone installed a security camera system for their home? Any
-            recommendations?
-          </Text>
-          <Text
-            style={{
-              justifyContent: "center",
-              alignItems: isRtl ? "flex-end" : "flex-start",
-              marginTop: 4,
-              marginLeft: 21,
-              marginRight: 21,
-              marginBottom: 12,
-            }}
-          >
-            I want to enhance the security of my home and I'm interested in
-            installing a reliable security camera system. As I navigate through
-            the numerous options available, I would greatly appreciate the
-            advice and recommendations from neighbors who have already gone
-            through the process.{" "}
-          </Text>
-          <TouchableOpacity
-            onPress={() => props.navigation.navigate("Replies")}
-          >
-            <View style={{ flexDirection: "row" }}>
-              <Ionicons
-                name="md-chatbox-outline"
-                size={23}
-                color="#000"
-                marginLeft={20}
-              />
-              <Text
-                style={{
-                  justifyContent: "center",
-                  alignItems: isRtl ? "flex-end" : "flex-start",
-                  // marginTop:4,
-                  marginLeft: 10,
-                  marginRight: 21,
-                  marginBottom: 12,
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  marginTop: 1,
-                }}
-              >
-                2 Replies
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            ...Default.shadow,
-            backgroundColor: Colors.white,
-            borderRadius: 10,
-            marginLeft: 12,
-            marginRight: 12,
-            marginTop: 25,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: isRtl ? "row-reverse" : "row",
-            }}
-          >
-            <View
-              style={{
-                // flex: 7,
-                flexDirection: isRtl ? "row-reverse" : "row",
-                marginLeft: 12,
-              }}
-            >
-              <Image
-                source={require("../assets/images/fo1.jpg")}
-                style={{
-                  height: 46,
-                  width: 66,
-                  borderRadius: 33,
-                  marginTop: 9,
-                }}
-                resizeMode="contain"
-              />
-              <View
-                style={{
-                  justifyContent: "center",
-                  marginLeft: 2,
-                  alignItems: isRtl ? "flex-end" : "flex-start",
-                }}
-              >
-                <Text
-                  numberOfLines={1}
-                  style={{ ...Fonts.SemiBold16black, overflow: "hidden" }}
-                >
-                  Laiba Riaz
-                </Text>
-              </View>
-            </View>
-            <View>
-              <TouchableOpacity
-                onPress={() => setDropdownOpend(!dropdownOpend)}
-              >
-                <Ionicons
-                  name="ellipsis-vertical"
-                  size={24}
-                  color="black"
-                  marginLeft={199}
-                  marginTop={10}
-                />
-              </TouchableOpacity>
-              {dropdownOpend && (
-                <View style={styles.dropdownss}>
-                  <TouchableOpacity
-                    style={[
-                      styles.dropdownButton,
-
-                      selectedValue === "button1" &&
-                        styles.dropdownButtonSelected,
-                    ]}
-                    onPress={() => props.navigation.navigate("Report")}
-                  >
-                    <Ionicons name="flag-outline" size={20} color="black" />
-                    <Text style={styles.dropdownButtonText}>Report</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
-          </View>
-          <Text
-            style={{
-              justifyContent: "center",
-              alignItems: isRtl ? "flex-end" : "flex-start",
-              marginTop: 12,
-              marginLeft: 21,
-              marginRight: 21,
-              marginBottom: 4,
-              fontSize: 18,
-              fontWeight: "bold",
-            }}
-          >
-            I'm interested in organizing a park clean-up day. Who would like to
-            volunteer?
-          </Text>
-          <Text
-            style={{
-              justifyContent: "center",
-              alignItems: isRtl ? "flex-end" : "flex-start",
-              marginTop: 4,
-              marginLeft: 21,
-              marginRight: 21,
-              marginBottom: 12,
-            }}
-          >
-            If you're interested in volunteering for the park clean-up day,
-            please express your willingness by commenting below.{" "}
-          </Text>
-          <TouchableOpacity
-            onPress={() => props.navigation.navigate("Replies")}
-          >
-            <View style={{ flexDirection: "row" }}>
-              <Ionicons
-                name="md-chatbox-outline"
-                size={23}
-                color="#000"
-                marginLeft={20}
-              />
-              <Text
-                style={{
-                  justifyContent: "center",
-                  alignItems: isRtl ? "flex-end" : "flex-start",
-                  // marginTop:4,
-                  marginLeft: 10,
-                  marginRight: 21,
-                  marginBottom: 12,
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  marginTop: 1,
-                }}
-              >
-                3 Replies
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            ...Default.shadow,
-            backgroundColor: Colors.white,
-            borderRadius: 10,
-            marginLeft: 12,
-            marginRight: 12,
-            marginTop: 25,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: isRtl ? "row-reverse" : "row",
-            }}
-          >
-            <View
-              style={{
-                // flex: 7,
-                flexDirection: isRtl ? "row-reverse" : "row",
-                marginLeft: 12,
-              }}
-            >
-              <Image
-                source={require("../assets/images/fo4.jpg")}
-                style={{
-                  height: 46,
-                  width: 66,
-                  borderRadius: 33,
-                  marginTop: 9,
-                }}
-                resizeMode="contain"
-              />
-              <View
-                style={{
-                  justifyContent: "center",
-                  marginLeft: 2,
-                  alignItems: isRtl ? "flex-end" : "flex-start",
-                }}
-              >
-                <Text
-                  numberOfLines={1}
-                  style={{ ...Fonts.SemiBold16black, overflow: "hidden" }}
-                >
-                  Aiza Khan
-                </Text>
-              </View>
-            </View>
-            <View>
-              <TouchableOpacity onPress={() => setDropdownOpen(!dropdownOpen)}>
-                <Ionicons
-                  name="ellipsis-vertical"
-                  size={24}
-                  color="black"
-                  marginLeft={199}
-                  marginTop={10}
-                />
-              </TouchableOpacity>
-              {dropdownOpen && (
-                <View style={styles.dropdownss}>
-                  <TouchableOpacity
-                    style={[
-                      styles.dropdownButton,
-
-                      selectedValue === "button1" &&
-                        styles.dropdownButtonSelected,
-                    ]}
-                    onPress={() => props.navigation.navigate("Report")}
-                  >
-                    <Ionicons name="flag-outline" size={20} color="black" />
-                    <Text style={styles.dropdownButtonText}>Report</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
-          </View>
-          <Text
-            style={{
-              justifyContent: "center",
-              alignItems: isRtl ? "flex-end" : "flex-start",
-              marginTop: 12,
-              marginLeft: 21,
-              marginRight: 21,
-              marginBottom: 4,
-              fontSize: 18,
-              fontWeight: "bold",
-            }}
-          >
-            Can anyone suggest me a good dentist nearby?
-          </Text>
-          <Text
-            style={{
-              justifyContent: "center",
-              alignItems: isRtl ? "flex-end" : "flex-start",
-              marginTop: 4,
-              marginLeft: 21,
-              marginRight: 21,
-              marginBottom: 12,
-            }}
-          >
-            Hello neighbors, I'm currently dealing with a troublesome toothache
-            and in urgent need of dental care. I'm reaching out to our
-            supportive community in the hopes that someone can recommend a good
-            dentist located nearby who can provide prompt assistance.{" "}
-          </Text>
-          <TouchableOpacity
-            onPress={() => props.navigation.navigate("Replies")}
-          >
-            <View style={{ flexDirection: "row" }}>
-              <Ionicons
-                name="md-chatbox-outline"
-                size={23}
-                color="#000"
-                marginLeft={20}
-              />
-              <Text
-                style={{
-                  justifyContent: "center",
-                  alignItems: isRtl ? "flex-end" : "flex-start",
-                  // marginTop:4,
-                  marginLeft: 10,
-                  marginRight: 21,
-                  marginBottom: 12,
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  marginTop: 1,
-                }}
-              >
-                2 Replies
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+          ))}
       </ScrollView>
     </SafeAreaView>
   );

@@ -13,41 +13,39 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import React, { useState, useCallback, useEffect } from "react";
-import {
-  Bubble,
-  GiftedChat,
-  Send,
-  InputToolbar,
-} from "react-native-gifted-chat";
-import * as ImagePicker from "expo-image-picker";
+
 import { Colors, Default, Fonts } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { ScrollView } from "react-native-gesture-handler";
+import { ScrollView, TextInput } from "react-native-gesture-handler";
+import { addReply, deleteReply } from "../apis/apis";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch, useSelector } from "react-redux";
+import { addReplyState, deleteReplyState } from "../redux/globalSlice";
 
 const { width, height } = Dimensions.get("window");
 
 const ChatScreen = (props) => {
-  const [cancelModal, setCancelModal] = useState(false);
-  useEffect(() => {
-    (async () => {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        alert("Sorry, we need camera roll permissions to make this work!");
-      }
-    })();
-  }, []);
+  const { topic } = props.route.params;
+  const { topics } = useSelector((state) => state.global);
+  const matchingTopic = topics.find((item) => item._id === topic._id);
+  const rep = matchingTopic.replies;
 
+  const dispatch = useDispatch();
+
+  const [cancelModal, setCancelModal] = useState(false);
   const [selectedId, setSelectedId] = useState("");
   const [selectedValue, setSelectedValue] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
   const [dropdownOpens, setDropdownOpens] = useState(false);
   const [dropdownOpend, setDropdownOpend] = useState(false);
-
   const [dropdownOpendd, setDropdownOpendd] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState({});
+
+  const [text, setText] = useState("");
+
   const handleButtonPress = (buttonValue) => {
     setSelectedValue(buttonValue);
     setDropdownOpen(false);
@@ -55,24 +53,13 @@ const ChatScreen = (props) => {
     setDropdownOpend(false);
     setDropdownOpendd(false);
   };
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-    if (!result.cancelled) {
-      setImage(result.uri);
-    }
-  };
+
   const { t, i18n } = useTranslation();
 
   const isRtl = i18n.dir() == "rtl";
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleReport = () => {
-    // Handle the report functionality here
     setModalVisible(false);
   };
 
@@ -90,168 +77,66 @@ const ChatScreen = (props) => {
       BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
 
-  const [messages, setMessages] = useState([]);
+  async function handleReply() {
+    if (!text) {
+      alert("Please write something");
+    } else {
+      try {
+        setIsLoading(true);
+
+        let response = await addReply({
+          id: topic._id,
+          text,
+        });
+        if (response.status === 201) {
+          dispatch(
+            addReplyState({
+              topicId: topic._id,
+              reply: {
+                _id: Date.now(),
+                text,
+                reply_by: { _id: user._id, name: user.name, image: user.image },
+              },
+            })
+          );
+          setText("");
+        }
+      } catch (error) {
+        console.log("Error While Replying", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  }
 
   useEffect(() => {
-    setMessages([
-      {
-        _id: 1,
-        createdAt: new Date(),
-        text: "Lorem ipsum dolor sit amen,elite. Eu scelerisque nequeneque vestibular Orem ipsum dolor sit consectetur ",
-        user: {
-          _id: 1,
-          name: "person1",
-        },
-      },
-
-      {
-        _id: 2,
-        createdAt: new Date(),
-        text: "Lorem ipsum dolor sit Amen,elide. Eu scelerisque nequeneque vestibules ",
-        user: {
-          _id: 2,
-          name: "person2",
-        },
-      },
-      {
-        _id: 3,
-        createdAt: new Date(),
-        text: "Hello, very Good morning...! let me send you room pic",
-        user: {
-          _id: 1,
-          name: "person1",
-        },
-      },
-      {
-        _id: 4,
-        createdAt: new Date(),
-        text: "Hey Good morning...! Can i see your home just to get more idea for cleaning",
-        user: {
-          _id: 2,
-          name: "person2",
-        },
-      },
-    ]);
+    const getUser = async () => {
+      const userJSON = await AsyncStorage.getItem("userData");
+      if (userJSON !== null) {
+        const user = JSON.parse(userJSON);
+        setUser(user.user);
+      }
+    };
+    getUser();
   }, []);
 
-  const onSend = useCallback((messages = []) => {
-    setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, messages)
-    );
-  }, []);
-
-  const renderSend = (props) => {
-    return (
-      <Send {...props}>
-        <View
-          style={{
-            height: 40,
-            width: 90,
-            backgroundColor: Colors.white,
-            justifyContent: "center",
-            alignItems: "center",
-            flexDirection: "row",
-          }}
-        >
-          <View
-            style={{
-              borderRadius: 3,
-              marginRight: 20,
-            }}
-          >
-            {image && (
-              <Image
-                source={{ uri: image }}
-                style={{ width: 200, height: 200 }}
-              />
-            )}
-          </View>
-          <View
-            style={{
-              marginRight: 9,
-
-              borderRadius: 30,
-              padding: 3,
-              borderWidth: 2,
-              borderColor: 140,
-            }}
-          >
-            <Ionicons name="send" size={20} color={Colors.primary} />
-          </View>
-        </View>
-      </Send>
-    );
-  };
-
-  const renderBubble = (props) => {
-    return (
-      <Bubble
-        {...props}
-        wrapperStyle={{
-          right: {
-            backgroundColor: Colors.extraLightPrimary,
-            maxWidth: "70%",
-            borderRadius: 10,
-            padding: Default.fixPadding * 0.5,
-            marginBottom: Default.fixPadding * 0.5,
-            marginHorizontal: Default.fixPadding,
-            ...Default.shadowPrimary,
-          },
-          left: {
-            backgroundColor: Colors.white,
-            maxWidth: "80%",
-            left: -25,
-            zIndex: 1,
-            padding: Default.fixPadding * 0.5,
-            borderRadius: 10,
-            marginBottom: Default.fixPadding * 0.5,
-            ...Default.shadow,
-          },
-        }}
-        textStyle={{
-          right: {
-            color: Colors.black,
-            fontSize: 15,
-            fontFamily: "Medium",
-          },
-          left: {
-            color: Colors.black,
-            fontSize: 15,
-            fontFamily: "Medium",
-          },
-        }}
-        timeTextStyle={{
-          left: {
-            color: Colors.grey,
-            fontSize: 12,
-            fontFamily: "Medium",
-          },
-          right: {
-            color: Colors.grey,
-            fontSize: 12,
-            fontFamily: "Medium",
-          },
-        }}
-      />
-    );
-  };
-
-  const scrollToBottomComponent = () => {
-    return (
-      <View
-        style={{
-          height: 30,
-          width: 30,
-          borderRadius: 15,
-          backgroundColor: Colors.transparentBlack,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <FontAwesome name="angle-double-down" size={20} color={Colors.white} />
-      </View>
-    );
-  };
+  async function handleDelete(replyId) {
+    try {
+      setCancelModal(false);
+      let result = await deleteReply({ forumId: topic._id, replyId });
+      if (result.status == 200) {
+        dispatch(
+          deleteReplyState({
+            topicId: topic._id,
+            replyId,
+          })
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+    }
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.white }}>
@@ -288,426 +173,185 @@ const ChatScreen = (props) => {
         </View>
       </View>
       <ScrollView>
-        <View
-          style={{
-            //   ...Default.shadow,
-            //  backgroundColor: Colors.white,
-            borderRadius: 10,
-            //    marginLeft:12,
-            marginRight: 12,
-            marginTop: 25,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: isRtl ? "row-reverse" : "row",
-            }}
-          >
-            <View
-              style={{
-                // flex: 7,
-                flexDirection: isRtl ? "row-reverse" : "row",
-                marginLeft: 6,
-              }}
-            >
-              <Image
-                source={require("../assets/images/r1.jpg")}
-                style={{
-                  height: 46,
-                  width: 66,
-                  borderRadius: 33,
-                  marginTop: 9,
-                }}
-                resizeMode="contain"
-              />
+        <View>
+          {rep &&
+            rep.map((reply) => (
               <View
+                key={reply._id}
                 style={{
-                  justifyContent: "center",
-                  marginLeft: 2,
-                  alignItems: isRtl ? "flex-end" : "flex-start",
+                  borderRadius: 10,
+
+                  marginRight: 12,
+                  marginTop: 25,
                 }}
               >
-                <Text
-                  numberOfLines={1}
-                  style={{ ...Fonts.SemiBold16black, overflow: "hidden" }}
+                <View
+                  style={{
+                    flexDirection: isRtl ? "row-reverse" : "row",
+                  }}
                 >
-                  Aiza Khan
-                </Text>
-              </View>
-            </View>
-            <View>
-              <TouchableOpacity onPress={() => setDropdownOpen(!dropdownOpen)}>
-                <Ionicons
-                  name="ellipsis-vertical"
-                  size={24}
-                  color="black"
-                  marginLeft={219}
-                />
-              </TouchableOpacity>
-              {dropdownOpen && (
-                <View style={styles.dropdownss}>
-                  <TouchableOpacity
-                    style={[
-                      styles.dropdownButton,
-
-                      selectedValue === "button1" &&
-                        styles.dropdownButtonSelected,
-                    ]}
-                    onPress={() => props.navigation.navigate("Report")}
-                  >
-                    <Ionicons name="flag-outline" size={20} color="black" />
-                    <Text style={styles.dropdownButtonText}>Report</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
-          </View>
-
-          <Text
-            style={{
-              justifyContent: "center",
-              alignItems: isRtl ? "flex-end" : "flex-start",
-              //  marginTop:4,
-              marginLeft: 70,
-              marginRight: 21,
-              marginBottom: 12,
-            }}
-          >
-            Outback Steakhouse - This Australian-themed restaurant serves a
-            variety of steaks, burgers, and seafood dishes , and also offers a
-            kids' menu with options like chicken on the barbie and grilled
-            cheese.{" "}
-          </Text>
-        </View>
-        <View
-          style={{
-            //   ...Default.shadow,
-            //  backgroundColor: Colors.white,
-            borderRadius: 10,
-            //    marginLeft:12,
-            marginRight: 12,
-            marginTop: 25,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: isRtl ? "row-reverse" : "row",
-            }}
-          >
-            <View
-              style={{
-                // flex: 7,
-                flexDirection: isRtl ? "row-reverse" : "row",
-                marginLeft: 6,
-              }}
-            >
-              <Image
-                source={require("../assets/images/r2.jpg")}
-                style={{
-                  height: 46,
-                  width: 66,
-                  borderRadius: 33,
-                  marginTop: 9,
-                }}
-                resizeMode="contain"
-              />
-              <View
-                style={{
-                  justifyContent: "center",
-                  marginLeft: 2,
-                  alignItems: isRtl ? "flex-end" : "flex-start",
-                }}
-              >
-                <Text
-                  numberOfLines={1}
-                  style={{ ...Fonts.SemiBold16black, overflow: "hidden" }}
-                >
-                  Laiba Riaz
-                </Text>
-              </View>
-            </View>
-            <View>
-              <TouchableOpacity
-                onPress={() => setDropdownOpens(!dropdownOpens)}
-              >
-                <Ionicons
-                  name="ellipsis-vertical"
-                  size={24}
-                  color="black"
-                  marginLeft={216}
-                />
-              </TouchableOpacity>
-              {dropdownOpens && (
-                <View style={styles.dropdownss}>
-                  <TouchableOpacity
-                    style={[
-                      styles.dropdownButton,
-
-                      selectedValue === "button1" &&
-                        styles.dropdownButtonSelected,
-                    ]}
-                    onPress={() => props.navigation.navigate("Report")}
-                  >
-                    <Ionicons name="flag-outline" size={20} color="black" />
-                    <Text style={styles.dropdownButtonText}>Report</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
-          </View>
-
-          <Text
-            style={{
-              justifyContent: "center",
-              alignItems: isRtl ? "flex-end" : "flex-start",
-              //  marginTop:4,
-              marginLeft: 70,
-              marginRight: 21,
-              marginBottom: 12,
-            }}
-          >
-            Red Robin - This restaurant serves burgers, sandwiches, and other
-            American fare, and is also known for its kid-friendly atmosphere and
-            free balloons.{" "}
-          </Text>
-        </View>
-        <View
-          style={{
-            //   ...Default.shadow,
-            //  backgroundColor: Colors.white,
-            borderRadius: 10,
-            //    marginLeft:12,
-            marginRight: 12,
-            marginTop: 25,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: isRtl ? "row-reverse" : "row",
-            }}
-          >
-            <View
-              style={{
-                // flex: 7,
-                flexDirection: isRtl ? "row-reverse" : "row",
-                marginLeft: 6,
-              }}
-            >
-              <Image
-                source={require("../assets/images/fo4.jpg")}
-                style={{
-                  height: 46,
-                  width: 66,
-                  borderRadius: 33,
-                  marginTop: 9,
-                }}
-                resizeMode="contain"
-              />
-              <View
-                style={{
-                  justifyContent: "center",
-                  marginLeft: 2,
-                  alignItems: isRtl ? "flex-end" : "flex-start",
-                }}
-              >
-                <Text
-                  numberOfLines={1}
-                  style={{ ...Fonts.SemiBold16black, overflow: "hidden" }}
-                >
-                  Mahnoor Khan
-                </Text>
-              </View>
-            </View>
-            <View>
-              <TouchableOpacity
-                onPress={() => setDropdownOpend(!dropdownOpend)}
-              >
-                <Ionicons
-                  name="ellipsis-vertical"
-                  size={24}
-                  color="black"
-                  marginLeft={184}
-                />
-              </TouchableOpacity>
-              {dropdownOpend && (
-                <View style={styles.dropdownss}>
-                  <TouchableOpacity
-                    style={[
-                      styles.dropdownButton,
-
-                      selectedValue === "button1" &&
-                        styles.dropdownButtonSelected,
-                    ]}
-                    onPress={() => props.navigation.navigate("Report")}
-                  >
-                    <Ionicons name="flag-outline" size={20} color="black" />
-                    <Text style={styles.dropdownButtonText}>Report</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
-          </View>
-
-          <Text
-            style={{
-              justifyContent: "center",
-              alignItems: isRtl ? "flex-end" : "flex-start",
-              //  marginTop:4,
-              marginLeft: 70,
-              marginRight: 21,
-              marginBottom: 12,
-            }}
-          >
-            {" "}
-          </Text>
-        </View>
-        <View
-          style={{
-            //   ...Default.shadow,
-            //  backgroundColor: Colors.white,
-            borderRadius: 10,
-            //    marginLeft:12,
-            marginRight: 12,
-            marginTop: 25,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: isRtl ? "row-reverse" : "row",
-            }}
-          >
-            <View
-              style={{
-                // flex: 7,
-                flexDirection: isRtl ? "row-reverse" : "row",
-                marginLeft: 6,
-              }}
-            >
-              <Image
-                source={require("../assets/images/r3.jpg")}
-                style={{
-                  height: 46,
-                  width: 66,
-                  borderRadius: 33,
-                  marginTop: 9,
-                }}
-                resizeMode="contain"
-              />
-              <View
-                style={{
-                  justifyContent: "center",
-                  marginLeft: 2,
-                  alignItems: isRtl ? "flex-end" : "flex-start",
-                }}
-              >
-                <Text
-                  numberOfLines={1}
-                  style={{ ...Fonts.SemiBold16black, overflow: "hidden" }}
-                >
-                  Nisa Waheed
-                </Text>
-              </View>
-            </View>
-            <View>
-              <TouchableOpacity
-                onPress={() => setDropdownOpendd(!dropdownOpendd)}
-              >
-                <Ionicons
-                  name="ellipsis-vertical"
-                  size={24}
-                  color="black"
-                  marginLeft={192}
-                />
-              </TouchableOpacity>
-              {dropdownOpendd && (
-                <View style={styles.dropdownss}>
-                  <TouchableOpacity
-                    style={[
-                      styles.dropdownButton,
-
-                      selectedValue === "button1" &&
-                        styles.dropdownButtonSelected,
-                    ]}
-                    onPress={() => props.navigation.navigate("Report")}
-                  >
-                    <Ionicons name="flag-outline" size={20} color="black" />
-                    <Text style={styles.dropdownButtonText}>Report</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.dropdownButton,
-
-                      selectedValue === "button1" &&
-                        styles.dropdownButtonSelected,
-                    ]}
-                    onPress={() => {
-                      setCancelModal(true);
-                      //  setSelectedId(item.key);
+                  <View
+                    style={{
+                      flexDirection: isRtl ? "row-reverse" : "row",
+                      marginLeft: 6,
                     }}
                   >
-                    <Ionicons name="trash-outline" size={20} color="black" />
-                    <Text style={styles.dropdownButtonText}>Delete</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
-          </View>
+                    <Image
+                      source={{ uri: reply.reply_by.image }}
+                      style={{
+                        height: 46,
+                        width: 46,
+                        borderRadius: 75,
+                        marginTop: 9,
+                        marginHorizontal: 14,
+                      }}
+                      resizeMode="contain"
+                    />
+                    <View
+                      style={{
+                        justifyContent: "center",
+                        marginLeft: 2,
+                        alignItems: isRtl ? "flex-end" : "flex-start",
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text
+                        numberOfLines={1}
+                        style={{
+                          ...Fonts.SemiBold16black,
+                          overflow: "hidden",
+                        }}
+                      >
+                        {reply.reply_by.name}
+                      </Text>
+                      {user._id === reply.reply_by._id && (
+                        <TouchableOpacity
+                          onPress={() => {
+                            setDropdownOpens(!dropdownOpens);
+                            setSelectedId(reply._id);
+                          }}
+                        >
+                          <Ionicons
+                            name="ellipsis-vertical"
+                            size={24}
+                            color="black"
+                            // marginLeft={179}
+                            marginTop={10}
+                          />
+                        </TouchableOpacity>
+                      )}
+                      {dropdownOpens && selectedId === reply._id && (
+                        <View style={styles.dropdowns}>
+                          <TouchableOpacity
+                            style={[
+                              styles.dropdownButton,
 
-          <Text
+                              selectedValue === "button1" &&
+                                styles.dropdownButtonSelected,
+                            ]}
+                            onPress={() => {
+                              handleDelete(reply._id);
+                            }}
+                          >
+                            <Ionicons
+                              name="trash-outline"
+                              size={20}
+                              color="black"
+                            />
+                            <Text style={styles.dropdownButtonText}>
+                              Delete
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                  <View>
+                    <TouchableOpacity
+                      onPress={() => setDropdownOpen(!dropdownOpen)}
+                    >
+                      <Ionicons
+                        name="ellipsis-vertical"
+                        size={24}
+                        color="black"
+                        marginLeft={219}
+                      />
+                    </TouchableOpacity>
+                    {dropdownOpen && (
+                      <View style={styles.dropdownss}>
+                        <TouchableOpacity
+                          style={[
+                            styles.dropdownButton,
+
+                            selectedValue === "button1" &&
+                              styles.dropdownButtonSelected,
+                          ]}
+                          onPress={() => props.navigation.navigate("Report")}
+                        >
+                          <Ionicons
+                            name="flag-outline"
+                            size={20}
+                            color="black"
+                          />
+                          <Text style={styles.dropdownButtonText}>Report</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  </View>
+                </View>
+
+                <Text
+                  style={{
+                    justifyContent: "center",
+                    alignItems: isRtl ? "flex-end" : "flex-start",
+
+                    marginLeft: 85,
+                    marginBottom: 12,
+                  }}
+                >
+                  {reply.text}{" "}
+                </Text>
+              </View>
+            ))}
+        </View>
+
+        <View
+          style={{
+            ...Default.shadow,
+            backgroundColor: Colors.white,
+            flexDirection: isRtl ? "row-reverse" : "row",
+            borderRadius: 5,
+            padding: Default.fixPadding * 0.8,
+            marginHorizontal: Default.fixPadding * 2,
+            borderWidth: 1,
+            borderColor: "gray",
+            marginTop: 14,
+          }}
+        >
+          <TextInput
+            placeholder="Write Something ..."
             style={{
-              justifyContent: "center",
-              alignItems: isRtl ? "flex-end" : "flex-start",
-              //  marginTop:4,
-              marginLeft: 70,
-              marginRight: 21,
-              marginBottom: 12,
-              width: 284,
+              ...Fonts.SemiBold16grey,
+              marginHorizontal: Default.fixPadding * 0.8,
+              flex: 1,
             }}
+            value={text}
+            onChangeText={(text) => setText(text)}
+          />
+          <TouchableOpacity
+            style={{
+              backgroundColor: Colors.primary,
+              padding: Default.fixPadding * 1,
+              borderRadius: 10,
+            }}
+            onPress={() => handleReply()}
           >
-            IHOP - This breakfast chain is open 24/7 and serves a variety of
-            breakfast, lunch, and dinner items that are popular with families.{" "}
-          </Text>
+            <Text style={{ color: "white" }}>Reply</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
-      <View style={{ flex: 1 }}>
-        <GiftedChat
-          placeholder={"Type your reply here"}
-          // messages={messages}
-          onSend={(messages) => onSend(messages)}
-          user={{
-            _id: 1,
-          }}
-          //  renderBubble={renderBubble}
-          alwaysShowSend
-          renderSend={renderSend}
-          scrollToBottom
-          scrollToBottomComponent={scrollToBottomComponent}
-          renderInputToolbar={(props) => (
-            <InputToolbar
-              {...props}
-              scrollToBottomComponent
-              containerStyle={{
-                height: 50,
-                justifyContent: "center",
-                alignItems: "center",
-                backgroundColor: Colors.white,
-                padding: Default.fixPadding * 0.5,
-                borderTopColor: Colors.white,
-              }}
-            />
-          )}
-        />
-
-        {Platform.OS === "android" && (
-          <KeyboardAvoidingView behavior="position" />
-        )}
-      </View>
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={cancelModal}
-        // onRequestClose={() => setCancelModal(false)}
-      >
+      <Modal animationType="fade" transparent={true} visible={cancelModal}>
         <TouchableOpacity
           activeOpacity={1}
           onPressOut={() => setCancelModal(false)}
@@ -792,9 +436,7 @@ const ChatScreen = (props) => {
                     borderBottomLeftRadius: isRtl ? 10 : 0,
                   }}
                   onPress={() => {
-                    //   deleteItem();
                     setCancelModal(false);
-                    //   setCancelToast(true);
                   }}
                 >
                   <Text
@@ -819,9 +461,6 @@ const ChatScreen = (props) => {
 export default ChatScreen;
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
-    //  alignItems: 'center',
-    //  justifyContent: 'center',
     marginBottom: 100,
   },
   border: {
@@ -829,10 +468,7 @@ const styles = StyleSheet.create({
     width: 115,
     height: 30,
     bottom: 14,
-    // borderTopWidth: 1,
-    // borderBottomWidth: 1,
-    // borderTopColor: 'black',
-    // borderBottomColor:'black',
+
     borderTopLeftRadius: 4,
     borderBottomLeftRadius: 4,
     borderBottomColor: "black",
@@ -862,27 +498,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    // paddingHorizontal: 10,
-    //marginTop:30,
-    //marginBottom:30,
+
     height: 30,
     fontSize: 10,
     marginLeft: 20,
     zIndex: 7,
-    //  marginHorizontal: Default.fixPadding * 2,
   },
   buttonContainer: {
-    // width: '60%',
-    //color:'white',
-    // padding: Default.fixPadding * 1.2,
     borderRadius: 10,
 
     backgroundColor: Colors.primary,
     zIndex: 7,
   },
   contain: {
-    // flex: 1,
-    // alignItems: 'center',
     position: "absolute",
     marginLeft: 20,
     justifyContent: "center",
@@ -892,25 +520,20 @@ const styles = StyleSheet.create({
   selectedButton: {
     flexDirection: "row",
     alignItems: "center",
-    //  padding: 10,
-    // borderWidth: 1,
+
     borderColor: "gray",
     zIndex: 108,
     marginLeft: 124,
-    //borderRadius: 5,
   },
   selectedButtonText: {
-    // marginLeft: 10,
-    //marginRight: 60,
     zIndex: 100,
   },
   dropdown: {
-    //  position: 'absolute',
     top: 30,
     marginRight: 8,
     backgroundColor: "white",
     width: 80,
-    //height:82,
+
     borderRadius: 5,
     shadowColor: "#000",
     shadowOffset: {
@@ -919,18 +542,17 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    // marginRight:70,
+
     position: "absolute",
     marginLeft: 140,
     zIndex: 107,
   },
   dropdowns: {
-    //  position: 'absolute',
     top: 30,
     marginRight: 13,
     backgroundColor: "white",
     width: 80,
-    //height:82,
+
     borderRadius: 5,
     shadowColor: "#000",
     shadowOffset: {
@@ -939,18 +561,17 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    // marginRight:70,
+
     position: "absolute",
     marginLeft: 130,
     zIndex: 107,
   },
   dropdownss: {
-    //  position: 'absolute',
     top: 20,
     marginRight: 13,
     backgroundColor: "white",
     width: 80,
-    //height:82,
+
     borderRadius: 5,
     shadowColor: "#000",
     shadowOffset: {
@@ -959,7 +580,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    // marginRight:70,
+
     position: "absolute",
     marginLeft: 170,
     zIndex: 107,
@@ -970,10 +591,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
 
     height: 42,
-    //   padding: 10,
-    // borderWidth: 1,
-    //  borderColor: 'gray',
-    //  borderBottomWidth: 1,
   },
   dropdownButtonSelected: {
     backgroundColor: "white",
@@ -989,9 +606,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     top: 4,
     height: 42,
-    //   padding: 10,
-    //  borderWidth: 1,
-    //  borderColor: 'gray',
-    //  borderBottomWidth: 1,
   },
 });

@@ -2,6 +2,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // export const baseUrl = `http://192.168.43.147:3333/api/v1/`;
+export const socketUrl = "http://192.168.43.147:3333/";
 
 export const baseUrl = `http://192.168.10.6:3333/api/v1/`;
 let token;
@@ -216,11 +217,21 @@ export const lostandfoundCategGet = async () => {
   return result;
 };
 export const lostandfoundCreate = async (data) => {
-  const headersWithToken = await getHeadersWithToken();
+  const headersWithToken = await getHeadersWithTokenFormData();
   let result = await apiRequest(
     "POST",
     `lostandfound_create`,
     data,
+    headersWithToken
+  );
+  return result;
+};
+export const updateLAndFImages = async (data) => {
+  const headersWithToken = await getHeadersWithTokenFormData();
+  let result = await apiRequest(
+    "PUT",
+    `update_landf_images/${data.id}`,
+    data.formData,
     headersWithToken
   );
   return result;
@@ -596,6 +607,18 @@ export const getMessages = async (data) => {
   return result;
 };
 
+export const getChats = async () => {
+  const id = await getId();
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "GET",
+    `accepted-friends/${id}`,
+    null,
+    headersWithToken
+  );
+  return result;
+};
+
 export const postMessage = async (data) => {
   const headersWithToken = await getHeadersWithTokenFormData();
   console.log(data);
@@ -609,6 +632,93 @@ export const deleteMessages = async (data) => {
     "POST",
     "delete_messages",
     data,
+    headersWithToken
+  );
+  return result;
+};
+
+export const deleteChat = async (data) => {
+  const id = await getId();
+  const { recepientId } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "DELETE",
+    `/delete_chat/${id}/${recepientId}`,
+    {},
+    headersWithToken
+  );
+  return result;
+};
+
+//Forum Api's
+export const addTopic = async (data) => {
+  const id = await getId();
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "POST",
+    `add_topic`,
+    { ...data, posted_by: id },
+    headersWithToken
+  );
+  return result;
+};
+
+export const getTopicsByUser = async () => {
+  const id = await getId();
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest("GET", `topics/${id}`, null, headersWithToken);
+  return result;
+};
+
+export const updateTopic = async (data) => {
+  let { _id } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "PUT",
+    `update_topic/${_id}`,
+    data,
+    headersWithToken
+  );
+  return result;
+};
+
+export const deleteTopic = async (data) => {
+  const headersWithToken = await getHeadersWithTokenFormData();
+  let result = await apiRequest(
+    "DELETE",
+    `delete_topic/${data._id}`,
+    null,
+    headersWithToken
+  );
+  return result;
+};
+
+export const getAllTopics = async () => {
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest("GET", `all_topics`, null, headersWithToken);
+  return result;
+};
+
+export const addReply = async (data) => {
+  let { id } = data;
+  const userId = await getId();
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "POST",
+    `add-reply/${id}`,
+    { reply_by: userId, text: data.text },
+    headersWithToken
+  );
+  return result;
+};
+
+export const deleteReply = async (data) => {
+  let { forumId, replyId } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "DELETE",
+    `delete-reply/${forumId}/${replyId}`,
+    {},
     headersWithToken
   );
   return result;

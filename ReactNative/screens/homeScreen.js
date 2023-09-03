@@ -196,7 +196,7 @@ const HomeScreen = ({ navigation, route }) => {
           <TouchableOpacity
             onPress={() =>
               navigation.navigate("Messages", {
-                title: "Electrician",
+                userId: userData._id,
               })
             }
           >
