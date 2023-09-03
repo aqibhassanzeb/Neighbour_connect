@@ -84,7 +84,7 @@ const CategoryScreen = ({ navigation, route }) => {
               marginHorizontal: Default.fixPadding * 1.2,
             }}
           >
-            {item.name}
+            {item?.name}
           </Text>
         </View>
       </View>
@@ -160,7 +160,7 @@ const CategoryScreen = ({ navigation, route }) => {
                   numberOfLines={1}
                   style={{ ...Fonts.SemiBold15black, overflow: "hidden" }}
                 >
-                  {skill.posted_by.name}
+                  {skill?.posted_by?.name}
                 </Text>
                 <Text
                   numberOfLines={1}

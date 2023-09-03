@@ -175,7 +175,7 @@ const HomeScreen = ({ navigation, route }) => {
               borderRadius: 5,
               padding: Default.fixPadding * 0.8,
               marginHorizontal: Default.fixPadding * 0.2,
-              width: 320,
+              // width: 320,
               marginRight: 6,
             }}
           >

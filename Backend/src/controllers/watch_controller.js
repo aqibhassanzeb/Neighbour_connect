@@ -1,6 +1,7 @@
 import { Watch } from "../models/watch.js";
 import { User } from "../models/user.js";
 import { v2 as cloudinary } from "cloudinary";
+import { calculateDistance } from "../utils/index.js";
 
 export const addWatch = async (req, res) => {
   const location = JSON.parse(req.body?.location);
@@ -143,28 +144,31 @@ export const getWatchByUser = async (req, res) => {
 };
 
 export const getAllWatch = async (req, res) => {
-  const user_id = req.user._id;
-  const user = await User.findById(user_id);
-  const connections = user.connections;
+  let { address_range, address } = req.user;
+  let { latitude, longitude } = address;
 
   try {
-    // const query = {
-    //   $or: [
-    //     { selected_visibility: "Connection", posted_by: { $in: connections } },
-    //     { selected_visibility: { $ne: "Connection" } },
-    //   ],
-    // };
-
     const posts = await Watch.find()
       .sort({ createdAt: -1 })
-      .populate("posted_by", "name image helpful_count")
+      .populate("posted_by", "name image helpful_count address")
       .populate("category");
 
     const filtered_array = posts.filter((item) => {
-      if (item.selected_visibility === "Connections ") {
-        return connections.includes(item.posted_by._id);
+      if (
+        item.selected_visibility === "Connections" &&
+        req.user.connections.includes(item.posted_by._id)
+      ) {
+        return true;
       }
-      return true;
+      const docLatitude = parseFloat(item.posted_by.address.latitude);
+      const docLongitude = parseFloat(item.posted_by.address.longitude);
+      const distanceInKm = calculateDistance(
+        latitude,
+        longitude,
+        docLatitude,
+        docLongitude
+      );
+      return distanceInKm <= parseFloat(address_range);
     });
 
     res.json(filtered_array);

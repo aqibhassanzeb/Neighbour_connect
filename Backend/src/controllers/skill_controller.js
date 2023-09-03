@@ -1,6 +1,7 @@
 import { Skill } from "../models/skill.js";
 import { User } from "../models/user.js";
 import { v2 as cloudinary } from "cloudinary";
+import { calculateDistance } from "../utils/index.js";
 
 export const addSkill = async (req, res) => {
   console.log(req.body);
@@ -122,20 +123,30 @@ export const deleteSkill = async (req, res) => {
 };
 
 export const getSkillsByCat = async (req, res) => {
+  let { address_range, address } = req.user;
+  let { latitude, longitude } = address;
   const { _id } = req.params;
-  const user_id = req.user._id;
-  const user = await User.findById(user_id);
-  const connections = user.connections;
 
   try {
     const posts = await Skill.find({ category: _id })
       .populate("category")
-      .populate("posted_by", "name image endorse_count endorsed_by");
+      .populate("posted_by", "name image address endorse_count endorsed_by");
     const filtered_array = posts.filter((item) => {
-      if (item.selected_visibility === "Connections ") {
-        return connections.includes(item.posted_by._id);
+      if (
+        item.selected_visibility === "Connections" &&
+        req.user.connections.includes(item.posted_by._id)
+      ) {
+        return true;
       }
-      return true;
+      const docLatitude = parseFloat(item.posted_by.address.latitude);
+      const docLongitude = parseFloat(item.posted_by.address.longitude);
+      const distanceInKm = calculateDistance(
+        latitude,
+        longitude,
+        docLatitude,
+        docLongitude
+      );
+      return distanceInKm <= parseFloat(address_range);
     });
     res.json(filtered_array);
   } catch (error) {

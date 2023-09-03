@@ -445,7 +445,7 @@ const ServicesScreen = ({ navigation }) => {
                     color="#005D7A"
                   />
                   <Text style={{ marginLeft: 1, fontSize: 15 }}>
-                    {post.location.name}
+                    {post?.location?.name}
                   </Text>
                 </View>
                 <View style={{ height: height / 2.8, marginHorizontal: 5 }}>

@@ -59,10 +59,10 @@ app.use("*", (req, res) => {
 
 //REAL TIME CHAT
 io.on("connection", (socket) => {
-  // console.log("User connected:", socket.id);
+  console.log("User connected:", socket.id);
 
   socket.on("join", (roomId) => {
-    console.log("room Id is", roomId);
+    socket.join(roomId);
   });
 
   socket.on("message", async (roomId, message) => {

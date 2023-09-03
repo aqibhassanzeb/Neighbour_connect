@@ -11,22 +11,14 @@ import {
   BackHandler,
 } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
-import { Feather } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
-import EmojiSelector from "react-native-emoji-selector";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ImageLoading from "../assets/images/image_loading.jpeg";
-import {
-  deleteMessages,
-  getMessages,
-  postMessage,
-  socketUrl,
-} from "../apis/apis";
+import { deleteMessages, getMessages, socketUrl } from "../apis/apis";
 import { useTranslation } from "react-i18next";
 import { Colors, Default, Fonts } from "../constants/styles";
 import { generateRoomId } from "../utils";
@@ -37,7 +29,6 @@ import { UPLOAD_PRESET, CLOUD_NAME } from "../config";
 const ChatMessagesScreen = ({ route }) => {
   const { user } = route.params;
   const { senderId: userId, recepientId, recepientName, recepientImage } = user;
-  // const [showEmojiSelector, setShowEmojiSelector] = useState(false);
   const [selectedMessages, setSelectedMessages] = useState([]);
   const [messages, setMessages] = useState([]);
   const [recepientData, setRecepientData] = useState();
@@ -49,7 +40,6 @@ const ChatMessagesScreen = ({ route }) => {
   const [progress, setProgress] = useState(0);
   const scrollViewRef = useRef(null);
   const roomId = generateRoomId(userId, recepientId);
-
   //TR
   const { t, i18n } = useTranslation();
   const isRtl = i18n.dir() == "rtl";
@@ -62,6 +52,7 @@ const ChatMessagesScreen = ({ route }) => {
     newSocket.emit("join", roomId);
     setSocket(newSocket);
     newSocket.on("message", (newMessage) => {
+      console.log("HERE");
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     });
     return () => {
@@ -82,10 +73,6 @@ const ChatMessagesScreen = ({ route }) => {
   const handleContentSizeChange = () => {
     scrollToBottom();
   };
-
-  // const handleEmojiPress = () => {
-  //   setShowEmojiSelector(!showEmojiSelector);
-  // };
 
   const fetchMessages = async () => {
     try {
