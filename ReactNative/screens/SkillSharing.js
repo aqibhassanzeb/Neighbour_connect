@@ -65,13 +65,14 @@ const ServicesScreen = ({ navigation }) => {
   }, []);
 
   const handleSearch = (text) => {
+    console.log("text :",text)
     setSearch(text);
 
-    if (text === "") {
+    if (search === "") {
       setFilteredCategories(Categories); // Reset to the original list
     } else {
       const filtered = Categories.filter((category) =>
-        category.name.toLowerCase().includes(text.toLowerCase())
+        category.name.toLowerCase().includes(search.toLowerCase())
       );
       setFilteredCategories(filtered);
     }
@@ -81,32 +82,7 @@ const ServicesScreen = ({ navigation }) => {
       {isLoading && <Loader />}
 
       <View>
-        {filteredCategories.length === 0 && (
-          <TouchableOpacity
-            style={{
-              ...Default.shadow,
-              backgroundColor: Colors.white,
-              marginTop: 30,
-              marginHorizontal: 13,
-              //    marginBottom: 27,
-              borderRadius: 10,
-              // overflow: "hidden",
-              flexDirection: isRtl ? "row-reverse" : "row",
-              paddingVertical: Default.fixPadding,
-            }}
-          >
-            <View
-              style={{
-                flex: 2,
-                //  paddingHorizontal: Default.fixPadding * 1.5,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Text>No Result Found</Text>
-            </View>
-          </TouchableOpacity>
-        )}
+        
         <FlatList
           data={filteredCategories && filteredCategories}
           keyExtractor={(item) => item._id}
@@ -253,6 +229,35 @@ const ServicesScreen = ({ navigation }) => {
             </TouchableOpacity>
           )}
         />
+
+        {/* filter view  */}
+
+        {filteredCategories.length === 0 && (
+          <TouchableOpacity
+            style={{
+              ...Default.shadow,
+              backgroundColor: Colors.white,
+              marginTop: 30,
+              marginHorizontal: 13,
+              //    marginBottom: 27,
+              borderRadius: 10,
+              // overflow: "hidden",
+              flexDirection: isRtl ? "row-reverse" : "row",
+              paddingVertical: Default.fixPadding,
+            }}
+          >
+            <View
+              style={{
+                flex: 2,
+                //  paddingHorizontal: Default.fixPadding * 1.5,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text>No Result Found</Text>
+            </View>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );

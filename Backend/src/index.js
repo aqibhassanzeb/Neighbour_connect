@@ -59,13 +59,14 @@ app.use("*", (req, res) => {
 
 //REAL TIME CHAT
 io.on("connection", (socket) => {
-  // console.log("User connected:", socket.id);
+  console.log("User connected:", socket.id);
 
   socket.on("join", (roomId) => {
     console.log("room Id is", roomId);
   });
 
   socket.on("message", async (roomId, message) => {
+    console.log("message in socket:",message)
     try {
       const newMessage = new Message({
         senderId: message.senderId,
@@ -75,8 +76,8 @@ io.on("connection", (socket) => {
         timestamp: new Date(),
         imageUrl: message.messageType === "image" ? message.imageUrl : null,
       });
-      await newMessage.save();
       io.to(roomId).emit("message", newMessage);
+      await newMessage.save();
     } catch (error) {
       console.log(error);
     }

@@ -25,6 +25,7 @@ import {
   handleSearchData,
   updataData,
 } from "../redux/loanandfoundSlice";
+import { useFocusEffect } from "@react-navigation/native";
 // import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 const Tab = createMaterialTopTabNavigator();
@@ -60,9 +61,13 @@ const CustomTabBar = ({ state, descriptors, navigation, position }) => {
 
     dispatch(handleSearchData(text));
   };
-  useEffect(() => {
-    handleGetlost();
-  }, [state.index]);
+  // useEffect(() => {
+  //   handleGetlost();
+  // }, [state.index]);
+  useFocusEffect(
+    React.useCallback(() => {
+      handleGetlost();
+    }, [state.index]))
 
   return (
     <SafeAreaView style={{ backgroundColor: Colors.extraLightGrey }}>
