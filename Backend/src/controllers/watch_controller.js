@@ -1,7 +1,7 @@
 import { Watch } from "../models/watch.js";
-import { User } from "../models/user.js";
 import { v2 as cloudinary } from "cloudinary";
 import { calculateDistance } from "../utils/index.js";
+import { Activity } from "../models/activity.js";
 
 export const addWatch = async (req, res) => {
   const location = JSON.parse(req.body?.location);
@@ -47,6 +47,12 @@ export const addWatch = async (req, res) => {
 
     const posted = await post.save();
     if (posted) {
+      await Activity.create({
+        posted_by: posted.posted_by,
+        description: "suspicious activity",
+        post_id: posted._id,
+        title: posted.title,
+      });
       return res
         .status(200)
         .json({ message: "Posted Successfully", data: posted });

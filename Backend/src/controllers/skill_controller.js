@@ -2,6 +2,7 @@ import { Skill } from "../models/skill.js";
 import { User } from "../models/user.js";
 import { v2 as cloudinary } from "cloudinary";
 import { calculateDistance } from "../utils/index.js";
+import { Activity } from "../models/activity.js";
 
 export const addSkill = async (req, res) => {
   console.log(req.body);
@@ -42,8 +43,13 @@ export const addSkill = async (req, res) => {
     });
 
     const posted = await post.save();
-    console.log(posted);
     if (posted) {
+      await Activity.create({
+        posted_by: posted.posted_by,
+        description: "skill sharing",
+        post_id: posted._id,
+        title: "",
+      });
       return res
         .status(200)
         .json({ message: "Posted Successfully", data: posted });

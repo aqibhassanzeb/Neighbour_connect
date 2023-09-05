@@ -12,6 +12,7 @@ import {
   Modal,
 } from "react-native";
 import React, { useState, useEffect, useLayoutEffect } from "react";
+import moment from "moment";
 
 import { Colors, Default, Fonts } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -23,10 +24,28 @@ import SnackbarToast from "../components/snackbarToast";
 import CameraModule from "../components/cameraModule";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { uploadImageToCloudinary } from "../utils";
-import { userUpdate } from "../apis/apis";
+import { getId, getUserActivities, userUpdate } from "../apis/apis";
 import { DEFAULT_USER_PIC } from "../config";
+import { useFocusEffect } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
+
+export const handleNavigation = (value) => {
+  switch (value) {
+    case "lost & found":
+      return "YourList";
+    case "suspicious activity":
+      return "Mysus";
+    case "neighbor forum":
+      return "MyDis";
+    case "skill sharing":
+      return "MySkills";
+    case "neighbor trade":
+      return "BuyMy";
+    default:
+      return;
+  }
+};
 
 const EditProfileScreen = (props) => {
   const [update, setUpdate] = useState(false);
@@ -38,6 +57,8 @@ const EditProfileScreen = (props) => {
   const [camera, setShowCamera] = useState(false);
   const [cameraNotGranted, setCameraNotGranted] = useState(false);
   const [user, setUser] = useState({});
+  const [activites, setActivites] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { t, i18n } = useTranslation();
   const isRtl = i18n.dir() == "rtl";
@@ -53,6 +74,25 @@ const EditProfileScreen = (props) => {
 
     return () =>
       BackHandler.removeEventListener("hardwareBackPress", backAction);
+  }, []);
+
+  const handleGetActivities = async () => {
+    try {
+      setIsLoading(true);
+      const id = await getId();
+      let result = await getUserActivities(id);
+      if (result.status == 200) {
+        setActivites(result.data);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    handleGetActivities();
   }, []);
 
   useLayoutEffect(() => {
@@ -109,6 +149,7 @@ const EditProfileScreen = (props) => {
       setCameraNotGranted(true);
     }
   };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       <View
@@ -131,6 +172,7 @@ const EditProfileScreen = (props) => {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Image Section  */}
         <View>
           <View
             style={{
@@ -212,68 +254,107 @@ const EditProfileScreen = (props) => {
           <View style={styles.line}></View>
         </View>
 
-        <View
-          style={{
-            flexDirection: isRtl ? "row-reverse" : "row",
-            borderRadius: 10,
-            padding: Default.fixPadding * 1.5,
-            marginHorizontal: Default.fixPadding * 2,
-            marginBottom: Default.fixPadding * 2,
-            alignItems: "center",
-          }}
-        >
+        {activites.length === 0 && !isLoading && (
           <TouchableOpacity
-            onPress={() =>
-              props.navigation.navigate("YourList", {
-                title: "Losted",
-              })
-            }
             style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "row",
+              ...Default.shadow,
+              backgroundColor: Colors.white,
+              marginTop: 30,
+              marginHorizontal: 13,
+              //    marginBottom: 27,
+              borderRadius: 10,
+              // overflow: "hidden",
+              flexDirection: isRtl ? "row-reverse" : "row",
+              paddingVertical: Default.fixPadding,
             }}
           >
-            <Ionicons name="create-outline" size={54} color="black" />
-
             <View
               style={{
-                marginLeft: isRtl ? 0 : Default.fixPadding * 1.5,
-                marginRight: isRtl ? Default.fixPadding * 1.5 : 0,
-                alignItems: isRtl ? "flex-end" : "flex-start",
-                flex: 9,
+                flex: 2,
+                //  paddingHorizontal: Default.fixPadding * 1.5,
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
-              <Text
-                numberOfLines={1}
-                style={{
-                  ...Fonts.SemiBold16black,
-                  overflow: "hidden",
-                  top: 12,
-                }}
-              >
-                Created a Lost & Found post.
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={{
-                  ...Fonts.Medium14Black,
-                  marginVertical: Default.fixPadding * 0.3,
-                  overflow: "hidden",
-                  top: 6,
-                }}
-              >
-                Pink bag founded on the road.
-              </Text>
-
-              <Text style={{ ...Fonts.Medium14grey }}>5 min ago</Text>
+              <Text>No Activity Today</Text>
             </View>
           </TouchableOpacity>
-        </View>
+        )}
 
-        <View style={styles.line}></View>
-        <View
+        {activites.length > 0 &&
+          activites.map((activity) => (
+            <View key={activity._id}>
+              <View
+                style={{
+                  flexDirection: isRtl ? "row-reverse" : "row",
+                  borderRadius: 10,
+                  padding: Default.fixPadding * 1.5,
+                  marginHorizontal: Default.fixPadding * 2,
+                  marginBottom: Default.fixPadding * 2,
+                  alignItems: "center",
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() =>
+                    props.navigation.navigate(
+                      handleNavigation(activity.description)
+                    )
+                  }
+                  style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexDirection: "row",
+                  }}
+                >
+                  <Ionicons name="create-outline" size={54} color="black" />
+
+                  <View
+                    style={{
+                      marginLeft: isRtl ? 0 : Default.fixPadding * 1.5,
+                      marginRight: isRtl ? Default.fixPadding * 1.5 : 0,
+                      alignItems: isRtl ? "flex-end" : "flex-start",
+                      flex: 9,
+                    }}
+                  >
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        ...Fonts.SemiBold16black,
+                        overflow: "hidden",
+                        top: 12,
+                      }}
+                    >
+                      Created a{" "}
+                      <Text style={{ textTransform: "capitalize" }}>
+                        {activity.description}
+                      </Text>{" "}
+                      post.
+                    </Text>
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        ...Fonts.Medium14Black,
+                        marginVertical: Default.fixPadding * 0.3,
+                        overflow: "hidden",
+                        top: 6,
+                      }}
+                    >
+                      {activity.title}
+                    </Text>
+
+                    <Text style={{ ...Fonts.Medium14grey }}>
+                      {moment(activity?.createdAt).fromNow()}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.line}></View>
+            </View>
+          ))}
+
+        {/* <View
           style={{
             flexDirection: isRtl ? "row-reverse" : "row",
             borderRadius: 10,
@@ -513,7 +594,7 @@ const EditProfileScreen = (props) => {
               <Text style={{ ...Fonts.Medium14grey }}>2 hrs ago</Text>
             </View>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </ScrollView>
 
       <Modal

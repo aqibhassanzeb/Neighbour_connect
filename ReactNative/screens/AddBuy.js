@@ -122,8 +122,9 @@ const PayPalScreen = ({ navigation }) => {
 
   const dispatch = useDispatch();
   const handlePost = async () => {
-    if (
-      selectedImages.length === 0 ||
+    if (selectedImages.length === 0) {
+      alert("Please select at least 1 Picture");
+    } else if (
       !selectedOption._id ||
       !description ||
       !selectedOptions ||

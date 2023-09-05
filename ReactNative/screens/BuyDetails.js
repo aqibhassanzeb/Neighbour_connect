@@ -213,7 +213,12 @@ const Losted = ({ navigation, route }) => {
               }}
             >
               <TouchableOpacity
-                onPress={() => navigation.navigate("Report")}
+                onPress={() =>
+                  navigation.navigate("Report", {
+                    postId: item._id,
+                    module: "neighbor trade",
+                  })
+                }
                 style={{
                   ...Default.shadow,
                   height: 40,

@@ -151,7 +151,6 @@ const ServicesScreen = ({ navigation }) => {
     setFilter(filteredPosts);
   }, [searchTerm, posts]);
 
-  console.log({ posts });
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       <ScrollView>
@@ -254,7 +253,7 @@ const ServicesScreen = ({ navigation }) => {
             Suspicious Activities
           </Text>
         </View>
-        {filter.length === 0 && (
+        {filter.length === 0 && !isLoading && (
           <TouchableOpacity
             style={{
               ...Default.shadow,
@@ -357,7 +356,12 @@ const ServicesScreen = ({ navigation }) => {
                             selectedValue === "button1" &&
                               styles.dropdownButtonSelected,
                           ]}
-                          onPress={() => navigation.navigate("Report")}
+                          onPress={() =>
+                            navigation.navigate("Report", {
+                              postId: post._id,
+                              module: "lost & found",
+                            })
+                          }
                         >
                           <Ionicons
                             name="flag-outline"

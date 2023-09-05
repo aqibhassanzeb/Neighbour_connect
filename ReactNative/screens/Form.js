@@ -188,7 +188,7 @@ const ChatScreen = (props) => {
             Recent Discussions
           </Text>
         </View>
-        {filteredTopics.length === 0 && (
+        {filteredTopics.length === 0 && !isLoading && (
           <TouchableOpacity
             style={{
               ...Default.shadow,
@@ -267,7 +267,10 @@ const ChatScreen = (props) => {
                 </View>
                 <View>
                   <TouchableOpacity
-                    onPress={() => setDropdownOpendd(!dropdownOpendd)}
+                    onPress={() => {
+                      setSelectedId(topic._id);
+                      setDropdownOpendd(!dropdownOpendd);
+                    }}
                   >
                     <Ionicons
                       name="ellipsis-vertical"
@@ -277,7 +280,7 @@ const ChatScreen = (props) => {
                       marginTop={10}
                     />
                   </TouchableOpacity>
-                  {dropdownOpendd && (
+                  {dropdownOpendd && selectedId === topic._id && (
                     <View style={styles.dropdown}>
                       <TouchableOpacity
                         style={[
@@ -286,7 +289,12 @@ const ChatScreen = (props) => {
                           selectedValue === "button1" &&
                             styles.dropdownButtonSelected,
                         ]}
-                        onPress={() => props.navigation.navigate("Report")}
+                        onPress={() =>
+                          props.navigation.navigate("Report", {
+                            postId: topic._id,
+                            module: "neighbor forum",
+                          })
+                        }
                       >
                         <Ionicons name="flag-outline" size={20} color="black" />
                         <Text style={styles.dropdownButtonText}>Report</Text>

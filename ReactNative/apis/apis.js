@@ -723,3 +723,23 @@ export const deleteReply = async (data) => {
   );
   return result;
 };
+
+// Activity Api
+
+export const getUserActivities = async (id) => {
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "GET",
+    `user_activities/${id}`,
+    null,
+    headersWithToken
+  );
+  return result;
+};
+
+// Report Api
+export const addReport = async (data) => {
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest("POST", "report", data, headersWithToken);
+  return result;
+};
