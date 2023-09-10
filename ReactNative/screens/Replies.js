@@ -43,6 +43,7 @@ const ChatScreen = (props) => {
   const [dropdownOpendd, setDropdownOpendd] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState({});
+  const [selected, setSelected] = useState("");
 
   const [text, setText] = useState("");
 
@@ -269,7 +270,10 @@ const ChatScreen = (props) => {
                   </View>
                   <View>
                     <TouchableOpacity
-                      onPress={() => setDropdownOpen(!dropdownOpen)}
+                      onPress={() => {
+                        setDropdownOpen(!dropdownOpen);
+                        setSelected(reply._id);
+                      }}
                     >
                       <Ionicons
                         name="ellipsis-vertical"
@@ -278,16 +282,20 @@ const ChatScreen = (props) => {
                         marginLeft={219}
                       />
                     </TouchableOpacity>
-                    {dropdownOpen && (
+                    {dropdownOpen && reply._id === selected && (
                       <View style={styles.dropdownss}>
                         <TouchableOpacity
                           style={[
                             styles.dropdownButton,
-
                             selectedValue === "button1" &&
                               styles.dropdownButtonSelected,
                           ]}
-                          onPress={() => props.navigation.navigate("Report")}
+                          onPress={() =>
+                            props.navigation.navigate("Report", {
+                              postId: reply._id,
+                              module: "neighbour forum",
+                            })
+                          }
                         >
                           <Ionicons
                             name="flag-outline"

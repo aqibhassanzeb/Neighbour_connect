@@ -8,8 +8,13 @@ const forumSchema = new mongoose.Schema(
     },
     topic: {
       type: String,
+      index: true,
     },
     description: String,
+    is_active: {
+      type: Boolean,
+      default: true,
+    },
     replies: [
       {
         reply_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },

@@ -8,6 +8,7 @@ const sellSchema = new mongoose.Schema(
     },
     title: {
       type: String,
+      index: true,
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,

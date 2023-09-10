@@ -743,3 +743,10 @@ export const addReport = async (data) => {
   let result = await apiRequest("POST", "report", data, headersWithToken);
   return result;
 };
+
+// ALL SEARCH
+export const AllSearch = async (query) => {
+  console.log(typeof query);
+  let result = await apiRequest("GET", `search?query=${query}`, null, null);
+  return result;
+};

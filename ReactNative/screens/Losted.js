@@ -185,7 +185,7 @@ const Losted = ({ navigation, route }) => {
           position: "absolute",
         }}
       >
-        <View
+        {/* <View
           style={{
             flex: 8,
             flexDirection: isRtl ? "row-reverse" : "row",
@@ -215,7 +215,7 @@ const Losted = ({ navigation, route }) => {
           >
             {data.type}
           </Text>
-        </View>
+        </View> */}
 
         <View
           style={{
@@ -349,7 +349,7 @@ const Losted = ({ navigation, route }) => {
                     paddingBottom: 30,
                   }}
                 >
-                  {data && data.location.name}
+                  {data && data.location?.name}
                 </Text>
                 <Text
                   style={{
