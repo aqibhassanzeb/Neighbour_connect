@@ -4,6 +4,7 @@ const lostFound = new mongoose.Schema(
   {
     title: {
       type: String,
+      index: true,
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,
@@ -41,7 +42,7 @@ const lostFound = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    isActive: {
+    is_active: {
       type: Boolean,
       default: true,
     },

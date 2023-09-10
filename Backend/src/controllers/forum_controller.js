@@ -1,5 +1,5 @@
 import { Forum } from "../models/forum.js";
-import { User } from "../models/user.js";
+import { Activity } from "../models/activity.js";
 
 export const addForum = async (req, res) => {
   try {
@@ -9,6 +9,12 @@ export const addForum = async (req, res) => {
 
     const posted = await post.save();
     if (posted) {
+      await Activity.create({
+        posted_by: posted.posted_by,
+        description: "neighbor forum",
+        post_id: posted._id,
+        title: posted.topic,
+      });
       return res
         .status(200)
         .json({ message: "Posted Successfully", data: posted });
@@ -32,7 +38,6 @@ export const updateForum = async (req, res) => {
 
 export const deleteForum = async (req, res) => {
   const { _id } = req.params;
-  console.log(_id);
 
   try {
     await Forum.findByIdAndDelete({ _id });

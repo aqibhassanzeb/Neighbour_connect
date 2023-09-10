@@ -49,7 +49,6 @@ export const userSignup = async (req, res) => {
 
 export const userEmailUpdate = async (req, res) => {
   const { new_email, _id } = req.body;
-  console.log("req body ;", req.body);
   if (!_id) {
     return res.status(400).json({ error: "user id is required" });
   }
@@ -144,7 +143,6 @@ export const userLogin = (req, res) => {
 };
 
 export const userUpdate = async (req, res) => {
-  console.log("user update ;", req.body);
   const { _id } = req.params;
   const { password } = req.body;
   let passwordUpdate = false;

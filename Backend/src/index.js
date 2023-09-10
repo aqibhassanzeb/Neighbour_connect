@@ -13,15 +13,12 @@ import Watch from "./routes/watch_routes.js";
 import Sell from "./routes/sell_routes.js";
 import MessageRoutes from "./routes/message_routes.js";
 import Forum from "./routes/forum_routes.js";
+import Activity from "./routes/activity_routes.js";
+import Report from "./routes/report_routes.js";
 import { Message } from "./models/message.js";
-import multer from "multer";
-import { v2 as cloudinary } from "cloudinary";
 
 const app = express();
-// const socketIo = require("socket.io");
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 const server = http.createServer(app);
 const io = new socketIo(server);
 
@@ -48,7 +45,9 @@ app.use(
   Watch,
   Sell,
   MessageRoutes,
-  Forum
+  Forum,
+  Activity,
+  Report
 );
 
 app.use("*", (req, res) => {
@@ -59,10 +58,10 @@ app.use("*", (req, res) => {
 
 //REAL TIME CHAT
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+  console.log("User connected to socket:", socket.id);
 
   socket.on("join", (roomId) => {
-    console.log("room Id is", roomId);
+    socket.join(roomId);
   });
 
   socket.on("message", async (roomId, message) => {

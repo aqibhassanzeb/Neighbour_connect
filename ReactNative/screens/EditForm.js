@@ -52,7 +52,6 @@ const RegisterScreen = ({ navigation, route }) => {
     try {
       setIsLoading(true);
       let response = await updateTopic({ topic, description, _id: data._id });
-      console.log(response._reponse);
       if (response.status === 200) {
         navigation.navigate("Fpos");
       }

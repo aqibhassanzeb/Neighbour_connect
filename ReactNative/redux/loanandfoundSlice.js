@@ -36,7 +36,6 @@ export const loanandfoundSlice = createSlice({
       state.selectedLocation = action.payload;
     },
     clearLocation: (state, action) => {
-      console.log("Called");
       state.selectedLocation = {};
     },
   },

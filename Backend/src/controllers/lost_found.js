@@ -1,4 +1,5 @@
 import { lostandFound } from "../models/lost_found.js";
+import { Activity } from "../models/activity.js";
 import dotenv from "dotenv";
 dotenv.config();
 import { v2 as cloudinary } from "cloudinary";
@@ -44,6 +45,12 @@ export const lostandfound_Create = async (req, res) => {
     });
     let item = await lostfound.save();
     if (item) {
+      await Activity.create({
+        posted_by: item.createdBy,
+        description: "lost & found",
+        post_id: item._id,
+        title: item.title,
+      });
       res.status(200).json({ message: "uploaded successfully" });
     }
   } catch (error) {
@@ -143,7 +150,6 @@ export const lostandfoundLoc_Get = async (req, res) => {
     const result = await lostandFound
       .find({ type })
       .populate("createdBy", "-password");
-    // console.log("resulut :",result)
     const filteredData = result.filter((elm) => {
       if (
         elm.visibility === "connections" &&

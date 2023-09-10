@@ -94,10 +94,8 @@ const Lostss = ({ navigation }) => {
       setSoldLoading(true);
       setCancelModal(false);
       let result = await handleSold({ _id: markId });
-      console.log({ result });
       if (result.status == 200) {
         const newData = result.data;
-        console.log("HERE", result.data._id);
         const itemIndex = userSells.findIndex(
           (item) => item._id === result.data._id
         );

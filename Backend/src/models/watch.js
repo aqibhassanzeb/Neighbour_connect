@@ -9,6 +9,7 @@ const watchSchema = new mongoose.Schema(
     title: {
       type: String,
       required: true,
+      index: true,
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,

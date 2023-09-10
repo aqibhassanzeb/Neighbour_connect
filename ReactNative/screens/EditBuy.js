@@ -207,7 +207,6 @@ const PayPalScreen = ({ navigation, route }) => {
     try {
       setIsLoading(true);
       let response = await updateSellImages({ formData, id: data._id });
-      console.log({ response });
       if (response.status === 200) {
         navigation.navigate("SkillUpdated");
       }

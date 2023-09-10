@@ -144,8 +144,6 @@ const PayPalScreen = ({ navigation }) => {
     handleGetCategories();
   }, []);
 
-  console.log({ categories });
-
   const dispatch = useDispatch();
   const handlePost = async () => {
     if (

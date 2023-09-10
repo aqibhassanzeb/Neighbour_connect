@@ -22,13 +22,17 @@ import { BottomSheet } from "react-native-btr";
 import { Camera } from "expo-camera";
 import SnackbarToast from "../components/snackbarToast";
 import CameraModule from "../components/cameraModule";
-import { Disconnect, getId } from "../apis/apis";
+import { Disconnect, getId, getUserActivities } from "../apis/apis";
+import moment from "moment";
+import { handleNavigation } from "./profileScreen";
 
 const { width } = Dimensions.get("window");
 
 const EditProfileScreen = (props) => {
   const [isConnected, setConnected] = useState(true);
   const connectionDetails = props.route.params?.user || {};
+  const [activites, setActivites] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleConnectedPress = () => {
     setConnected(true);
@@ -123,7 +127,6 @@ const EditProfileScreen = (props) => {
       let disconnect = await Disconnect({
         connection_id: connectionDetails._id,
       });
-      console.log(disconnect);
       if (disconnect.status == 200) {
         setConnected(false);
         setCancelModal(false);
@@ -148,6 +151,24 @@ const EditProfileScreen = (props) => {
       setLoggedInUserId(id);
     }
     getAsyncId();
+  }, []);
+
+  const handleGetActivities = async () => {
+    try {
+      setIsLoading(true);
+      let result = await getUserActivities(connectionDetails._id);
+      if (result.status == 200) {
+        setActivites(result.data);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    handleGetActivities();
   }, []);
 
   return (
@@ -234,7 +255,12 @@ const EditProfileScreen = (props) => {
                   styles.dropdownButton,
                   selectedValue === "button1" && styles.dropdownButtonSelected,
                 ]}
-                onPress={() => props.navigation.navigate("Report")}
+                onPress={() =>
+                  props.navigation.navigate("Report", {
+                    postId: connectionDetails._id,
+                    module: "user",
+                  })
+                }
               >
                 <Ionicons name="flag-outline" size={23} color="black" />
                 <Text style={styles.dropdownButtonText}>Report</Text>
@@ -246,8 +272,9 @@ const EditProfileScreen = (props) => {
         <View
           style={{
             flexDirection: "row",
-            position: "absolute",
-            marginTop: 130,
+            // position: "absolute",
+            marginTop: 25,
+            // marginBottom: 99,
           }}
         >
           <TouchableOpacity
@@ -322,7 +349,7 @@ const EditProfileScreen = (props) => {
             </View>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() =>
             props.navigation.navigate("SeeAll", {
               title: "Losted",
@@ -330,154 +357,106 @@ const EditProfileScreen = (props) => {
           }
         >
           <Text style={{ top: 110, left: 360 }}>SeeAll</Text>
-        </TouchableOpacity>
-        <View
-          style={{
-            flexDirection: isRtl ? "row-reverse" : "row",
-            borderRadius: 10,
-            padding: Default.fixPadding * 1.5,
-            marginHorizontal: Default.fixPadding * 2,
-            marginBottom: Default.fixPadding * 2,
-            marginTop: 99,
-            alignItems: "center",
-          }}
-        >
+        </TouchableOpacity> */}
+        {activites.length === 0 && !isLoading && (
           <TouchableOpacity
-            onPress={() =>
-              props.navigation.navigate("Losted", {
-                title: "Losted",
-              })
-            }
             style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "row",
+              ...Default.shadow,
+              backgroundColor: Colors.white,
+              marginTop: 30,
+              marginHorizontal: 13,
+              //    marginBottom: 27,
+              borderRadius: 10,
+              // overflow: "hidden",
+              flexDirection: isRtl ? "row-reverse" : "row",
+              paddingVertical: Default.fixPadding,
             }}
           >
-            <Ionicons name="create-outline" size={54} color="black" />
-
             <View
               style={{
-                marginLeft: isRtl ? 0 : Default.fixPadding * 1.5,
-                marginRight: isRtl ? Default.fixPadding * 1.5 : 0,
-                alignItems: isRtl ? "flex-end" : "flex-start",
-                flex: 9,
+                flex: 2,
+                //  paddingHorizontal: Default.fixPadding * 1.5,
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
-              <Text
-                numberOfLines={1}
-                style={{
-                  ...Fonts.SemiBold16black,
-                  overflow: "hidden",
-                  top: 12,
-                }}
-              >
-                Created a Lost & Found post.
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={{
-                  ...Fonts.Medium14Black,
-                  marginVertical: Default.fixPadding * 0.3,
-                  overflow: "hidden",
-                  top: 6,
-                }}
-              >
-                Pink bag founded on the road.
-              </Text>
-
-              <Text style={{ ...Fonts.Medium14grey }}>5 min ago</Text>
+              <Text>No Activity Today</Text>
             </View>
           </TouchableOpacity>
-        </View>
+        )}
 
-        <View style={styles.line}></View>
-        <View
-          style={{
-            flexDirection: isRtl ? "row-reverse" : "row",
-            borderRadius: 10,
-            padding: Default.fixPadding * 1.5,
-            marginHorizontal: Default.fixPadding * 2,
-            marginBottom: Default.fixPadding * 2,
-            alignItems: "center",
-          }}
-        >
-          <TouchableOpacity
-            onPress={() =>
-              props.navigation.navigate("Sus", {
-                title: "Losted",
-              })
-            }
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-          >
-            <Ionicons name="create-outline" size={54} color="black" />
-
-            <View
-              style={{
-                marginLeft: isRtl ? 0 : Default.fixPadding * 1.5,
-                marginRight: isRtl ? Default.fixPadding * 1.5 : 0,
-                alignItems: isRtl ? "flex-end" : "flex-start",
-                flex: 9,
-              }}
-            >
-              <Text
-                numberOfLines={1}
+        {activites.length > 0 &&
+          activites.map((activity) => (
+            <View key={activity._id}>
+              <View
                 style={{
-                  ...Fonts.SemiBold16black,
-                  overflow: "hidden",
-                  top: 12,
+                  flexDirection: isRtl ? "row-reverse" : "row",
+                  borderRadius: 10,
+                  padding: Default.fixPadding * 1.5,
+                  marginHorizontal: Default.fixPadding * 2,
+                  marginBottom: Default.fixPadding * 2,
+                  alignItems: "center",
                 }}
               >
-                Created a Suspicious Activity post.
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={{
-                  ...Fonts.Medium14Black,
-                  marginVertical: Default.fixPadding * 0.3,
-                  overflow: "hidden",
-                  top: 6,
-                }}
-              >
-                I noticed a man wearing a mask and gloves walking around the
-                Neighborhood
-              </Text>
+                <TouchableOpacity
+                  // onPress={() =>
+                  //   props.navigation.navigate(
+                  //     handleNavigation(activity.description)
+                  //   )
+                  // }
+                  style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexDirection: "row",
+                  }}
+                >
+                  <Ionicons name="create-outline" size={54} color="black" />
 
-              <Text style={{ ...Fonts.Medium14grey }}>10 min ago</Text>
+                  <View
+                    style={{
+                      marginLeft: isRtl ? 0 : Default.fixPadding * 1.5,
+                      marginRight: isRtl ? Default.fixPadding * 1.5 : 0,
+                      alignItems: isRtl ? "flex-end" : "flex-start",
+                      flex: 9,
+                    }}
+                  >
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        ...Fonts.SemiBold16black,
+                        overflow: "hidden",
+                        top: 12,
+                      }}
+                    >
+                      Created a{" "}
+                      <Text style={{ textTransform: "capitalize" }}>
+                        {activity.description}
+                      </Text>{" "}
+                      post.
+                    </Text>
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        ...Fonts.Medium14Black,
+                        marginVertical: Default.fixPadding * 0.3,
+                        overflow: "hidden",
+                        top: 6,
+                      }}
+                    >
+                      {activity.title}
+                    </Text>
+
+                    <Text style={{ ...Fonts.Medium14grey }}>
+                      {moment(activity?.createdAt).fromNow()}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.line}></View>
             </View>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.line}></View>
-        <View
-          style={{
-            flexDirection: isRtl ? "row-reverse" : "row",
-            borderRadius: 10,
-            padding: Default.fixPadding * 1.5,
-            marginHorizontal: Default.fixPadding * 2,
-            marginBottom: Default.fixPadding * 2,
-            alignItems: "center",
-          }}
-        >
-          <TouchableOpacity
-            onPress={() =>
-              props.navigation.navigate("Salon3", {
-                title: "Losted",
-              })
-            } // Add your press event handler
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-          ></TouchableOpacity>
-        </View>
+          ))}
       </ScrollView>
 
       {/* <Modal

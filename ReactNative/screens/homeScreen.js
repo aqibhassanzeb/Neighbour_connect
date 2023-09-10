@@ -3,7 +3,7 @@ import {
   Text,
   View,
   SafeAreaView,
-  ScrollView,
+  // ScrollView,
   TouchableOpacity,
   Image,
   Modal,
@@ -15,7 +15,8 @@ import {
   PanResponder,
   StatusBar,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { ScrollView } from "react-native-virtualized-view";
 import { Colors, Default, Fonts } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -27,7 +28,7 @@ import Stars from "react-native-stars";
 import Swiper from "react-native-swiper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Loader from "../components/loader";
-import { userGet, userGetbyId } from "../apis/apis";
+import { AllSearch, userGet, userGetbyId } from "../apis/apis";
 import { useDispatch, useSelector } from "react-redux";
 import { handleSetUserinfo } from "../redux/loanandfoundSlice";
 
@@ -35,12 +36,42 @@ const { width, height } = Dimensions.get("window");
 
 const HomeScreen = ({ navigation, route }) => {
   const [cancelModal, setCancelModal] = useState(false);
+  const [query, setQuery] = useState("");
+  const [searchResults, setsearchResults] = useState([]);
+  const [cachedResults, setCachedResults] = useState({});
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [showDropDown, setshowDropDown] = useState(false);
   const [userData, setUserData] = useState("");
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const [loader, setLoader] = useState(false);
   const toggleSidePanel = () => {
     setIsSidePanelOpen(!isSidePanelOpen);
   };
+
+  async function handleSearch() {
+    try {
+      if (query.trim() === "") {
+        setshowDropDown(false);
+        setsearchResults([]);
+        return;
+      }
+      setSearchLoading(true);
+      const response = await AllSearch(query);
+      setshowDropDown(true);
+      setsearchResults(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setSearchLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (query.trim() === "") {
+      setshowDropDown(false);
+      setsearchResults([]);
+    }
+  }, [query]);
 
   const { userInfo } = useSelector((state) => state.loanandfound);
 
@@ -103,6 +134,23 @@ const HomeScreen = ({ navigation, route }) => {
     // Load user data from AsyncStorage when the component mounts
     loadUserData();
   }, [navigation]);
+
+  const handleNavigation = (value) => {
+    switch (value) {
+      case "lost & found":
+        return "Losted";
+      case "suspicious activity":
+        return "Mysus";
+      case "neighbour watch":
+        return "SearchSus";
+      case "neighbour forum":
+        return "FormSearch";
+      case "sell zone":
+        return "BuyDetails";
+      default:
+        return;
+    }
+  };
   return (
     <SafeAreaView
       style={{
@@ -167,19 +215,18 @@ const HomeScreen = ({ navigation, route }) => {
           <TouchableOpacity onPress={toggleSidePanel}>
             <Ionicons name="md-menu" size={38} color="white" />
           </TouchableOpacity>
-          <TouchableOpacity
+          <View
             style={{
               ...Default.shadow,
               backgroundColor: Colors.white,
               flexDirection: isRtl ? "row-reverse" : "row",
               borderRadius: 5,
-              padding: Default.fixPadding * 0.8,
+              padding: Default.fixPadding * 0.4,
               marginHorizontal: Default.fixPadding * 0.2,
               width: 320,
               marginRight: 6,
             }}
           >
-            <Ionicons name="search" size={20} color={Colors.grey} />
             <TextInput
               style={{
                 // Add your custom styles here
@@ -187,12 +234,131 @@ const HomeScreen = ({ navigation, route }) => {
                 marginLeft: Default.fixPadding * 0.6,
                 ...Fonts.SemiBold16grey,
               }}
-              placeholder={tr("search")}
+              placeholder={tr("Search")}
               placeholderTextColor={Colors.grey}
-              //  value={searchText}
-              //    onChangeText={setSearchText}
+              value={query}
+              onChangeText={(text) => setQuery(text)}
             />
-          </TouchableOpacity>
+            <TouchableOpacity onPress={handleSearch}>
+              <Ionicons
+                name="search"
+                size={20}
+                color={Colors.white}
+                style={{
+                  backgroundColor: Colors.primary,
+                  padding: 5,
+                  borderRadius: 4,
+                }}
+              />
+            </TouchableOpacity>
+          </View>
+          {searchLoading && (
+            <View
+              style={{
+                width: 320,
+                height: 50,
+                backgroundColor: "white",
+                position: "absolute",
+                top: 50,
+                left: 40,
+                borderRadius: 5,
+                padding: 10,
+                zIndex: 998,
+              }}
+            >
+              <Text
+                style={{ fontWeight: 700, fontSize: 15, textAlign: "center" }}
+              >
+                Searching for{" "}
+                <Text
+                  style={{
+                    fontWeight: 700,
+                    fontSize: 15,
+                    color: Colors.primary,
+                  }}
+                >
+                  {query}
+                </Text>
+              </Text>
+            </View>
+          )}
+          {showDropDown && (
+            <View
+              style={{
+                width: 320,
+                // height: 50,
+                backgroundColor: "white",
+                position: "absolute",
+                top: 50,
+                left: 40,
+                borderRadius: 5,
+                padding: 10,
+                zIndex: 998,
+              }}
+            >
+              {searchResults.length < 1 && !searchLoading ? (
+                <Text
+                  style={{
+                    fontWeight: 700,
+                    fontSize: 15,
+                    textAlign: "center",
+                    height: 50,
+                  }}
+                >
+                  No result found for{" "}
+                  <Text
+                    style={{
+                      fontWeight: 700,
+                      fontSize: 15,
+                      color: Colors.primary,
+                    }}
+                  >
+                    {query}
+                  </Text>
+                </Text>
+              ) : (
+                !searchLoading && (
+                  <ScrollView>
+                    <FlatList
+                      // style={{ height: 220 }}
+                      data={searchResults}
+                      renderItem={({ item }) => (
+                        <TouchableOpacity
+                          onPress={() => {
+                            setshowDropDown(false);
+                            navigation.navigate(
+                              handleNavigation(item.result_from),
+                              {
+                                item: item,
+                                _id: item._id,
+                                topic: item,
+                              }
+                            );
+                          }}
+                          key={item._id}
+                          style={{ paddingVertical: 10, gap: 10 }}
+                        >
+                          <Text style={{ fontSize: 15, fontWeight: "700" }}>
+                            {item.title || item.topic}
+                          </Text>
+                          <Text
+                            style={{
+                              fontSize: 13,
+                              textTransform: "capitalize",
+                            }}
+                          >
+                            {item.result_from}
+                          </Text>
+                          <View style={styles.line}></View>
+                        </TouchableOpacity>
+                      )}
+                      keyExtractor={(item) => item._id}
+                    />
+                  </ScrollView>
+                )
+              )}
+            </View>
+          )}
           <TouchableOpacity
             onPress={() =>
               navigation.navigate("Messages", {
@@ -204,7 +370,7 @@ const HomeScreen = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
       </View>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ zIndex: -1 }}>
         <View
           style={{
             flexDirection: isRtl ? "row-reverse" : "row",
@@ -625,5 +791,10 @@ const styles = StyleSheet.create({
   panelButtonText: {
     fontSize: 18,
     textAlign: "center",
+  },
+  line: {
+    width: "100%",
+    height: 1,
+    backgroundColor: "black",
   },
 });

@@ -1,6 +1,7 @@
 import { Sell } from "../models/sell.js";
-import { User } from "../models/user.js";
 import { v2 as cloudinary } from "cloudinary";
+import { calculateDistance } from "../utils/index.js";
+import { Activity } from "../models/activity.js";
 
 export const addSell = async (req, res) => {
   const location = JSON.parse(req.body.location);
@@ -41,6 +42,12 @@ export const addSell = async (req, res) => {
 
     const posted = await post.save();
     if (posted) {
+      await Activity.create({
+        posted_by: posted.posted_by,
+        description: "neighbor trade",
+        post_id: posted._id,
+        title: posted.title,
+      });
       return res
         .status(200)
         .json({ message: "Posted Successfully", data: posted });
@@ -108,7 +115,6 @@ export const updateImages = async (req, res) => {
 
 export const deleteSell = async (req, res) => {
   const { _id } = req.params;
-  console.log(_id);
 
   try {
     await Sell.findByIdAndDelete({ _id });
@@ -121,19 +127,29 @@ export const deleteSell = async (req, res) => {
 
 export const getSellsByCat = async (req, res) => {
   const { _id } = req.params;
-  const user_id = req.user._id;
-  const user = await User.findById(user_id);
-  const connections = user.connections;
+  let { address_range, address } = req.user;
+  let { latitude, longitude } = address;
 
   try {
     const items = await Sell.find({ category: _id })
       .populate("category")
-      .populate("posted_by", "name image");
+      .populate("posted_by", "name address image");
     const filtered_array = items.filter((item) => {
-      if (item.selected_visibility === "Connections ") {
-        return connections.includes(item.posted_by._id);
+      if (
+        item.selected_visibility === "Connections" &&
+        req.user.connections.includes(item.posted_by._id)
+      ) {
+        return true;
       }
-      return true;
+      const docLatitude = parseFloat(item.posted_by.address.latitude);
+      const docLongitude = parseFloat(item.posted_by.address.longitude);
+      const distanceInKm = calculateDistance(
+        latitude,
+        longitude,
+        docLatitude,
+        docLongitude
+      );
+      return distanceInKm <= parseFloat(address_range);
     });
     res.json(filtered_array);
   } catch (error) {
@@ -174,21 +190,31 @@ export const markSolded = async (req, res) => {
 };
 
 export const getAllItems = async (req, res) => {
-  const user_id = req.user._id;
-  const user = await User.findById(user_id);
-  const connections = user.connections;
+  let { address_range, address } = req.user;
+  let { latitude, longitude } = address;
 
   try {
     const items = await Sell.find()
       .sort({ createdAt: -1 })
-      .populate("posted_by", "name image")
+      .populate("posted_by", "name address image")
       .populate("category");
 
     const filtered_array = items.filter((item) => {
-      if (item.selected_visibility === "Connections ") {
-        return connections.includes(item.posted_by._id);
+      if (
+        item.selected_visibility === "Connections" &&
+        req.user.connections.includes(item.posted_by._id)
+      ) {
+        return true;
       }
-      return true;
+      const docLatitude = parseFloat(item.posted_by.address.latitude);
+      const docLongitude = parseFloat(item.posted_by.address.longitude);
+      const distanceInKm = calculateDistance(
+        latitude,
+        longitude,
+        docLatitude,
+        docLongitude
+      );
+      return distanceInKm <= parseFloat(address_range);
     });
 
     res.json(filtered_array);

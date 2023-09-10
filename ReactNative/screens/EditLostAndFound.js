@@ -45,7 +45,6 @@ const { width, height } = Dimensions.get("window");
 const PayPalScreen = ({ navigation, route }) => {
   const { selectedLocation } = useSelector((state) => state.loanandfound);
   const { data } = route.params;
-  console.log(data);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(data.category.name);

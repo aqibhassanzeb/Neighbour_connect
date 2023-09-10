@@ -103,7 +103,6 @@ const PickAddressScreen = ({ navigation, route }) => {
       const response = await axios.get(
         `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchText}&types=geocode&key=${apiKey}`
       );
-      console.log(response.data);
       if (response.data && response.data.predictions) {
         setSearchResults(response.data.predictions);
       }
@@ -309,87 +308,3 @@ const PickAddressScreen = ({ navigation, route }) => {
 };
 
 export default PickAddressScreen;
-
-// import React, { useState } from "react";
-// import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
-// import MapView, { Marker } from "react-native-maps";
-
-// const PickAddressScreen = () => {
-//   const [selectedLocation, setSelectedLocation] = useState(null);
-//   console.log(selectedLocation);
-
-//   const handleMapPress = (event) => {
-//     const { coordinate } = event.nativeEvent;
-//     setSelectedLocation(coordinate);
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <MapView
-//         style={styles.map}
-//         initialRegion={{
-//           latitude: 37.78825,
-//           longitude: -122.4324,
-//           latitudeDelta: 0.0922,
-//           longitudeDelta: 0.0421,
-//         }}
-//         onPress={handleMapPress}
-//       >
-//         {selectedLocation && (
-//           <Marker
-//             coordinate={selectedLocation}
-//             title="Selected Location"
-//             description="This is the selected location."
-//           />
-//         )}
-//       </MapView>
-//       <View style={styles.textContainer}>
-//         {selectedLocation && (
-//           <Text>
-//             Latitude: {selectedLocation.latitude.toFixed(6)}, Longitude:{" "}
-//             {selectedLocation.longitude.toFixed(6)}
-//           </Text>
-//         )}
-//       </View>
-//       <TouchableOpacity
-//         style={styles.button}
-//         onPress={() => {
-//           // Handle the selected location as needed
-//           if (selectedLocation) {
-//             console.log("Selected Location:", selectedLocation);
-//             // You can save the selected location to your state or perform other actions here.
-//           } else {
-//             console.log("No location selected.");
-//           }
-//         }}
-//       >
-//         <Text style={styles.buttonText}>Save Location</Text>
-//       </TouchableOpacity>
-//     </View>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//   },
-//   map: {
-//     flex: 1,
-//   },
-//   textContainer: {
-//     alignItems: "center",
-//     justifyContent: "center",
-//     padding: 10,
-//   },
-//   button: {
-//     backgroundColor: "blue",
-//     alignItems: "center",
-//     padding: 15,
-//   },
-//   buttonText: {
-//     color: "white",
-//     fontSize: 18,
-//   },
-// });
-
-// export default PickAddressScreen;

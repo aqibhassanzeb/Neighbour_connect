@@ -29,8 +29,6 @@ const MessagesScreen = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [chatList, setChatList] = useState([]);
 
-  console.log({ selectedMessages });
-
   function tr(key) {
     return t(`messagesScreen:${key}`);
   }

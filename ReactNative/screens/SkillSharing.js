@@ -82,7 +82,6 @@ const ServicesScreen = ({ navigation }) => {
       {isLoading && <Loader />}
 
       <View>
-        
         <FlatList
           data={filteredCategories && filteredCategories}
           keyExtractor={(item) => item._id}
@@ -229,10 +228,7 @@ const ServicesScreen = ({ navigation }) => {
             </TouchableOpacity>
           )}
         />
-
-        {/* filter view  */}
-
-        {filteredCategories.length === 0 && (
+        {filteredCategories.length === 0 && !isLoading && (
           <TouchableOpacity
             style={{
               ...Default.shadow,

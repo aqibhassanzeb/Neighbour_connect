@@ -57,7 +57,6 @@ const OngoingTab = (props) => {
       handleGetItems();
     }, [])
   );
-  console.log({ filteredSellZoneItems });
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       {filteredSellZoneItems.length === 0 && (

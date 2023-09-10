@@ -58,6 +58,7 @@ import Location from "./screens/Location";
 import Fpos from "./screens/Fpos";
 import Upos from "./screens/Upos";
 import EditsSus from "./screens/EditsSus";
+import SearchSus from "./screens/SearchSus";
 import EditSuccess from "./screens/EditSuccess";
 import Report from "./screens/Report";
 import Edit from "./screens/Edit";
@@ -80,6 +81,7 @@ import CategorySkill from "./components/CategorySkill";
 import BuySell from "./screens/BuySell";
 import Suspicious from "./screens/Suspicious";
 import Form from "./screens/Form";
+import FormSearch from "./screens/FormSearch";
 import Slocate from "./screens/Slocate";
 import Profile3 from "./screens/Profile3";
 import Profile4 from "./screens/Profile4";
@@ -586,6 +588,11 @@ const MainNavigation = (props) => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name="SearchSus"
+          component={SearchSus}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
           name="Sus"
           component={Sus}
           options={{ headerShown: false }}
@@ -603,6 +610,11 @@ const MainNavigation = (props) => {
         <Stack.Screen
           name="Form"
           component={Form}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="FormSearch"
+          component={FormSearch}
           options={{ headerShown: false }}
         />
         <Stack.Screen

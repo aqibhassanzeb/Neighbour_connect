@@ -1,6 +1,7 @@
 import { Watch } from "../models/watch.js";
-import { User } from "../models/user.js";
 import { v2 as cloudinary } from "cloudinary";
+import { calculateDistance } from "../utils/index.js";
+import { Activity } from "../models/activity.js";
 
 export const addWatch = async (req, res) => {
   const location = JSON.parse(req.body?.location);
@@ -46,6 +47,12 @@ export const addWatch = async (req, res) => {
 
     const posted = await post.save();
     if (posted) {
+      await Activity.create({
+        posted_by: posted.posted_by,
+        description: "suspicious activity",
+        post_id: posted._id,
+        title: posted.title,
+      });
       return res
         .status(200)
         .json({ message: "Posted Successfully", data: posted });
@@ -117,7 +124,6 @@ export const updateMedia = async (req, res) => {
 
 export const deleteWatch = async (req, res) => {
   const { _id } = req.params;
-  console.log(_id);
 
   try {
     await Watch.findByIdAndDelete({ _id });
@@ -143,28 +149,31 @@ export const getWatchByUser = async (req, res) => {
 };
 
 export const getAllWatch = async (req, res) => {
-  const user_id = req.user._id;
-  const user = await User.findById(user_id);
-  const connections = user.connections;
+  let { address_range, address } = req.user;
+  let { latitude, longitude } = address;
 
   try {
-    // const query = {
-    //   $or: [
-    //     { selected_visibility: "Connection", posted_by: { $in: connections } },
-    //     { selected_visibility: { $ne: "Connection" } },
-    //   ],
-    // };
-
     const posts = await Watch.find()
       .sort({ createdAt: -1 })
-      .populate("posted_by", "name image helpful_count")
+      .populate("posted_by", "name image helpful_count address")
       .populate("category");
 
     const filtered_array = posts.filter((item) => {
-      if (item.selected_visibility === "Connections ") {
-        return connections.includes(item.posted_by._id);
+      if (
+        item.selected_visibility === "Connections" &&
+        req.user.connections.includes(item.posted_by._id)
+      ) {
+        return true;
       }
-      return true;
+      const docLatitude = parseFloat(item.posted_by.address.latitude);
+      const docLongitude = parseFloat(item.posted_by.address.longitude);
+      const distanceInKm = calculateDistance(
+        latitude,
+        longitude,
+        docLatitude,
+        docLongitude
+      );
+      return distanceInKm <= parseFloat(address_range);
     });
 
     res.json(filtered_array);
@@ -177,7 +186,6 @@ export const getAllWatch = async (req, res) => {
 export const increaseHelpful = async (req, res) => {
   const { _id } = req.params;
   const user_id = req.user._id;
-  console.log({ postId: _id, user_id });
   try {
     const post = await Watch.findById(_id);
     if (!post) {
@@ -198,7 +206,6 @@ export const increaseHelpful = async (req, res) => {
 export const decreaseHelpful = async (req, res) => {
   const { _id } = req.params;
   const user_id = req.user._id;
-  console.log({ postId: _id, user_id });
 
   try {
     const post = await Watch.findById(_id);

@@ -72,6 +72,7 @@ const Losted = ({ navigation, route }) => {
           style={{
             marginLeft: Default.fixPadding * 2,
             flex: 1,
+            flexDirection: "row",
           }}
           onPress={() => navigation.goBack()}
         >
@@ -80,6 +81,16 @@ const Losted = ({ navigation, route }) => {
             size={25}
             color={Colors.white}
           />
+          <Text
+            style={{
+              ...Fonts.SemiBold18white,
+              justifyContent: "center",
+              alignItems: "center",
+              marginHorizontal: Default.fixPadding * 1.2,
+            }}
+          >
+            {item.title}
+          </Text>
         </TouchableOpacity>
         <View style={{}}></View>
       </View>
@@ -125,7 +136,7 @@ const Losted = ({ navigation, route }) => {
           ))}
         </Swiper>
       </View>
-      <View
+      {/* <View
         style={{
           flexDirection: isRtl ? "row-reverse" : "row",
           alignItems: "center",
@@ -164,7 +175,7 @@ const Losted = ({ navigation, route }) => {
             {item.title}
           </Text>
         </View>
-      </View>
+      </View> */}
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={{ backgroundColor: Colors.extraLightGrey }}>
           <View
@@ -213,7 +224,12 @@ const Losted = ({ navigation, route }) => {
               }}
             >
               <TouchableOpacity
-                onPress={() => navigation.navigate("Report")}
+                onPress={() =>
+                  navigation.navigate("Report", {
+                    postId: item._id,
+                    module: "neighbor trade",
+                  })
+                }
                 style={{
                   ...Default.shadow,
                   height: 40,
