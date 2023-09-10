@@ -150,7 +150,6 @@ export const lostandfoundLoc_Get = async (req, res) => {
     const result = await lostandFound
       .find({ type })
       .populate("createdBy", "-password");
-    // console.log("resulut :",result)
     const filteredData = result.filter((elm) => {
       if (
         elm.visibility === "connections" &&

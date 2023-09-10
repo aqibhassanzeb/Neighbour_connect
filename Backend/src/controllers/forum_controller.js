@@ -38,7 +38,6 @@ export const updateForum = async (req, res) => {
 
 export const deleteForum = async (req, res) => {
   const { _id } = req.params;
-  console.log(_id);
 
   try {
     await Forum.findByIdAndDelete({ _id });

@@ -32,7 +32,6 @@ const ChatScreen = (props) => {
   const [dropdownOpens, setDropdownOpens] = useState(false);
   const [dropdownOpend, setDropdownOpend] = useState(false);
   const [dropdownOpendd, setDropdownOpendd] = useState(false);
-  console.log({ topic });
   // const [topics, setTopics] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 

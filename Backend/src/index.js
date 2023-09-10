@@ -58,7 +58,7 @@ app.use("*", (req, res) => {
 
 //REAL TIME CHAT
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+  console.log("User connected to socket:", socket.id);
 
   socket.on("join", (roomId) => {
     socket.join(roomId);

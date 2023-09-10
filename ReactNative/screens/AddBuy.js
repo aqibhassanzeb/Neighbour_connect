@@ -157,7 +157,6 @@ const PayPalScreen = ({ navigation }) => {
       try {
         setIsLoading(true);
         let response = await addSell(formData);
-        console.log(response);
 
         if (response.status === 200) {
           dispatch(clearLocation());

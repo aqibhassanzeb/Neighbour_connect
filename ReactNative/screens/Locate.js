@@ -103,7 +103,6 @@ const PickAddressScreen = ({ navigation, route }) => {
       const response = await axios.get(
         `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchText}&types=geocode&key=${apiKey}`
       );
-      console.log(response.data);
       if (response.data && response.data.predictions) {
         setSearchResults(response.data.predictions);
       }

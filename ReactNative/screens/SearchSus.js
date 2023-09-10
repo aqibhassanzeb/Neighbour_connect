@@ -30,7 +30,6 @@ const { width, height } = Dimensions.get("window");
 const ServicesScreen = ({ navigation, route }) => {
   const { item: data } = route.params;
   const [item, setItem] = useState(data);
-  console.log({ item });
   const [selectedValue, setSelectedValue] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dropdownOpens, setDropdownOpens] = useState(false);

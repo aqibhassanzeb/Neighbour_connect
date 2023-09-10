@@ -91,7 +91,6 @@ const CategoryScreen = ({ navigation, route }) => {
     try {
       setCancelModal(false);
       let result = await deleteWatch({ _id: selectedId });
-      console.log({ result });
       if (result.status == 200) {
         handleGetWatches();
       }

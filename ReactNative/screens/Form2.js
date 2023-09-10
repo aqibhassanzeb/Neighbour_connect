@@ -54,7 +54,6 @@ const RegisterScreen = ({ navigation }) => {
       try {
         setIsLoading(true);
         let response = await addTopic({ topic, description });
-        console.log(response);
         if (response.status === 200) {
           navigation.navigate("Fpos");
         }

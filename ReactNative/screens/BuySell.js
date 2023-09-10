@@ -155,7 +155,6 @@ const CustomTabBar = ({ state, descriptors, navigation, position }) => {
               });
 
               if (!isFocused && !event.defaultPrevented) {
-                console.log(route.name);
                 navigation.navigate({ name: route.name, merge: true });
               }
             };

@@ -115,7 +115,6 @@ export const updateImages = async (req, res) => {
 
 export const deleteSell = async (req, res) => {
   const { _id } = req.params;
-  console.log(_id);
 
   try {
     await Sell.findByIdAndDelete({ _id });

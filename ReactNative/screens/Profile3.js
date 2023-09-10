@@ -127,7 +127,6 @@ const EditProfileScreen = (props) => {
       let disconnect = await Disconnect({
         connection_id: connectionDetails._id,
       });
-      console.log(disconnect);
       if (disconnect.status == 200) {
         setConnected(false);
         setCancelModal(false);
@@ -158,7 +157,6 @@ const EditProfileScreen = (props) => {
     try {
       setIsLoading(true);
       let result = await getUserActivities(connectionDetails._id);
-      console.log(result);
       if (result.status == 200) {
         setActivites(result.data);
       }
@@ -172,8 +170,6 @@ const EditProfileScreen = (props) => {
   useEffect(() => {
     handleGetActivities();
   }, []);
-
-  console.log({ activites });
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>

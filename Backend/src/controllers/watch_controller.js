@@ -124,7 +124,6 @@ export const updateMedia = async (req, res) => {
 
 export const deleteWatch = async (req, res) => {
   const { _id } = req.params;
-  console.log(_id);
 
   try {
     await Watch.findByIdAndDelete({ _id });
@@ -187,7 +186,6 @@ export const getAllWatch = async (req, res) => {
 export const increaseHelpful = async (req, res) => {
   const { _id } = req.params;
   const user_id = req.user._id;
-  console.log({ postId: _id, user_id });
   try {
     const post = await Watch.findById(_id);
     if (!post) {
@@ -208,7 +206,6 @@ export const increaseHelpful = async (req, res) => {
 export const decreaseHelpful = async (req, res) => {
   const { _id } = req.params;
   const user_id = req.user._id;
-  console.log({ postId: _id, user_id });
 
   try {
     const post = await Watch.findById(_id);

@@ -52,7 +52,6 @@ const ChatMessagesScreen = ({ route }) => {
     newSocket.emit("join", roomId);
     setSocket(newSocket);
     newSocket.on("message", (newMessage) => {
-      console.log("HERE");
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     });
     return () => {
@@ -117,7 +116,6 @@ const ChatMessagesScreen = ({ route }) => {
             setProgress(Math.round((data.loaded / data.total) * 100)),
         }
       );
-      console.log(response.data.secure_url);
       return response.data.secure_url;
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -158,7 +156,6 @@ const ChatMessagesScreen = ({ route }) => {
     try {
       const messages = JSON.stringify({ messages: messageIds });
       const response = await deleteMessages(messages);
-      console.log(response);
 
       if (response.status === 200) {
         setSelectedMessages((prevSelectedMessages) =>

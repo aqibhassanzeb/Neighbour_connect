@@ -112,7 +112,6 @@ const Lostss = ({ navigation }) => {
   }, []);
 
   const handleUpdate = async () => {
-    console.log("selected id :", setselectedEditId);
     setCancelModal(false);
     try {
       setLoader(true);
@@ -121,7 +120,6 @@ const Lostss = ({ navigation }) => {
       if (result.status == 200) {
         navigation.navigate("lostTabt");
       } else {
-        console.log("result :", result);
         alert(result.data.error);
       }
     } catch (error) {

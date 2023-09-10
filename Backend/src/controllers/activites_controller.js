@@ -39,8 +39,6 @@ export const searchAll = async (req, res) => {
       result.result_from = "neighbour forum";
     });
 
-    console.log(forumResults);
-
     const lostFoundResults = await lostandFound
       .find({
         title: { $regex: query, $options: "i" },

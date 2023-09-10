@@ -350,7 +350,6 @@ export const addSkill = async (data) => {
   const id = await getId();
   data.append("posted_by", id);
   const headersWithToken = await getHeadersWithTokenFormData();
-  console.log(data);
   let result = await apiRequest("POST", `add_skill`, data, headersWithToken);
   return result;
 };
@@ -439,7 +438,6 @@ export const addWatch = async (data) => {
   const id = await getId();
   data.append("posted_by", id);
   const headersWithToken = await getHeadersWithTokenFormData();
-  console.log(data);
   let result = await apiRequest("POST", "add_watch", data, headersWithToken);
   return result;
 };
@@ -453,7 +451,6 @@ export const updateWatch = async (data) => {
     data,
     headersWithToken
   );
-  console.log(result);
   return result;
 };
 
@@ -522,7 +519,6 @@ export const addSell = async (data) => {
   const id = await getId();
   data.append("posted_by", id);
   const headersWithToken = await getHeadersWithTokenFormData();
-  console.log(data);
   let result = await apiRequest("POST", `add_sell`, data, headersWithToken);
   return result;
 };
@@ -621,7 +617,6 @@ export const getChats = async () => {
 
 export const postMessage = async (data) => {
   const headersWithToken = await getHeadersWithTokenFormData();
-  console.log(data);
   let result = await apiRequest("POST", "messages", data, headersWithToken);
   return result;
 };
@@ -746,7 +741,6 @@ export const addReport = async (data) => {
 
 // ALL SEARCH
 export const AllSearch = async (query) => {
-  console.log(typeof query);
   let result = await apiRequest("GET", `search?query=${query}`, null, null);
   return result;
 };

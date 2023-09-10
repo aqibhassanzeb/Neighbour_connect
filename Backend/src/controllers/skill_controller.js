@@ -5,7 +5,6 @@ import { calculateDistance } from "../utils/index.js";
 import { Activity } from "../models/activity.js";
 
 export const addSkill = async (req, res) => {
-  console.log(req.body);
   const location = JSON.parse(req.body.location);
   if (!req.files || req.files.length === 0) {
     return res.status(400).send("No files uploaded.");
@@ -117,7 +116,6 @@ export const updateImages = async (req, res) => {
 
 export const deleteSkill = async (req, res) => {
   const { _id } = req.params;
-  console.log(_id);
 
   try {
     await Skill.findByIdAndDelete({ _id });
