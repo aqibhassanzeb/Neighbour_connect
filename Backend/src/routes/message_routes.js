@@ -6,6 +6,7 @@ import {
   deleteChat,
   deleteMessages,
   fetchMessages,
+  friendsChat,
   getFriends,
   postMessage,
   userDetails,
@@ -28,6 +29,7 @@ routes.post("/delete_messages", deleteMessages);
 routes.delete("/delete_chat/:senderId/:recepientId", deleteChat);
 
 //endpoint to access all the friends of the logged in user!
+routes.get("/friends-chat/:userId", friendsChat);
 routes.get("/accepted-friends/:userId", getFriends);
 
 export default routes;

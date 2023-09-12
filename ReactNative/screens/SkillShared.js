@@ -14,6 +14,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import { getSkillsByCategory } from "../apis/apis";
 import Loader from "../components/loader";
+import { useFocusEffect } from "@react-navigation/native";
 
 const CategoryScreen = ({ navigation, route }) => {
   const { item } = route.params;
@@ -53,9 +54,15 @@ const CategoryScreen = ({ navigation, route }) => {
     }
   };
 
-  useEffect(() => {
-    handleGetSkillsByCategory();
-  }, []);
+  // useEffect(() => {
+  //   handleGetSkillsByCategory();
+  // }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      handleGetSkillsByCategory();
+    }, [])
+  );
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       {isLoading && <Loader />}

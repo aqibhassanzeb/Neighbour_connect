@@ -289,7 +289,7 @@ const Losted = ({ navigation, route }) => {
                     paddingBottom: 30,
                   }}
                 >
-                  {item.location.name}
+                  {item.location?.name}
                 </Text>
 
                 <Text
@@ -338,7 +338,7 @@ const Losted = ({ navigation, route }) => {
                     paddingBottom: 30,
                   }}
                 >
-                  {item.posted_by.name}
+                  {item.posted_by?.name}
                 </Text>
 
                 <Text
@@ -364,7 +364,7 @@ const Losted = ({ navigation, route }) => {
                     paddingBottom: 30,
                   }}
                 >
-                  {item.category.name}
+                  {item.category?.name}
                 </Text>
                 <Text
                   style={{
