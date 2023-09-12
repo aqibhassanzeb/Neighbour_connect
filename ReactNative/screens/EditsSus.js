@@ -39,6 +39,7 @@ const { width, height } = Dimensions.get("window");
 const PayPalScreen = ({ navigation, route }) => {
   const { selectedLocation } = useSelector((state) => state.loanandfound);
   const { data } = route.params;
+  const [oldImages, setOldImages] = useState(data.media);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(data.category.name);
@@ -131,6 +132,11 @@ const PayPalScreen = ({ navigation, route }) => {
     setSelectedMedia(updatedImages);
   };
 
+  const handleOldRemove = (index) => {
+    const updatedImages = oldImages.filter((uri, i) => i !== index);
+    setOldImages(updatedImages);
+  };
+
   const handleGetCategories = async () => {
     try {
       let result = await getWatchCategories();
@@ -181,7 +187,7 @@ const PayPalScreen = ({ navigation, route }) => {
   const handleUpdateMedia = async () => {
     const formData = new FormData();
 
-    selectedMedia.slice(0, 3).forEach((image) => {
+    selectedMedia.forEach((image) => {
       const extension = image.uri.split(".").pop();
       const type = `${image.type}/${extension}`;
       const name = image.uri.split("/").pop();
@@ -191,6 +197,9 @@ const PayPalScreen = ({ navigation, route }) => {
         name,
       });
     });
+    oldImages.map((media) =>
+      formData.append("oldMedia", JSON.stringify(media))
+    );
 
     try {
       setIsLoading(true);
@@ -235,32 +244,78 @@ const PayPalScreen = ({ navigation, route }) => {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {selectedMedia.length === 0 && (
-          <ScrollView horizontal style={{ margin: 10 }}>
-            {data.media.map((media, index) => (
-              <View
-                key={index}
-                style={{ flexDirection: "row", alignItems: "center" }}
-              >
-                <View style={{ marginRight: 10 }}>
-                  {media.media_type === "image" ? (
-                    <Image
-                      source={{ uri: media.source }}
-                      style={{ width: 120, height: 150, borderRadius: 10 }}
-                    />
-                  ) : (
-                    <Video
-                      source={{ uri: media.source }}
-                      style={{ width: 150, height: 150, borderRadius: 10 }}
-                      useNativeControls
-                      resizeMode="contain"
-                    />
-                  )}
-                </View>
+        <ScrollView horizontal style={{ margin: 10 }}>
+          {oldImages.map((media, index) => (
+            <View
+              key={index}
+              style={{ flexDirection: "row", alignItems: "center" }}
+            >
+              <View style={{ marginRight: 10 }}>
+                {media.media_type === "image" ? (
+                  <Image
+                    source={{ uri: media.source }}
+                    style={{ width: 120, height: 150, borderRadius: 10 }}
+                  />
+                ) : (
+                  <Video
+                    source={{ uri: media.source }}
+                    style={{ width: 150, height: 150, borderRadius: 10 }}
+                    useNativeControls
+                    resizeMode="contain"
+                  />
+                )}
               </View>
-            ))}
-          </ScrollView>
-        )}
+              <FontAwesome5
+                onPress={() => handleOldRemove(index)}
+                name="times-circle"
+                size={24}
+                color="red"
+                style={{
+                  position: "absolute",
+                  top: -1,
+                  right: 10,
+                  zIndex: 1,
+                }}
+              />
+            </View>
+          ))}
+          {selectedMedia.map((uri, index) => (
+            <View
+              key={index}
+              style={{ flexDirection: "row", alignItems: "center" }}
+            >
+              <TouchableOpacity style={{ marginRight: 10 }}>
+                {uri.type === "image" ? (
+                  <Image
+                    source={{ uri: uri.uri }}
+                    style={{ width: 120, height: 150, borderRadius: 10 }}
+                  />
+                ) : (
+                  <Video
+                    source={{ uri: uri.uri }}
+                    style={{ width: 150, height: 150, borderRadius: 10 }}
+                    useNativeControls
+                    resizeMode="contain"
+                  />
+                )}
+
+                <FontAwesome5
+                  onPress={() => handleMediaRemove(index)}
+                  name="times-circle"
+                  size={24}
+                  color="red"
+                  style={{
+                    position: "absolute",
+                    top: -1,
+                    right: -1,
+                    zIndex: 1,
+                  }}
+                />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </ScrollView>
+
         <View
           style={{
             alignItems: "center",
@@ -272,45 +327,6 @@ const PayPalScreen = ({ navigation, route }) => {
           <TouchableOpacity onPress={pickMedia}>
             <Ionicons name="ios-camera" size={80} color="grey" />
           </TouchableOpacity>
-        </View>
-        <View>
-          <ScrollView horizontal style={{ margin: 10 }}>
-            {selectedMedia.map((uri, index) => (
-              <View
-                key={index}
-                style={{ flexDirection: "row", alignItems: "center" }}
-              >
-                <TouchableOpacity style={{ marginRight: 10 }}>
-                  {uri.type === "image" ? (
-                    <Image
-                      source={{ uri: uri.uri }}
-                      style={{ width: 120, height: 150, borderRadius: 10 }}
-                    />
-                  ) : (
-                    <Video
-                      source={{ uri: uri.uri }}
-                      style={{ width: 150, height: 150, borderRadius: 10 }}
-                      useNativeControls
-                      resizeMode="contain"
-                    />
-                  )}
-
-                  <FontAwesome5
-                    onPress={() => handleMediaRemove(index)}
-                    name="times-circle"
-                    size={24}
-                    color="red"
-                    style={{
-                      position: "absolute",
-                      top: -1,
-                      right: -1,
-                      zIndex: 1,
-                    }}
-                  />
-                </TouchableOpacity>
-              </View>
-            ))}
-          </ScrollView>
         </View>
         <View
           style={{

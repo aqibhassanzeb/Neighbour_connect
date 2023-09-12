@@ -12,3 +12,7 @@ export const calculateDistance = (lat1, lon1, lat2, lon2) => {
   const distance = R * c; // Distance in km
   return distance;
 };
+
+export const isObjectEmpty = (obj) => {
+  return Object.keys(obj).length === 0;
+};

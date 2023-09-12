@@ -25,6 +25,7 @@ import Swiper from "react-native-swiper";
 import { getAllWatches, getId, addHelpful, removeHelpful } from "../apis/apis";
 import Loader from "../components/loader";
 import { extractDate, extractTime } from "../utils";
+import { useFocusEffect } from "@react-navigation/native";
 const { width, height } = Dimensions.get("window");
 
 const ServicesScreen = ({ navigation }) => {
@@ -103,9 +104,15 @@ const ServicesScreen = ({ navigation }) => {
     }
   };
 
-  useEffect(() => {
-    handleGetWatches();
-  }, []);
+  // useEffect(() => {
+  //   handleGetWatches();
+  // }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      handleGetWatches();
+    }, [])
+  );
 
   const handleHelpfulClick = async (postId) => {
     const updatedPosts = posts.map((post) =>
