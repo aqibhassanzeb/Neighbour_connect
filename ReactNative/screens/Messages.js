@@ -252,7 +252,9 @@ const MessagesScreen = ({ navigation, route }) => {
         >
           {tr("Messages")}
         </Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Mesaagess")}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Mesaagess", { userId })}
+        >
           <View>
             <Ionicons name="add" size={32} color="white" />
           </View>
@@ -262,6 +264,19 @@ const MessagesScreen = ({ navigation, route }) => {
       {selectedMessages.length > 0 && renderSelectDeleteBar()}
 
       <FlatList
+        ListHeaderComponent={
+          <Text
+            style={{
+              top: 23,
+              left: 20,
+              fontSize: 23,
+              fontWeight: 900,
+              marginBottom: 30,
+            }}
+          >
+            Chats
+          </Text>
+        }
         data={messageList}
         renderItem={renderItemMessage}
         keyExtractor={(item) => item._id}

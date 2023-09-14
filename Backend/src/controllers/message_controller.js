@@ -115,7 +115,7 @@ export const deleteChat = async (req, res) => {
   }
 };
 
-export const getFriends = async (req, res) => {
+export const friendsChat = async (req, res) => {
   try {
     const userId = req.params.userId;
 
@@ -141,17 +141,64 @@ export const getFriends = async (req, res) => {
       })
         .sort({ timeStamp: -1 })
         .limit(1);
-
-      connectionsWithMessages.push({
-        name: connection.name,
-        _id: connection._id,
-        image: connection.image,
-        lastMessage: lastMessage ? lastMessage.message : "Empty Chat, Join Now",
-        timeStamp: lastMessage ? lastMessage.timeStamp : null,
-      });
+      if (lastMessage) {
+      }
+      if (lastMessage) {
+        connectionsWithMessages.push({
+          name: connection.name,
+          _id: connection._id,
+          image: connection.image,
+          lastMessage: lastMessage
+            ? lastMessage.message
+            : "Empty Chat, Join Now",
+          timeStamp: lastMessage ? lastMessage.timeStamp : null,
+        });
+      }
     }
 
     res.json(connectionsWithMessages);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const getFriends = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    // Fetch the user's connections
+    const user = await User.findById(userId).populate({
+      path: "connections",
+      select: "name image",
+      model: User,
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const connectionsWithoutMessages = [];
+
+    for (const connection of user.connections) {
+      const lastMessage = await Message.findOne({
+        $or: [
+          { senderId: user._id, recepientId: connection._id },
+          { senderId: connection._id, recepientId: user._id },
+        ],
+      });
+
+      if (!lastMessage) {
+        connectionsWithoutMessages.push({
+          name: connection.name,
+          _id: connection._id,
+          image: connection.image,
+          lastMessage: "Empty Chat, Join Now",
+        });
+      }
+    }
+
+    res.json(connectionsWithoutMessages);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });

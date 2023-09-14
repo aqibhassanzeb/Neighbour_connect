@@ -1,5 +1,6 @@
 import { Forum } from "../models/forum.js";
 import { Activity } from "../models/activity.js";
+import { response } from "express";
 
 export const addForum = async (req, res) => {
   try {
@@ -85,9 +86,15 @@ export const addReply = async (req, res) => {
     if (!forum) {
       return res.status(404).json({ error: "Forum not found" });
     }
-    forum.replies.push({ reply_by, text });
-    await forum.save();
-    res.status(201).json({ message: "Reply added successfully", forum });
+    const newReply = { reply_by, text };
+    forum.replies.push(newReply);
+    const rep = await forum.save();
+    res
+      .status(201)
+      .json({
+        message: "Reply added successfully",
+        id: rep.replies[rep.replies.length - 1]._id,
+      });
   } catch (error) {
     console.error("Error adding reply:", error);
     res.status(500).json({ message: "Internal server error" });

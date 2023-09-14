@@ -1,6 +1,6 @@
 import { Watch } from "../models/watch.js";
 import { v2 as cloudinary } from "cloudinary";
-import { calculateDistance } from "../utils/index.js";
+import { calculateDistance, isObjectEmpty } from "../utils/index.js";
 import { Activity } from "../models/activity.js";
 
 export const addWatch = async (req, res) => {
@@ -75,11 +75,20 @@ export const updateWatch = async (req, res) => {
 
 export const updateMedia = async (req, res) => {
   const { _id } = req.params;
+  const { oldMedia } = req.body;
   if (!req.files || req.files.length === 0) {
     return res.status(400).send("No files uploaded.");
   }
   try {
-    const uploaded_media = [];
+    let parsed_media = [];
+    let parse_single = {};
+    if (Array.isArray(oldMedia)) {
+      parsed_media = oldMedia.map((media) => JSON.parse(media));
+    } else if (typeof oldMedia === "object") {
+      parse_single = JSON.parse(oldMedia);
+    }
+
+    const uploaded_media = [...parsed_media];
 
     const uploadPromises = req.files.map((file) => {
       return new Promise((resolve, reject) => {
@@ -107,6 +116,10 @@ export const updateMedia = async (req, res) => {
         source: item.secure_url,
       };
     });
+
+    if (!isObjectEmpty(parse_single)) {
+      media.push(parse_single);
+    }
 
     const response = await Watch.findByIdAndUpdate(
       _id,

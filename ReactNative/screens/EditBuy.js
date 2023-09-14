@@ -41,6 +41,7 @@ const PayPalScreen = ({ navigation, route }) => {
   const { selectedLocation } = useSelector((state) => state.loanandfound);
   const { data } = route.params;
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [oldImages, setOldImages] = useState(data.images);
   const [selectedOption, setSelectedOption] = useState(data.category.name);
   const [dropdownOpens, setDropdownOpens] = useState(false);
   const [title, setTitle] = useState(data.title);
@@ -193,7 +194,7 @@ const PayPalScreen = ({ navigation, route }) => {
   const handleUpdateImages = async () => {
     const formData = new FormData();
 
-    selectedImages.slice(0, 3).forEach((image, index) => {
+    selectedImages.forEach((image, index) => {
       const extension = image.uri.split(".").pop();
       const type = `${image.type}/${extension}`;
       const name = image.uri.split("/").pop();
@@ -203,6 +204,9 @@ const PayPalScreen = ({ navigation, route }) => {
         name,
       });
     });
+    oldImages.map((media) =>
+      formData.append("oldImages", JSON.stringify(media))
+    );
 
     try {
       setIsLoading(true);
@@ -220,6 +224,12 @@ const PayPalScreen = ({ navigation, route }) => {
   useEffect(() => {
     handleGetCategories();
   }, []);
+
+  const handleOldRemove = (index) => {
+    const updatedImages = oldImages.filter((uri, i) => i !== index);
+    setOldImages(updatedImages);
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       {isLoading && <Loader />}
@@ -250,38 +260,34 @@ const PayPalScreen = ({ navigation, route }) => {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {selectedImages.length === 0 && (
-          <ScrollView horizontal style={{ margin: 10 }}>
-            {data.images.map((uri, index) => (
-              <View
-                key={index}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginHorizontal: 5,
-                }}
-              >
-                <Image
-                  source={{ uri: uri }}
-                  style={{ width: 150, height: 150, borderRadius: 10 }}
-                />
-              </View>
-            ))}
-          </ScrollView>
-        )}
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            flexDirection: "row",
-            marginTop: 20,
-          }}
-        >
-          <TouchableOpacity onPress={pickImageAsync}>
-            <Ionicons name="ios-camera" size={80} color="grey" />
-          </TouchableOpacity>
-        </View>
         <ScrollView horizontal style={{ margin: 10 }}>
+          {oldImages.map((uri, index) => (
+            <View
+              key={index}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginHorizontal: 5,
+              }}
+            >
+              <Image
+                source={{ uri: uri }}
+                style={{ width: 150, height: 150, borderRadius: 10 }}
+              />
+              <FontAwesome5
+                onPress={() => handleOldRemove(index)}
+                name="times-circle"
+                size={24}
+                color="red"
+                style={{
+                  position: "absolute",
+                  top: 1,
+                  right: 5,
+                  zIndex: 1,
+                }}
+              />
+            </View>
+          ))}
           {selectedImages.map((uri, index) => (
             <View
               key={index}
@@ -310,6 +316,19 @@ const PayPalScreen = ({ navigation, route }) => {
             </View>
           ))}
         </ScrollView>
+
+        <View
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "row",
+            marginTop: 20,
+          }}
+        >
+          <TouchableOpacity onPress={pickImageAsync}>
+            <Ionicons name="ios-camera" size={80} color="grey" />
+          </TouchableOpacity>
+        </View>
 
         <View
           style={{

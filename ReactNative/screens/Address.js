@@ -18,10 +18,17 @@ const { width, height } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+const LATITUDE = 33.5651;
+const LONGITUDE = 73.0169;
 
 const PickAddressScreen = ({ navigation, route }) => {
   const { user, lostandfoundCreate } = route.params;
-  const [region, setRegion] = useState(null);
+  const [region, setRegion] = useState({
+    latitude: LATITUDE,
+    longitude: LONGITUDE,
+    latitudeDelta: LATITUDE_DELTA,
+    longitudeDelta: LONGITUDE_DELTA,
+  });
   const [poi, setPoi] = useState(null);
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -50,7 +57,14 @@ const PickAddressScreen = ({ navigation, route }) => {
   }, []);
 
   const onPoiClick = (e) => {
+    const apiKey = GOOGLE_APIKEY;
     const poi = e.nativeEvent;
+    axios
+      .get(
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=ChIJAAAAAAAAAAARoNmT40fyKz8&fields=geometry&key=${apiKey}`
+      )
+      .then((response) => console.log(response.data));
+    console.log(poi);
     setPoi(poi);
   };
 
@@ -70,6 +84,7 @@ const PickAddressScreen = ({ navigation, route }) => {
   };
 
   const handleSelectLocation = (placeId) => {
+    console.log("HERE");
     try {
       const apiKey = GOOGLE_APIKEY;
       axios
@@ -77,6 +92,7 @@ const PickAddressScreen = ({ navigation, route }) => {
           `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=geometry&key=${apiKey}`
         )
         .then((response) => {
+          console.log(response.data.result);
           if (
             response.data &&
             response.data.result &&
@@ -142,6 +158,7 @@ const PickAddressScreen = ({ navigation, route }) => {
           style={{ flex: 1 }}
           region={region}
           onPoiClick={onPoiClick}
+          onPress={onPoiClick}
           showsUserLocation={true}
           onRegionChangeComplete={handleMapRegionChange}
         >

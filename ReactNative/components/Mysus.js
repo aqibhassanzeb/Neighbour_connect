@@ -260,9 +260,9 @@ const CategoryScreen = ({ navigation, route }) => {
                           selectedValue === "button1" &&
                             styles.dropdownButtonSelected,
                         ]}
-                        onPress={() =>
-                          navigation.navigate("EditsSus", { data: post })
-                        }
+                        onPress={() => {
+                          navigation.navigate("EditsSus", { data: post });
+                        }}
                       >
                         <Ionicons
                           name="create-outline"

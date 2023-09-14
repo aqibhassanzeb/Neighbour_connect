@@ -5,6 +5,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export const socketUrl = "http://192.168.10.6:3333/";
 
 export const baseUrl = `http://192.168.10.6:3333/api/v1/`;
+// export const socketUrl = "http://192.168.10.6:3333/";
+
 let token;
 const getData = async () => {
   try {
@@ -604,6 +606,18 @@ export const getMessages = async (data) => {
 };
 
 export const getChats = async () => {
+  const id = await getId();
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "GET",
+    `friends-chat/${id}`,
+    null,
+    headersWithToken
+  );
+  return result;
+};
+
+export const getEmptyChats = async () => {
   const id = await getId();
   const headersWithToken = await getHeadersWithToken();
   let result = await apiRequest(

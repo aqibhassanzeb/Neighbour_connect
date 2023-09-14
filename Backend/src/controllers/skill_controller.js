@@ -1,7 +1,7 @@
 import { Skill } from "../models/skill.js";
 import { User } from "../models/user.js";
 import { v2 as cloudinary } from "cloudinary";
-import { calculateDistance } from "../utils/index.js";
+import { calculateDistance, isObjectEmpty } from "../utils/index.js";
 import { Activity } from "../models/activity.js";
 
 export const addSkill = async (req, res) => {
@@ -72,11 +72,18 @@ export const updateSkill = async (req, res) => {
 
 export const updateImages = async (req, res) => {
   const { _id } = req.params;
+  const { oldImages } = req.body;
+
   if (!req.files || req.files.length === 0) {
     return res.status(400).send("No files uploaded.");
   }
   try {
-    const uploadedImages = [];
+    let parsed_images = [];
+    if (Array.isArray(oldImages)) {
+      parsed_images = oldImages.map((media) => JSON.parse(media));
+    }
+
+    const uploadedImages = [...parsed_images];
 
     const uploadPromises = req.files.map((file) => {
       return new Promise((resolve, reject) => {
@@ -99,6 +106,11 @@ export const updateImages = async (req, res) => {
 
     await Promise.all(uploadPromises);
     const updated_images = uploadedImages.map((item) => item.secure_url);
+
+    if (typeof oldImages === "string") {
+      const parseImage = JSON.parse(oldImages);
+      updated_images.push(parseImage);
+    }
 
     const response = await Skill.findByIdAndUpdate(
       _id,

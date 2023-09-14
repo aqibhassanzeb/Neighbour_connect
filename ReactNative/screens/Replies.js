@@ -94,7 +94,7 @@ const ChatScreen = (props) => {
             addReplyState({
               topicId: topic._id,
               reply: {
-                _id: Date.now(),
+                _id: response.data.id,
                 text,
                 reply_by: { _id: user._id, name: user.name, image: user.image },
               },
@@ -123,6 +123,7 @@ const ChatScreen = (props) => {
 
   async function handleDelete(replyId) {
     try {
+      setDropdownOpens(false);
       setCancelModal(false);
       let result = await deleteReply({ forumId: topic._id, replyId });
       if (result.status == 200) {
@@ -349,13 +350,14 @@ const ChatScreen = (props) => {
           />
           <TouchableOpacity
             style={{
-              backgroundColor: Colors.primary,
+              backgroundColor: isLoading ? "white" : Colors.primary,
               padding: Default.fixPadding * 1,
+              borderWidth: isLoading ? 1 : 0,
               borderRadius: 10,
             }}
             onPress={() => handleReply()}
           >
-            <Text style={{ color: "white" }}>Reply</Text>
+            <Text style={{ color: isLoading ? "gray" : "white" }}>Reply</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

@@ -42,7 +42,7 @@ const RegisterScreen = ({ navigation, route }) => {
     }, 2000);
   };
 
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(route.params?.userData.address_range);
 
   const [checked, setChecked] = useState(false);
 
@@ -54,7 +54,7 @@ const RegisterScreen = ({ navigation, route }) => {
     return t(`registerScreen:${key}`);
   }
   const backAction = () => {
-    navigation.navigate("loginScreen");
+    navigation.goBack();
     return true;
   };
   useEffect(() => {
@@ -89,7 +89,7 @@ const RegisterScreen = ({ navigation, route }) => {
       if (verified.status == 200) {
         await AsyncStorage.setItem("userUpdated", "true"),
           alert("updated successfully");
-        navigation.navigate("homeScreen");
+        // navigation.navigate("homeScreen");
       } else {
         alert(verified.data.error);
       }
@@ -163,9 +163,9 @@ const RegisterScreen = ({ navigation, route }) => {
             }}
           >
             <Slider
+              initialValue={value}
               min={1}
               max={5}
-              value={value}
               valueOnChange={(value) => setValue(value)}
               valueLabelsBackgroundColor={Colors.primary}
               inRangeBarColor={Colors.extraLightGrey}

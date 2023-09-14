@@ -62,12 +62,23 @@ const PickAddressScreen = ({ navigation, route }) => {
   };
 
   const onPoiClick = (e) => {
-    const poi = e.nativeEvent;
-    setPoi(poi);
-    dispatch(updateLocation(poi));
+    const selectedLocation = e.nativeEvent;
+    setPoi(selectedLocation);
+    dispatch(updateLocation(selectedLocation));
   };
 
   const handleButtonPress = () => {
+    if (poi === null) {
+      dispatch(
+        updateLocation({
+          coordinate: {
+            latitude: LATITUDE,
+            longitude: LONGITUDE,
+          },
+          name: "Rawalpindi",
+        })
+      );
+    }
     if (
       (title && title === "Watch") ||
       "Sell" ||

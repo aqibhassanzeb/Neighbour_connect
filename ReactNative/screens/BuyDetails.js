@@ -20,10 +20,12 @@ import Stars from "react-native-stars";
 import SnackbarToast from "../components/snackbarToast";
 import Swiper from "react-native-swiper";
 import ChatScreen from "../screens/chatScreen";
+import { getId } from "../apis/apis";
 const { width, height } = Dimensions.get("window");
 
 const Losted = ({ navigation, route }) => {
   const { item } = route.params;
+  const [loggedInUserId, setLoggedInUserId] = useState("");
 
   const { t, i18n } = useTranslation();
 
@@ -58,6 +60,13 @@ const Losted = ({ navigation, route }) => {
 
   const [readMore, setReadMore] = useState(false);
 
+  useEffect(() => {
+    async function getAsyncId() {
+      const id = await getId();
+      setLoggedInUserId(id);
+    }
+    getAsyncId();
+  }, []);
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       <View
@@ -289,7 +298,7 @@ const Losted = ({ navigation, route }) => {
                     paddingBottom: 30,
                   }}
                 >
-                  {item.location.name}
+                  {item.location?.name}
                 </Text>
 
                 <Text
@@ -338,7 +347,7 @@ const Losted = ({ navigation, route }) => {
                     paddingBottom: 30,
                   }}
                 >
-                  {item.posted_by.name}
+                  {item.posted_by?.name}
                 </Text>
 
                 <Text
@@ -364,7 +373,7 @@ const Losted = ({ navigation, route }) => {
                     paddingBottom: 30,
                   }}
                 >
-                  {item.category.name}
+                  {item.category?.name}
                 </Text>
                 <Text
                   style={{
@@ -404,7 +413,16 @@ const Losted = ({ navigation, route }) => {
             }}
           ></View>
           <TouchableOpacity
-            onPress={() => navigation.navigate("chatScreen")}
+            onPress={() =>
+              navigation.navigate("ChattingScreen", {
+                user: {
+                  recepientId: item.posted_by._id,
+                  recepientName: item.posted_by.name,
+                  recepientImage: item.posted_by.image,
+                  senderId: loggedInUserId,
+                },
+              })
+            }
             style={{
               backgroundColor: Colors.primary,
               borderRadius: 10,

@@ -4,7 +4,6 @@ import {
   SafeAreaView,
   TouchableOpacity,
   BackHandler,
-  ScrollView,
   StyleSheet,
   Button,
   Image,
@@ -80,122 +79,111 @@ const ServicesScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       {isLoading && <Loader />}
+      <>
+        <View
+          style={{
+            backgroundColor: Colors.primary,
+            paddingBottom: 12,
+          }}
+        >
+          <View
+            style={{
+              paddingVertical: Default.fixPadding * 1.2,
+              flexDirection: isRtl ? "row-reverse" : "row",
+              alignItems: "center",
+              backgroundColor: Colors.primary,
+              paddingHorizontal: Default.fixPadding * 2,
+            }}
+          >
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Ionicons
+                name={isRtl ? "arrow-forward" : "arrow-back"}
+                size={25}
+                color={Colors.white}
+              />
+            </TouchableOpacity>
+            <Text
+              style={{
+                ...Fonts.SemiBold18white,
+                marginHorizontal: Default.fixPadding * 1.2,
+              }}
+            >
+              {"Skills Hub"}
+            </Text>
+          </View>
+          <View
+            style={{
+              ...Default.shadow,
+              backgroundColor: Colors.white,
+              flexDirection: isRtl ? "row-reverse" : "row",
+              borderRadius: 5,
+              padding: Default.fixPadding * 0.8,
+              marginHorizontal: Default.fixPadding * 2,
+            }}
+          >
+            <Ionicons name="search" size={20} color={Colors.grey} />
+            <KeyboardAvoidingView>
+              <TextInput
+                placeholder="Search"
+                style={{
+                  ...Fonts.SemiBold16grey,
+                  marginHorizontal: Default.fixPadding * 0.8,
+                  width: 300,
+                  flex: 1,
+                }}
+                value={search}
+                onChangeText={(text) => handleSearch(text)}
+              />
+            </KeyboardAvoidingView>
+          </View>
+        </View>
+        <View style={styles.container}>
+          <View style={styles.buttonContainer}>
+            <View flexDirection="row">
+              <Ionicons name="add-circle-outline" size={32} color="white" />
 
+              <Button
+                color="#005D7A"
+                title="Add Skills"
+                onPress={() => navigation.navigate("AddSkills")}
+              />
+            </View>
+          </View>
+          <View style={styles.buttonContainer}>
+            <View flexDirection="row">
+              <Ionicons name="list-circle-outline" size={32} color="white" />
+              <Button
+                color="#005D7A"
+                title="My Skills"
+                onPress={() => navigation.navigate("MySkills")}
+              />
+            </View>
+          </View>
+        </View>
+        <View
+          style={{
+            paddingTop: Default.fixPadding * 2.5,
+            paddingLeft: Default.fixPadding * 2.5,
+            paddingRight: Default.fixPadding * 5,
+            fontWeight: 90,
+            paddingBottom: 20,
+          }}
+        >
+          <Text
+            style={{
+              ...Fonts.Bold16primary,
+              textDecorationLine: "underline",
+            }}
+          >
+            Categories
+          </Text>
+        </View>
+      </>
       <View>
         <FlatList
           data={filteredCategories && filteredCategories}
           keyExtractor={(item) => item._id}
           numColumns={2}
-          ListHeaderComponent={() => (
-            <>
-              <View
-                style={{
-                  backgroundColor: Colors.primary,
-                  paddingBottom: 12,
-                }}
-              >
-                <View
-                  style={{
-                    paddingVertical: Default.fixPadding * 1.2,
-                    flexDirection: isRtl ? "row-reverse" : "row",
-                    alignItems: "center",
-                    backgroundColor: Colors.primary,
-                    paddingHorizontal: Default.fixPadding * 2,
-                  }}
-                >
-                  <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Ionicons
-                      name={isRtl ? "arrow-forward" : "arrow-back"}
-                      size={25}
-                      color={Colors.white}
-                    />
-                  </TouchableOpacity>
-                  <Text
-                    style={{
-                      ...Fonts.SemiBold18white,
-                      marginHorizontal: Default.fixPadding * 1.2,
-                    }}
-                  >
-                    {"Skills Hub"}
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    ...Default.shadow,
-                    backgroundColor: Colors.white,
-                    flexDirection: isRtl ? "row-reverse" : "row",
-                    borderRadius: 5,
-                    padding: Default.fixPadding * 0.8,
-                    marginHorizontal: Default.fixPadding * 2,
-                  }}
-                >
-                  <Ionicons name="search" size={20} color={Colors.grey} />
-                  <KeyboardAvoidingView>
-                    <TextInput
-                      placeholder="Search"
-                      style={{
-                        ...Fonts.SemiBold16grey,
-                        marginHorizontal: Default.fixPadding * 0.8,
-                        width: 300,
-                        flex: 1,
-                      }}
-                      value={search}
-                      onChangeText={(text) => handleSearch(text)}
-                    />
-                  </KeyboardAvoidingView>
-                </View>
-              </View>
-              <View style={styles.container}>
-                <View style={styles.buttonContainer}>
-                  <View flexDirection="row">
-                    <Ionicons
-                      name="add-circle-outline"
-                      size={32}
-                      color="white"
-                    />
-
-                    <Button
-                      color="#005D7A"
-                      title="Add Skills"
-                      onPress={() => navigation.navigate("AddSkills")}
-                    />
-                  </View>
-                </View>
-                <View style={styles.buttonContainer}>
-                  <View flexDirection="row">
-                    <Ionicons
-                      name="list-circle-outline"
-                      size={32}
-                      color="white"
-                    />
-                    <Button
-                      color="#005D7A"
-                      title="My Skills"
-                      onPress={() => navigation.navigate("MySkills")}
-                    />
-                  </View>
-                </View>
-              </View>
-              <View
-                style={{
-                  paddingTop: Default.fixPadding * 2.5,
-                  paddingLeft: Default.fixPadding * 2.5,
-                  paddingRight: Default.fixPadding * 5,
-                  fontWeight: 90,
-                  paddingBottom: 20,
-                }}
-              >
-                <Text
-                  style={{
-                    ...Fonts.Bold16primary,
-                    textDecorationLine: "underline",
-                  }}
-                >
-                  Categories
-                </Text>
-              </View>
-            </>
-          )}
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => navigation.navigate("SkillShared", { item })}
