@@ -61,7 +61,7 @@ const Losted = ({ navigation, route }) => {
   const [readMore, setReadMore] = useState(false);
 
   const [data, setData] = useState("");
-  const [loader, setLoader] = useState(false);
+    const [loader, setLoader] = useState(false);
   const [loggedInUserId, setLoggedInUserId] = useState("");
 
   const handleGetitem = async () => {
@@ -472,9 +472,9 @@ const Losted = ({ navigation, route }) => {
             onPress={() =>
               navigation.navigate("ChattingScreen", {
                 user: {
-                  recepientId: data.createdBy._id,
-                  recepientName: data.createdBy.name,
-                  recepientImage: data.createdBy.image,
+                  recepientId: data.createdBy?._id,
+                  recepientName: data.createdBy?.name,
+                  recepientImage: data.createdBy?.image,
                   senderId: loggedInUserId,
                 },
               })
