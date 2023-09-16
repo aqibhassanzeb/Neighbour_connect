@@ -386,7 +386,7 @@ const PayPalScreen = ({ navigation, route }) => {
               placeholder={tr("Title")}
               placeholderTextColor={Colors.grey}
               selectionColor={Colors.primary}
-              maxLength={16}
+              // maxLength={16}
               style={{
                 ...Fonts.Medium16Black,
                 flex: 9.3,
@@ -473,11 +473,11 @@ const PayPalScreen = ({ navigation, route }) => {
                     <Text style={{ padding: 10 }}>{elm.name} </Text>
                   </TouchableOpacity>
                 ))}
-              <TouchableOpacity
-                onPress={() => handleOptionSelect({ name: "other", _id: null })}
+              {/* <TouchableOpacity
+                onPress={() => handleOptionSelect({ name: "Other", _id: null })}
               >
-                <Text style={{ padding: 10 }}>other </Text>
-              </TouchableOpacity>
+                <Text style={{ padding: 10 }}>Other </Text>
+              </TouchableOpacity> */}
               {/* <TouchableOpacity onPress={() => handleOptionSelect('Pet ')}>
             <Text style={{ padding: 10 }}>Pet</Text>
           </TouchableOpacity>

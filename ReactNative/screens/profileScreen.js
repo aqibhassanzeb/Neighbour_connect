@@ -91,9 +91,15 @@ const EditProfileScreen = (props) => {
     }
   };
 
-  useEffect(() => {
-    handleGetActivities();
-  }, []);
+  // useEffect(() => {
+  //   handleGetActivities();
+  // }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      handleGetActivities();
+    }, [])
+  );
 
   useLayoutEffect(() => {
     const getUser = async () => {

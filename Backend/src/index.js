@@ -15,6 +15,7 @@ import MessageRoutes from "./routes/message_routes.js";
 import Forum from "./routes/forum_routes.js";
 import Activity from "./routes/activity_routes.js";
 import Report from "./routes/report_routes.js";
+import Notification from "./routes/notification_routes.js";
 import { Message } from "./models/message.js";
 
 const app = express();
@@ -47,7 +48,8 @@ app.use(
   MessageRoutes,
   Forum,
   Activity,
-  Report
+  Report,
+  Notification
 );
 
 app.use("*", (req, res) => {

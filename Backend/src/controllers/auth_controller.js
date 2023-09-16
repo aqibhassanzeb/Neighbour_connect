@@ -3,6 +3,15 @@ import bycrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { sendMail } from "../middleware/email_send.js";
 import { calculateDistance } from "../utils/index.js";
+import { Activity } from "../models/activity.js";
+import { Forum } from "../models/forum.js";
+import { Report } from "../models/report.js";
+import { lostandFound } from "../models/lost_found.js";
+import { Notification } from "../models/notification.js";
+import { Sell } from "../models/sell.js";
+import { Skill } from "../models/skill.js";
+import { Watch } from "../models/watch.js";
+import { Message } from "../models/message.js";
 
 export const userSignup = async (req, res) => {
   const { status, email, password, name } = req.body;
@@ -210,6 +219,7 @@ export const userGetbyId = async (req, res) => {
     let result = await User.findById(filter).select("-password");
     res.json({ success: true, data: result });
   } catch (error) {
+    console.error(error);
     res.status(400).json({ message: "something went wrong!" });
   }
 };
@@ -473,5 +483,28 @@ export const getMayKnow = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+//Delete Account
+export const deleteAccount = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await Activity.deleteMany({ posted_by: id });
+    await Forum.deleteMany({ posted_by: id });
+    await lostandFound.deleteMany({ posted_by: id });
+    await Notification.deleteMany({ userid: id });
+    await Report.deleteMany({ report_by: id });
+    await Sell.deleteMany({ posted_by: id });
+    await Skill.deleteMany({ posted_by: id });
+    await Watch.deleteMany({ posted_by: id });
+    await User.findByIdAndDelete(id);
+    await Message.deleteMany({
+      $or: [{ senderId: id }, { recepientId: id }],
+    });
+    res.json({ message: "Accsount and associated data deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error Deleting User" });
   }
 };

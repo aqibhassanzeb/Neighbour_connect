@@ -19,6 +19,7 @@ import {
   getConnections,
   getMayKnow,
   userGetbyId,
+  deleteAccount,
 } from "../controllers/auth_controller.js";
 import { uploadMultiple, uploadSingle } from "../middleware/pic_upload.js";
 import { protect } from "../middleware/user_middleware.js";
@@ -34,6 +35,7 @@ routes.put("/user_emailupdate", protect, userEmailUpdate);
 routes.post("/user_login", userLogin);
 routes.put("/reset_password", forgotPass);
 routes.put("/reset_passcode", verifyForgotcode);
+routes.delete("/delete_account/:id", deleteAccount);
 
 // Connection routes
 routes.get("/get_requests/:id", getRequests);

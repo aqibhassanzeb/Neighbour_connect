@@ -9,6 +9,8 @@ const activitySchema = new mongoose.Schema(
     description: String,
     post_id: String,
     title: String,
+    visibility: String,
+    image: String,
   },
   {
     timestamps: true,

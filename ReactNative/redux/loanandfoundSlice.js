@@ -32,6 +32,9 @@ export const loanandfoundSlice = createSlice({
     handleSetUserinfo: (state, action) => {
       state.userInfo = action.payload;
     },
+    handleClearUserInfo: (state) => {
+      state.userInfo = {};
+    },
     updateLocation: (state, action) => {
       state.selectedLocation = action.payload;
     },
@@ -51,6 +54,7 @@ export const {
   handleSetUserinfo,
   updateLocation,
   clearLocation,
+  handleClearUserInfo,
 } = loanandfoundSlice.actions;
 
 export default loanandfoundSlice.reducer;

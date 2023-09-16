@@ -47,6 +47,8 @@ export const addSell = async (req, res) => {
         description: "neighbor trade",
         post_id: posted._id,
         title: posted.title,
+        visibility: posted.selected_visibility,
+        image: images[0],
       });
       return res
         .status(200)

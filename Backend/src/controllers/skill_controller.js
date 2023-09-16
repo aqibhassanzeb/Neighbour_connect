@@ -48,6 +48,8 @@ export const addSkill = async (req, res) => {
         description: "skill sharing",
         post_id: posted._id,
         title: "",
+        visibility: posted.selected_visibility,
+        image: images[0],
       });
       return res
         .status(200)

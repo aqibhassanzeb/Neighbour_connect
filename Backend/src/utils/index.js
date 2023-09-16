@@ -16,3 +16,10 @@ export const calculateDistance = (lat1, lon1, lat2, lon2) => {
 export const isObjectEmpty = (obj) => {
   return Object.keys(obj).length === 0;
 };
+
+export const replacements = {
+  lost: "lost & found",
+  sell: "neighbor trade",
+  suspicious: "suspicious activity",
+  forum: "neighbor forum",
+};

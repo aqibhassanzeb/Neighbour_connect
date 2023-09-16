@@ -18,7 +18,10 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { Colors, Default, Fonts } from "../constants/styles";
 import Loader from "../components/loader";
 import { userGet, userGetbyId, userUpdate } from "../apis/apis";
+import { useSelector } from "react-redux";
 const MyAccountScreen = (props) => {
+  const { userInfo } = useSelector((state) => state.loanandfound);
+
   const { width, height } = Dimensions.get("window");
   const [cancelModal, setCancelModal] = useState(false);
   const [userData, setUserData] = useState("");
@@ -41,8 +44,10 @@ const MyAccountScreen = (props) => {
     return () =>
       BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [showFirstName, showLastName] = fullName.split(" ");
+  const [firstName, setFirstName] = useState(showFirstName);
+  const [lastName, setLastName] = useState(showLastName);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -56,7 +61,7 @@ const MyAccountScreen = (props) => {
   const handleSubmit = async () => {
     setCancelModals(false);
     try {
-      let payload = { name: firstName, last_name: lastName, _id: userData._id };
+      let payload = { name: `${firstName} ${lastName}`, _id: userData._id };
       setLoader(true);
       let verified = await userUpdate(payload);
       if (verified.status == 200) {
@@ -89,12 +94,13 @@ const MyAccountScreen = (props) => {
     try {
       setLoader(true);
       let paylaod = {};
-      paylaod._id = props.route.params.userData?._id;
+      paylaod._id = userInfo.user._id;
       let result = await userGetbyId(paylaod);
       if (result.status == 200) {
         setUserData(result.data.data);
-        setFirstName(result.data?.data?.name);
-        setLastName(result.data?.data?.last_name);
+        const nameParts = result.data?.data?.name.split(" ");
+        setFirstName(nameParts[0]);
+        setLastName(nameParts.slice(1).join(" "));
       }
     } catch (error) {
       console.log("error ;", error);
@@ -194,6 +200,15 @@ const MyAccountScreen = (props) => {
           onChangeText={setLastName}
         />
 
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            handleSave();
+          }}
+        >
+          <Text style={styles.buttonText}>Update Name</Text>
+        </TouchableOpacity>
+
         {/* Email Address */}
         <Text
           style={{
@@ -235,15 +250,6 @@ const MyAccountScreen = (props) => {
             <Text style={styles.buttonText}>Change Password</Text>
           </TouchableOpacity>
         </View>
-
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            handleSave();
-          }}
-        >
-          <Text style={styles.buttonText}>save</Text>
-        </TouchableOpacity>
       </View>
 
       <View style={styles.contain}>
@@ -262,9 +268,7 @@ const MyAccountScreen = (props) => {
           style={styles.deactivateButton}
           onPress={() => props.navigation.navigate("Deactivate")}
         >
-          <Text style={styles.deactivateButtonText}>
-            Deactivate Your Account
-          </Text>
+          <Text style={styles.deactivateButtonText}>Delete Account</Text>
         </TouchableOpacity>
       </View>
       <Modal
@@ -328,7 +332,10 @@ const MyAccountScreen = (props) => {
                 }}
               >
                 <TouchableOpacity
-                  onPress={() => props.navigation.navigate("Logins1")}
+                  onPress={() => {
+                    props.navigation.navigate("Logins1");
+                    setCancelModal(false);
+                  }}
                   style={{
                     ...Default.shadow,
                     backgroundColor: Colors.primary,
@@ -522,7 +529,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "white",
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: "700",
     textAlign: "center",
   },
