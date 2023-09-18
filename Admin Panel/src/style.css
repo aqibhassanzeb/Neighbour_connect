@@ -1,0 +1,24 @@
+.foo {
+  width: 100%;
+  margin: 0 auto;
+
+  /* Small Devices, Tablets */
+  @media only screen and (min-width : 768px) {
+    width: 75%;
+    background-color: "#005D7A";
+  }
+
+  /* Medium Devices, Desktops */
+  @media only screen and (min-width : 992px) {
+    width: 100%;
+  }
+}
+*{
+  -ms-overflow-style: none;
+}
+::-webkit-scrollbar {
+  display: none;
+}
+*{
+scroll-behavior: smooth;
+}

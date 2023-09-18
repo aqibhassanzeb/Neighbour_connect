@@ -184,6 +184,12 @@ export const forgotPassVerify = async (data) => {
   return result;
 };
 
+export const deleteAccount = async () => {
+  const id = await getId();
+  let result = await apiRequest("DELETE", `delete_account/${id}`);
+  return result;
+};
+
 // lost and found apis
 
 export const lostItemGetbyLoc = async (data) => {
@@ -756,5 +762,50 @@ export const addReport = async (data) => {
 // ALL SEARCH
 export const AllSearch = async (query) => {
   let result = await apiRequest("GET", `search?query=${query}`, null, null);
+  return result;
+};
+
+//Notifications
+export const getNotifications = async (query) => {
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "GET",
+    `user_notifications?${query}`,
+    null,
+    headersWithToken
+  );
+  return result;
+};
+
+export const getSettings = async () => {
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "GET",
+    "notification_settings",
+    null,
+    headersWithToken
+  );
+  return result;
+};
+
+export const updateNotifications = async (data) => {
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "PUT",
+    "update_settings",
+    data,
+    headersWithToken
+  );
+  return result;
+};
+
+export const deleteNotifications = async (data) => {
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "POST",
+    `deleted_notifications`,
+    data,
+    headersWithToken
+  );
   return result;
 };

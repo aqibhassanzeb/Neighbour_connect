@@ -28,9 +28,13 @@ import Stars from "react-native-stars";
 import Swiper from "react-native-swiper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Loader from "../components/loader";
-import { AllSearch, userGet, userGetbyId } from "../apis/apis";
+import { AllSearch, getSettings, userGet, userGetbyId } from "../apis/apis";
 import { useDispatch, useSelector } from "react-redux";
-import { handleSetUserinfo } from "../redux/loanandfoundSlice";
+import {
+  handleClearUserInfo,
+  handleSetUserinfo,
+} from "../redux/loanandfoundSlice";
+import { setSettings } from "../redux/notificationSlice";
 
 const { width, height } = Dimensions.get("window");
 
@@ -85,10 +89,9 @@ const HomeScreen = ({ navigation, route }) => {
 
   const handleLogout = async () => {
     try {
-      // dispatch(handleSetUserinfo({}));
-      // setUserData("")
-      // await AsyncStorage.removeItem("userData");
-      await AsyncStorage.clear();
+      dispatch(handleClearUserInfo());
+      await AsyncStorage.removeItem("userDatainfo");
+      await AsyncStorage.removeItem("userData");
       setCancelModal(false);
       navigation.navigate("Logins1");
     } catch (error) {
@@ -151,6 +154,24 @@ const HomeScreen = ({ navigation, route }) => {
         return;
     }
   };
+
+  const handleGetSettings = async () => {
+    try {
+      let result = await getSettings();
+      console.log(result.data);
+      if (result.status == 200) {
+        dispatch(setSettings({ settings: result.data }));
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  };
+
+  useEffect(() => {
+    handleGetSettings();
+  }, []);
+
   return (
     <SafeAreaView
       style={{
@@ -159,7 +180,7 @@ const HomeScreen = ({ navigation, route }) => {
         paddingTop: StatusBar.currentHeight,
       }}
     >
-      {loader && <Loader />}
+      {/* {loader && <Loader />} */}
       <View
         style={{
           backgroundColor: Colors.primary,

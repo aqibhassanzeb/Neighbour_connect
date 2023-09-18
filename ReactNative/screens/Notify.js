@@ -14,81 +14,77 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import { SwipeListView } from "react-native-swipe-list-view";
 import SnackbarToast from "../components/snackbarToast";
+import { useFocusEffect } from "@react-navigation/native";
+import { deleteNotifications, getNotifications } from "../apis/apis";
+import moment from "moment";
+import Loader from "../components/loader";
+import { useSelector } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const NotificationScreen = ({ navigation }) => {
+  const { queryParams } = useSelector((state) => state.notifications);
+
   const { t, i18n } = useTranslation();
+
+  const [notificationList, setNotificationList] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [notificationToast, setNotificationToast] = useState(false);
+  const [listData, setListData] = useState([]);
+  const [deletedNotification, setDeletedNotification] = useState("");
+  const [query, setQuery] = useState("");
 
   const isRtl = i18n.dir() == "rtl";
 
   function tr(key) {
     return t(`notificationScreen:${key}`);
   }
+
   const backAction = () => {
     navigation.goBack();
     return true;
   };
+
+  // useEffect(() => {
+  //   const queryParams = [
+  //     lost && "lost=true",
+  //     suspicious && "suspicious=true",
+  //     sell && "sell=true",
+  //     forum && "forum=true",
+  //   ]
+  //     .filter(Boolean)
+  //     .join("&");
+
+  //   setQuery(queryParams);
+  // }, []);
+
   useEffect(() => {
     BackHandler.addEventListener("hardwareBackPress", backAction);
 
     return () =>
       BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
-  const [notificationToast, setNotificationToast] = useState(false);
 
   const onToggleSnackBarNotificationToast = () => setNotificationToast(false);
 
-  const notificationList = [
-    {
-      key: "1",
-      title: "Lost & Found",
-      description: "Pink Bag founded on the road.",
-      status: "2 min ago",
-      image: require("../assets/images/bag.jpg"),
-    },
-    {
-      key: "2",
-      title: "Lost & Found",
-      description: "Wallet lost on the road.",
-      status: "5 min ago",
-      image: require("../assets/images/wallets.jpg"),
-    },
-    {
-      key: "3",
-      title: "Suspicious Activity",
-      description: "A car just pulled up in front of the building.",
-      status: "6 min ago",
-      image: require("../assets/images/scar.jpg"),
-    },
-    {
-      key: "4",
-      title: "Lost & Found",
-      description: "Keys founded on road.",
-      status: "10 min ago",
-      image: require("../assets/images/key.jpg"),
-    },
-    {
-      key: "5",
-      title: "Suspicious Activity",
-      description:
-        "I noticed a man wearing a mask and gloves walking around the neighborhoodl.",
-      status: "5 hours ago",
-      image: require("../assets/images/sper.jpg"),
-    },
-  ];
   const rowTranslateAnimatedValues = {};
+
   notificationList.forEach((_, i) => {
-    rowTranslateAnimatedValues[`${i}`] = new Animated.Value(1);
+    rowTranslateAnimatedValues[_._id] = new Animated.Value(1);
   });
 
-  const [listData, setListData] = useState(
-    notificationList.map((NotificationItem, i) => ({
-      key: `${i}`,
-      title: NotificationItem.title,
-      description: NotificationItem.description,
-      status: NotificationItem.status,
-      image: NotificationItem.image,
-    }))
-  );
+  const formateData = notificationList.map((not) => {
+    return {
+      key: not._id,
+      description: not.title,
+      title: not.description,
+      image: not.image,
+      status: moment(not?.createdAt).fromNow(),
+    };
+  });
+
+  useEffect(() => {
+    setListData(formateData);
+  }, [notificationList]);
 
   const onSwipeValueChange = (swipeData) => {
     const { key, value } = swipeData;
@@ -103,39 +99,29 @@ const NotificationScreen = ({ navigation }) => {
         newData.splice(prevIndex, 1);
         setListData(newData);
         setNotificationToast(true);
+        setDeletedNotification(key);
       });
     }
   };
 
   const renderItem = (data) => {
-    // Inside your component or function
-    const handlePress = (item) => {
-      switch (data.item.key) {
-        case "0":
-          navigation.navigate("Losted", {
-            title: "Losted",
-          });
-          break;
-        case "1":
-          navigation.navigate("wallet", {
-            title: "Losted",
-          });
-          break;
-        case "2":
-          navigation.navigate("Sus");
-          break;
-        case "3":
-          navigation.navigate("key", {
-            title: "Losted",
-          });
-          break;
-        case "4":
-          navigation.navigate("Sus");
-          break;
+    const handleNavigation = (value) => {
+      switch (value) {
+        case "lost & found":
+          return "lostTabt";
+        case "suspicious activity":
+          return "Sus";
+        case "neighbor forum":
+          return "Form";
+        case "skill sharing":
+          return "SkillSharing";
+        case "neighbor trade":
+          return "BuySell";
         default:
-          break;
+          return;
       }
     };
+
     return (
       <View style={{ backgroundColor: Colors.extraLightGrey }}>
         <Animated.View
@@ -148,16 +134,18 @@ const NotificationScreen = ({ navigation }) => {
             marginBottom: Default.fixPadding * 2,
             backgroundColor: Colors.white,
             alignItems: "center",
-            ...{
-              height: rowTranslateAnimatedValues[data.item.key].interpolate({
-                inputRange: [0, 1],
-                outputRange: [0, 100],
-              }),
-            },
+            // ...{
+            //   height: rowTranslateAnimatedValues[data.item.key].interpolate({
+            //     inputRange: [0, 1],
+            //     outputRange: [0, 100],
+            //   }),
+            // },
           }}
         >
           <TouchableOpacity
-            onPress={() => handlePress(data.item.TouchableOpacity)} // Add your press event handler
+            onPress={() =>
+              navigation.navigate(handleNavigation(data.item.title))
+            } // Add your press event handler
             style={{
               flex: 1,
               justifyContent: "center",
@@ -178,7 +166,7 @@ const NotificationScreen = ({ navigation }) => {
               }}
             >
               <Image
-                source={data.item.image}
+                source={{ uri: data.item.image }}
                 style={{ height: 28, width: 28 }}
               />
             </View>
@@ -193,7 +181,11 @@ const NotificationScreen = ({ navigation }) => {
             >
               <Text
                 numberOfLines={1}
-                style={{ ...Fonts.SemiBold16black, overflow: "hidden" }}
+                style={{
+                  ...Fonts.SemiBold16black,
+                  overflow: "hidden",
+                  textTransform: "capitalize",
+                }}
               >
                 {data.item.title}
               </Text>
@@ -227,6 +219,43 @@ const NotificationScreen = ({ navigation }) => {
     );
   };
 
+  const handleGetNotifications = async () => {
+    try {
+      setIsLoading(true);
+      console.log(queryParams);
+      let result = await getNotifications(queryParams);
+      if (result.status == 200) {
+        setNotificationList(result.data);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      handleGetNotifications();
+    }, [queryParams])
+  );
+
+  const handleDelete = async () => {
+    try {
+      if (deletedNotification.length > 0) {
+        await deleteNotifications({
+          notification_id: deletedNotification,
+        });
+      }
+    } catch (error) {
+      console.log("Error While Deleting", error);
+    }
+  };
+
+  useEffect(() => {
+    handleDelete();
+  }, [deletedNotification]);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       <View
@@ -247,8 +276,8 @@ const NotificationScreen = ({ navigation }) => {
           {tr("Notifications")}
         </Text>
       </View>
-
-      {listData.length === 0 ? (
+      {isLoading && <Loader />}
+      {notificationList.length === 0 ? (
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >

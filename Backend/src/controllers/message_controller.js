@@ -3,7 +3,6 @@ import { v2 as cloudinary } from "cloudinary";
 import { User } from "../models/user.js";
 
 export const postMessage = async (req, res) => {
-  console.log(req.body);
   try {
     const { senderId, recepientId, messageType, messageText } = req.body;
 

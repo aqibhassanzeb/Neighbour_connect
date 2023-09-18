@@ -8,17 +8,24 @@ import {
   SafeAreaView,
   Text,
   TouchableOpacity,
+  Dimensions,
+  Modal,
 } from "react-native";
 
 import { useTranslation } from "react-i18next";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 import { Colors, Default, Fonts } from "../constants/styles";
+import { deleteAccount } from "../apis/apis";
+
 const MyAccountScreen = (props) => {
   const { t, i18n } = useTranslation();
+  const { width, height } = Dimensions.get("window");
 
   const [dropdownOpens, setDropdownOpens] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState("Select reason");
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [cancelModal, setCancelModal] = useState(false);
 
   const handleOptionSelects = (option) => {
     setSelectedOptions(option);
@@ -70,6 +77,22 @@ const MyAccountScreen = (props) => {
     // ...
   };
 
+  async function handleDelete() {
+    try {
+      setCancelModal(true);
+      setDeleteLoading(true);
+      const result = await deleteAccount();
+      console.log(result);
+      if (result.status == 200) {
+        props.navigation.navigate("Logins1");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setDeleteLoading(false);
+      setCancelModal(false);
+    }
+  }
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       <View
@@ -94,7 +117,7 @@ const MyAccountScreen = (props) => {
             marginHorizontal: Default.fixPadding * 1.2,
           }}
         >
-          Deactivate Account
+          Delete Account
         </Text>
       </View>
       <View style={styles.container}>
@@ -110,18 +133,83 @@ const MyAccountScreen = (props) => {
           style={styles.textarea}
           multiline
           numberOfLines={4}
-          placeholder="Enter your suggestions"
+          placeholder="Enter your suggestions (Optional)"
           value={text}
           onChangeText={handleChangeText}
         />
 
         <TouchableOpacity
+          disabled={deleteLoading}
           style={styles.button}
-          onPress={() => props.navigation.navigate("Registers1")}
+          onPress={() => handleDelete()}
         >
-          <Text style={styles.buttonText}>Deactivate</Text>
+          <Text style={styles.buttonText}>Delete Permanently</Text>
         </TouchableOpacity>
       </View>
+      <Modal
+        animationType="fade"
+        // transparent={true}
+        visible={cancelModal}
+        // onRequestClose={() => setCancelModal(false)}
+      >
+        <TouchableOpacity
+          activeOpacity={1}
+          // onPressOut={() => setCancelModal(false)}
+          style={{ flex: 1 }}
+        >
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: Colors.transparentBlack,
+            }}
+          >
+            <View
+              style={{
+                width: width * 0.8,
+                backgroundColor: Colors.white,
+                borderRadius: 10,
+                justifyContent: "center",
+                ...Default.shadow,
+              }}
+            >
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: Default.fixPadding * 2,
+                }}
+              >
+                <Text
+                  style={{
+                    ...Fonts.SemiBold18primary,
+                    marginTop: Default.fixPadding,
+                  }}
+                >
+                  {"Please wait while we deleting your account"}
+                </Text>
+                <Text
+                  numberOfLines={2}
+                  style={{
+                    ...Fonts.SemiBold15black,
+                    textAlign: "center",
+                    maxWidth: "90%",
+                    marginTop: Default.fixPadding * 2,
+                    overflow: "hidden",
+                  }}
+                ></Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: isRtl ? "row-reverse" : "row",
+                  marginTop: Default.fixPadding * 2,
+                }}
+              ></View>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </SafeAreaView>
   );
 };

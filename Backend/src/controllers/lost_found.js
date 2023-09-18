@@ -50,10 +50,13 @@ export const lostandfound_Create = async (req, res) => {
         description: "lost & found",
         post_id: item._id,
         title: item.title,
+        visibility: item.visibility,
+        image: images[0],
       });
       res.status(200).json({ message: "uploaded successfully" });
     }
   } catch (error) {
+    console.error(error);
     res.status(422).json({ error: "something went wrong!" });
   }
 };

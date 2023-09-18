@@ -52,6 +52,8 @@ export const addWatch = async (req, res) => {
         description: "suspicious activity",
         post_id: posted._id,
         title: posted.title,
+        visibility: posted.selected_visibility,
+        image: media[0].source,
       });
       return res
         .status(200)

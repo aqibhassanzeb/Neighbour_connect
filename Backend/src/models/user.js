@@ -5,9 +5,6 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    last_name: {
-      type: String,
-    },
     status: {
       type: String,
       required: true,
