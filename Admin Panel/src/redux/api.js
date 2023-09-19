@@ -45,10 +45,10 @@ export const api = createApi({
       providesTags: ["User"],
     }),
     resetPassword: build.mutation({
-      query: ({ token, data }) => {
+      query: (data) => {
         return {
-          url: `/user/reset_password/${token}`,
-          method: "POST",
+          url: `/reset_password`,
+          method: "PUT",
           body: data,
         };
       },

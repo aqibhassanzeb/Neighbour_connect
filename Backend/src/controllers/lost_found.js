@@ -126,7 +126,7 @@ export const lostandfound_Update = async (req, res) => {
   }
 };
 export const lostandfound_Get = async (req, res) => {
-  let filter = { isActive: true };
+  let filter = { is_active: true };
   if (req.query._id) {
     filter._id = req.query._id.split(",");
   }
@@ -142,7 +142,7 @@ export const lostandfound_Get = async (req, res) => {
   if (req.query.createdBy) {
     filter.createdBy = req.query.createdBy;
   }
-
+  console.log({ filter });
   try {
     const result = await lostandFound
       .find(filter)
