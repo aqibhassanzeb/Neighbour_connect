@@ -199,7 +199,7 @@ export const userPassUpdate = async (req, res) => {
 };
 
 export const userGet = async (req, res) => {
-  let filter = { isActive: true };
+  let filter = { isActive: true, status: "user" };
   if (req.query._id) {
     filter._id = req.query._id.split(",");
   }

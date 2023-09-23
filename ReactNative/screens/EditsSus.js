@@ -42,7 +42,7 @@ const PayPalScreen = ({ navigation, route }) => {
   const [oldImages, setOldImages] = useState(data.media);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(data.category.name);
+  const [selectedOption, setSelectedOption] = useState(data.category);
   const [dropdownOpensd, setDropdownOpensd] = useState(false);
   const [selectedOptionsd, setSelectedOptionsd] = useState(
     data.selected_visibility
@@ -442,7 +442,7 @@ const PayPalScreen = ({ navigation, route }) => {
                         fontSize: 16,
                       }}
                     >
-                      {selectedOption}
+                      {selectedOption.name}
                     </Text>
                     <View
                       style={{

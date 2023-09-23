@@ -203,7 +203,7 @@ const ChatScreen = (props) => {
                       name="ellipsis-vertical"
                       size={24}
                       color="black"
-                      // marginLeft={179}
+                      marginLeft={179}
                       marginTop={10}
                     />
                   </TouchableOpacity>

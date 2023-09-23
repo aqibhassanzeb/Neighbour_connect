@@ -5,7 +5,11 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import OTPInput, { ResendOTP } from "otp-input-react";
 import { toast } from "react-hot-toast";
-import { useResetPasswordMutation } from "../../redux/api";
+import {
+  useResetPasswordMutation,
+  useUserUpdateMutation,
+  useVerifyOTPMutation,
+} from "../../redux/api";
 
 const useStyles = makeStyles({
   root: {
@@ -42,10 +46,13 @@ const useStyles = makeStyles({
 
 const ForgotPassword = () => {
   const [sendCode, codeResponse] = useResetPasswordMutation();
+  const [verifyOTP, verifyResp] = useVerifyOTPMutation();
+  const [updateUser, updateResp] = useUserUpdateMutation();
 
   const classes = useStyles();
   const history = useNavigate();
   const [OTP, setOTP] = useState("");
+  const [userId, setUserId] = useState("");
   const [isForgot, setForgot] = useState(false);
   const [type, setType] = useState("");
   const [formValues, setFormValues] = useState({
@@ -70,13 +77,22 @@ const ForgotPassword = () => {
     e.preventDefault();
 
     if (!formValues.email.value) {
-      return toast.error("Please enter an email address");
+      return toast.error("Please enter an email address", {
+        style: {
+          textTransform: "capitalize",
+        },
+      });
     } else {
       sendCode({ email: formValues.email.value })
         .then((res) => {
           if (res.error) {
-            toast.error(res.error.data.error);
+            toast.error(res.error.data.error, {
+              style: {
+                textTransform: "capitalize",
+              },
+            });
           } else if (res.data.message) {
+            setUserId(res.data.user._id);
             setType("forgot");
             setForgot(!isForgot);
           }
@@ -89,11 +105,50 @@ const ForgotPassword = () => {
     if (!OTP && OTP.length < 4) {
       return toast.error("Please enter a vlid OTP");
     } else {
-      setType("password");
+      verifyOTP({ resetCode: OTP, _id: userId })
+        .then((res) => {
+          if (res.error) {
+            toast.error(res.error.data.error, {
+              style: {
+                textTransform: "capitalize",
+              },
+            });
+          } else if (res.data.message) {
+            setType("password");
+          }
+        })
+        .catch((err) => console.log(err));
     }
   };
 
-  const handleSetPassword = () => {};
+  const handleSetPassword = (e) => {
+    e.preventDefault();
+    if (!formValues.password.value || !formValues.confirmPassword.value) {
+      toast.error(`Please fill both fields`);
+    } else if (formValues.password.value !== formValues.confirmPassword.value) {
+      toast.error(`Passwords must be same`);
+    } else if (
+      formValues.password.value === formValues.confirmPassword.value &&
+      formValues.password.value.length < 6
+    ) {
+      toast.error(`Weak Password`);
+    } else {
+      updateUser({ id: userId, data: { password: formValues.password.value } })
+        .then((res) => {
+          if (res.error) {
+            toast.error(res.error.data.error, {
+              style: {
+                textTransform: "capitalize",
+              },
+            });
+          } else if (res.data.message) {
+            toast.success("Password Updated Successfuly");
+            history("/");
+          }
+        })
+        .catch((err) => console.log(err));
+    }
+  };
 
   const handleInput = (e) => {
     const { name, value } = e.target;
@@ -231,9 +286,15 @@ const ForgotPassword = () => {
                   borderRadius: 3,
                 }}
                 variant="contained"
-                style={{ backgroundColor: "#005D7A" }}
+                style={{
+                  backgroundColor: verifyResp.isLoading ? "white" : "#005D7A",
+                }}
               >
-                Verify Otp
+                {verifyResp.isLoading ? (
+                  <CircularProgress style={{ color: "#005D7A" }} size={25} />
+                ) : (
+                  " Verify Otp"
+                )}
               </Button>
             </Box>
           )}
@@ -249,12 +310,6 @@ const ForgotPassword = () => {
                   fullWidth
                   className={classes.input}
                   onChange={handleInput}
-                  error={type === "password" && formValues.password.error}
-                  helperText={
-                    type === "password" &&
-                    formValues.password.error &&
-                    formValues.password.errorMessage
-                  }
                   value={formValues.password.value}
                   margin="normal"
                   type={"password"}
@@ -286,9 +341,15 @@ const ForgotPassword = () => {
                     marginLeft: "35%",
                   }}
                   variant="contained"
-                  style={{ backgroundColor: "#005D7A" }}
+                  style={{
+                    backgroundColor: updateResp.isLoading ? "white" : "#005D7A",
+                  }}
                 >
-                  Done
+                  {updateResp.isLoading ? (
+                    <CircularProgress style={{ color: "#005D7A" }} size={25} />
+                  ) : (
+                    " Done"
+                  )}
                 </Button>
               </form>
             </Box>

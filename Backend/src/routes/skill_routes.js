@@ -6,6 +6,7 @@ import { protect } from "../middleware/user_middleware.js";
 import {
   addSkill,
   deleteSkill,
+  getAllSkills,
   getSkillsByCat,
   getSkillsByUser,
   increaseEndorse,
@@ -42,6 +43,7 @@ routes.put("/update_images/:_id", upload.array("images", 3), updateImages);
 routes.delete("/delete_skill/:_id", deleteSkill);
 routes.get("/skill_category/:_id", protect, getSkillsByCat);
 routes.get("/skills/:user_id", getSkillsByUser);
+routes.get("/all_skills", getAllSkills);
 
 // endorse
 routes.post("/endorse/:_id", protect, increaseEndorse);

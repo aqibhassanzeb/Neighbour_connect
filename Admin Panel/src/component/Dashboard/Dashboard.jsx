@@ -48,6 +48,8 @@ import EventSeatRoundedIcon from "@mui/icons-material/EventSeatRounded";
 import Diversity1RoundedIcon from "@mui/icons-material/Diversity1Rounded";
 import ContentPasteOffOutlinedIcon from "@mui/icons-material/ContentPasteOffOutlined";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+
 // chart data
 let data = [
   { month: "Jan", Accounts: 35 },
@@ -210,6 +212,7 @@ const Search = styled("div")(({ theme }) => ({
 }));
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { name, image } = useSelector((state) => state.authReducer.activeUser);
 
   const handleShowPost = () => {
     // Navigate to the desired page
@@ -284,10 +287,10 @@ const Dashboard = () => {
                 sx={{ position: "relative", cursor: "pointer" }}
                 onClick={(e) => setBasicMenu(true)}
               >
-                <Avatar alt="Pankaj" src={RecentMessage[2].image} />
+                <Avatar alt="Pankaj" src={image} />
               </ListItemAvatar>
 
-              <ListItemText primary="Nisa Waheed" />
+              <ListItemText primary={name} />
             </ListItem>
           </Paper>
 

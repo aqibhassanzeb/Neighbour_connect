@@ -207,9 +207,9 @@ export const getAllItems = async (req, res) => {
   let { latitude, longitude } = address;
 
   try {
-    const items = await Sell.find()
+    const items = await Sell.find({ is_active: true })
       .sort({ createdAt: -1 })
-      .populate("posted_by", "name address image")
+      .populate("posted_by", "name email address image")
       .populate("category");
 
     const filtered_array = items.filter((item) => {

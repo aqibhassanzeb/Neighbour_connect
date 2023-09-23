@@ -142,7 +142,6 @@ export const lostandfound_Get = async (req, res) => {
   if (req.query.createdBy) {
     filter.createdBy = req.query.createdBy;
   }
-  console.log({ filter });
   try {
     const result = await lostandFound
       .find(filter)

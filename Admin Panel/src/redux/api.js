@@ -12,7 +12,7 @@ export const api = createApi({
     },
   }),
   reducerPath: "neighbour-api",
-  tagTypes: ["User", "CC", "BC", "DC", "MC", "DVC"],
+  tagTypes: ["User", "Watch", "LANDF", "Skill", "Sell", "Forum"],
   endpoints: (build) => ({
     Register: build.mutation({
       query: (data) => {
@@ -34,11 +34,11 @@ export const api = createApi({
       },
       providesTags: ["User"],
     }),
-    forgetPassword: build.mutation({
+    verifyOTP: build.mutation({
       query: (data) => {
         return {
-          url: "/user/forget_password",
-          method: "POST",
+          url: "/reset_passcode",
+          method: "PUT",
           body: data,
         };
       },
@@ -54,335 +54,132 @@ export const api = createApi({
       },
       providesTags: ["User"],
     }),
-    getAllUsers: build.query({
-      query: () => "/user/users",
-      providesTags: ["User"],
-    }),
-    updateProfile: build.mutation({
+    userUpdate: build.mutation({
       query: (data) => {
         return {
-          url: `user/user_update/${data.id}`,
+          url: `/user_update/${data.id}`,
           method: "PUT",
           body: data.data,
         };
       },
       invalidatesTags: ["User"],
     }),
-    postCC: build.mutation({
-      query: (data) => {
-        return {
-          url: "/character-certificate",
-          method: "POST",
-          body: data,
-        };
-      },
-      invalidatesTags: ["CC"],
+    getAllUsers: build.query({
+      query: () => "/user_get",
+      providesTags: ["User"],
     }),
-    getAllCC: build.query({
+    getAllWatches: build.query({
       query: () => {
         return {
-          url: "/character-certificate",
+          url: "/all_watch",
           method: "GET",
         };
       },
-      providesTags: ["CC"],
+      providesTags: ["Watch"],
     }),
-    approveCC: build.mutation({
+    updateWatch: build.mutation({
       query: (param) => {
         return {
-          url: `/character-certificate/approve/${param}`,
-          method: "PATCH",
+          url: `/update_watch/${param.id}`,
+          method: "PUT",
+          body: param.data,
         };
       },
-      invalidatesTags: ["CC"],
+      invalidatesTags: ["Watch"],
     }),
-    rejectCC: build.mutation({
-      query: (param) => {
-        return {
-          url: `/character-certificate/reject/${param}`,
-          method: "PATCH",
-        };
-      },
-      invalidatesTags: ["CC"],
-    }),
-    getCCByUser: build.query({
-      query: (id) => {
-        return {
-          url: `/character-certificate-by-user/${id}`,
-          method: "GET",
-        };
-      },
-      providesTags: ["CC"],
-    }),
-    postBC: build.mutation({
-      query: (data) => {
-        return {
-          url: "/birth-certificate",
-          method: "POST",
-          body: data,
-        };
-      },
-      invalidatesTags: ["BC"],
-    }),
-    getAllBC: build.query({
+    getAllLostAndFound: build.query({
       query: () => {
         return {
-          url: "/birth-certificate",
+          url: "/lostandfound",
           method: "GET",
         };
       },
-      providesTags: ["BC"],
+      providesTags: ["LANDF"],
     }),
-    approveBC: build.mutation({
+    updateLostAndFound: build.mutation({
       query: (param) => {
         return {
-          url: `/birth-certificate/approve/${param}`,
-          method: "PATCH",
+          url: `/lostandfound_update/${param.id}`,
+          method: "PUT",
+          body: param.data,
         };
       },
-      invalidatesTags: ["BC"],
+      invalidatesTags: ["LANDF"],
     }),
-    rejectBC: build.mutation({
-      query: (param) => {
-        return {
-          url: `/birth-certificate/reject/${param}`,
-          method: "PATCH",
-        };
-      },
-      invalidatesTags: ["BC"],
-    }),
-    getBCByUser: build.query({
-      query: (id) => {
-        return {
-          url: `/birth-certificate-by-user/${id}`,
-          method: "GET",
-        };
-      },
-      providesTags: ["BC"],
-    }),
-    postDC: build.mutation({
-      query: (data) => {
-        console.log(data);
-        return {
-          url: "/death-certificate",
-          method: "POST",
-          body: data,
-        };
-      },
-      invalidatesTags: ["DC"],
-    }),
-    getAllDC: build.query({
+    getAllSkills: build.query({
       query: () => {
         return {
-          url: "/death-certificate",
+          url: "/all_skills",
           method: "GET",
         };
       },
-      providesTags: ["DC"],
+      providesTags: ["Skill"],
     }),
-    approveDC: build.mutation({
+    updateSkills: build.mutation({
       query: (param) => {
         return {
-          url: `/death-certificate/approve/${param}`,
-          method: "PATCH",
+          url: `/update_skill/${param.id}`,
+          method: "PUT",
+          body: param.data,
         };
       },
-      invalidatesTags: ["DC"],
+      invalidatesTags: ["Skill"],
     }),
-    rejectDC: build.mutation({
-      query: (param) => {
-        return {
-          url: `/death-certificate/reject/${param}`,
-          method: "PATCH",
-        };
-      },
-      invalidatesTags: ["DC"],
-    }),
-    getDCByUser: build.query({
-      query: (id) => {
-        return {
-          url: `/death-certificate-by-user/${id}`,
-          method: "GET",
-        };
-      },
-      providesTags: ["DC"],
-    }),
-    postDMC: build.mutation({
-      query: (data) => {
-        return {
-          url: "/domicile-certificate",
-          method: "POST",
-          body: data,
-        };
-      },
-      invalidatesTags: ["DMC"],
-    }),
-    getAllDMC: build.query({
+    getAllSells: build.query({
       query: () => {
         return {
-          url: "/domicile-certificate",
+          url: "/all_items",
           method: "GET",
         };
       },
-      providesTags: ["DMC"],
+      providesTags: ["Sell"],
     }),
-    approveDMC: build.mutation({
+    updateSells: build.mutation({
       query: (param) => {
         return {
-          url: `/domicile-certificate/approve/${param}`,
-          method: "PATCH",
+          url: `/update_sell/${param.id}`,
+          method: "PUT",
+          body: param.data,
         };
       },
-      invalidatesTags: ["DMC"],
+      invalidatesTags: ["Sell"],
     }),
-    rejectDMC: build.mutation({
-      query: (param) => {
-        return {
-          url: `/domicile-certificate/reject/${param}`,
-          method: "PATCH",
-        };
-      },
-      invalidatesTags: ["DMC"],
-    }),
-    getDMCByUser: build.query({
-      query: (id) => {
-        return {
-          url: `/domicile-certificate-by-user/${id}`,
-          method: "GET",
-        };
-      },
-      providesTags: ["DMC"],
-    }),
-    postMC: build.mutation({
-      query: (data) => {
-        return {
-          url: "/marriage-certificate",
-          method: "POST",
-          body: data,
-        };
-      },
-      invalidatesTags: ["MC"],
-    }),
-    getAllMC: build.query({
+    getAllForums: build.query({
       query: () => {
         return {
-          url: "/marriage-certificate",
+          url: "/all_topics",
           method: "GET",
         };
       },
-      providesTags: ["MC"],
+      providesTags: ["Forum"],
     }),
-    approveMC: build.mutation({
+    updateForum: build.mutation({
       query: (param) => {
         return {
-          url: `/marriage-certificate/approve/${param}`,
-          method: "PATCH",
+          url: `/update_topic/${param.id}`,
+          method: "PUT",
+          body: param.data,
         };
       },
-      invalidatesTags: ["MC"],
-    }),
-    rejectMC: build.mutation({
-      query: (param) => {
-        return {
-          url: `/marriage-certificate/reject/${param}`,
-          method: "PATCH",
-        };
-      },
-      invalidatesTags: ["MC"],
-    }),
-    getMCByUser: build.query({
-      query: (id) => {
-        return {
-          url: `/marriage-certificate-by-user/${id}`,
-          method: "GET",
-        };
-      },
-      providesTags: ["MC"],
-    }),
-    postDVC: build.mutation({
-      query: (data) => {
-        return {
-          url: "/divorce-certificate",
-          method: "POST",
-          body: data,
-        };
-      },
-      invalidatesTags: ["DVC"],
-    }),
-    getAllDVC: build.query({
-      query: () => {
-        return {
-          url: "/divorce-certificate",
-          method: "GET",
-        };
-      },
-      providesTags: ["DVC"],
-    }),
-    approveDVC: build.mutation({
-      query: (param) => {
-        return {
-          url: `/divorce-certificate/approve/${param}`,
-          method: "PATCH",
-        };
-      },
-      invalidatesTags: ["DVC"],
-    }),
-    rejectDVC: build.mutation({
-      query: (param) => {
-        return {
-          url: `/divorce-certificate/reject/${param}`,
-          method: "PATCH",
-        };
-      },
-      invalidatesTags: ["DVC"],
-    }),
-    getDVCByUser: build.query({
-      query: (id) => {
-        return {
-          url: `/divorce-certificate-by-user/${id}`,
-          method: "GET",
-        };
-      },
-      providesTags: ["DVC"],
+      invalidatesTags: ["Forum"],
     }),
   }),
 });
 
 export const {
-  useRegisterMutation,
   useLoginMutation,
-  usePostDMCMutation,
-  usePostMCMutation,
-  usePostDVCMutation,
-  usePostCCMutation,
-  useGetAllCCQuery,
-  useApproveCCMutation,
-  useRejectCCMutation,
-  useGetCCByUserQuery,
-  usePostBCMutation,
-  usePostDCMutation,
-  useGetBCByUserQuery,
-  useGetAllBCQuery,
-  useRejectBCMutation,
-  useApproveBCMutation,
-  useGetDCByUserQuery,
-  useGetAllDCQuery,
-  useRejectDCMutation,
-  useApproveDCMutation,
-  useGetDMCByUserQuery,
-  useGetAllDMCQuery,
-  useRejectDMCMutation,
-  useApproveDMCMutation,
-  useGetMCByUserQuery,
-  useGetAllMCQuery,
-  useRejectMCMutation,
-  useApproveMCMutation,
-  useGetDVCByUserQuery,
-  useGetAllDVCQuery,
-  useRejectDVCMutation,
-  useApproveDVCMutation,
-  useForgetPasswordMutation,
   useResetPasswordMutation,
+  useVerifyOTPMutation,
+  useUserUpdateMutation,
   useGetAllUsersQuery,
-  useUpdateProfileMutation,
+  useGetAllWatchesQuery,
+  useUpdateWatchMutation,
+  useGetAllLostAndFoundQuery,
+  useUpdateLostAndFoundMutation,
+  useGetAllSkillsQuery,
+  useUpdateSkillsMutation,
+  useGetAllSellsQuery,
+  useUpdateSellsMutation,
+  useGetAllForumsQuery,
+  useUpdateForumMutation,
 } = api;

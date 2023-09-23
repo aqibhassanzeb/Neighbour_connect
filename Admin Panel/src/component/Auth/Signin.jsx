@@ -108,7 +108,7 @@ const Signin = () => {
       response?.isSuccess &&
       response?.data?.user?.status === "admin"
     ) {
-      dispatch(setActiveUser(response?.data?.data?.user));
+      dispatch(setActiveUser(response?.data?.user));
       dispatch(setToken(response?.data?.token));
       toast.success("Login Successful");
       history("/dashboard");
