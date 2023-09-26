@@ -2,14 +2,25 @@ import mongoose from "mongoose";
 
 const reportSchema = new mongoose.Schema(
   {
-    report_by: {
+    reported_post: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      refPath: "post_type",
+      required: true,
     },
-    post_id: String,
-    module: String,
-    report_type: String,
-    optional_note: String,
+    post_type: {
+      type: String,
+      enum: [
+        "lost_found",
+        "sell",
+        "neighbour-watch",
+        "skill",
+        "neighbour-forum",
+      ],
+      required: true,
+    },
+    reports: [
+      { email: String, reason: String, date: String, optional_note: String },
+    ],
   },
   {
     timestamps: true,

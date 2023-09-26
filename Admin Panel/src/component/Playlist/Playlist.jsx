@@ -18,32 +18,16 @@ import {
   Dialog,
   DialogActions,
   DialogTitle,
+  CircularProgress,
 } from "@mui/material";
 import { makeStyles } from "@material-ui/core";
 import { useNavigate } from "react-router-dom";
 
 import "../Option/Option.css";
 import SearchIcon from "@mui/icons-material/Search";
-function ConfirmationDialog({ open, onClose, onConfirm }) {
-  const handleConfirm = () => {
-    onConfirm();
-    onClose();
-  };
-
-  return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Are you sure you want to perform this action?</DialogTitle>
-      <DialogActions>
-        <Button onClick={handleConfirm} color="primary">
-          Confirm
-        </Button>
-        <Button onClick={onClose} color="error">
-          Cancel
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-}
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { useGetAllUsersQuery, useUserUpdateMutation } from "../../redux/api";
+import moment from "moment";
 
 const columns = [
   { id: "name", label: "Name", minWidth: 80, option: { order: true } },
@@ -72,48 +56,65 @@ const columns = [
   },
 ];
 
-function handleSuspend(rows) {
-  // Logic for suspending a resident
-}
-
-function handleRemove(rows) {
-  // Logic for removing a resident
-}
-function ActionsColumn({ row }) {
-  const [open, setOpen] = useState(false);
-
-  const navigate = useNavigate();
-
-  const handleConfirmsations = () => {
-    setOpen(true);
-  };
-
-  const handleSuspendssConfirm = () => {
-    handleSuspend(rows); // Call your suspend logic here
-    setOpen(false);
-  };
-
-  const handleRemoveConfirm = () => {
-    handleRemove(rows); // Call your remove logic here
-    setOpen(false);
+function ConfirmationDialog({ open, onClose, onConfirm }) {
+  const handleConfirm = () => {
+    onConfirm();
+    onClose();
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "row" }}>
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Are you sure you want to perform this action?</DialogTitle>
+      <DialogActions>
+        <Button onClick={handleConfirm} color="primary">
+          Confirm
+        </Button>
+        <Button onClick={onClose} color="error">
+          Cancel
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+function ActionsColumn({ row }) {
+  const [open, setOpen] = React.useState(false);
+  const [updateUser, updateResp] = useUserUpdateMutation();
+
+  const navigate = useNavigate();
+
+  const handleConfirmation = () => {
+    setOpen(true);
+  };
+
+  const handleShowPost = () => {
+    navigate("/posts");
+  };
+
+  const handleRemoveConfirm = () => {
+    handleRemove(row); // Call your remove logic here
+    setOpen(false);
+  };
+
+  function handleRemove(row) {
+    updateUser({ id: row.id, data: { isActive: true } });
+  }
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "center",
+      }}
+    >
       <Button
-        sx={{
-          backgroundColor: "#005D7A",
-          color: "white",
-          width: 105,
-          marginRight: 2,
-        }}
+        sx={{ backgroundColor: "#005D7A", width: 105, color: "white" }}
         variant="outlined"
         size="small"
-        onClick={handleConfirmsations}
+        onClick={handleConfirmation}
       >
         Reactivate
       </Button>
-
       <ConfirmationDialog
         open={open}
         onClose={() => setOpen(false)}
@@ -122,6 +123,7 @@ function ActionsColumn({ row }) {
     </div>
   );
 }
+
 function createData(name, code, population, size) {
   const density = population / size;
   const actions = columns
@@ -695,6 +697,10 @@ const rowsss = [
 ];
 
 const Signin = () => {
+  const { data: users, isLoading, isError, error } = useGetAllUsersQuery();
+
+  const inActiveUsers =
+    users && users.data.filter((user) => user.isActive === false);
   const [value, setValue] = useState(0);
   const history = useNavigate();
   const handleChange = (event, newValue) => {
@@ -771,6 +777,32 @@ const Signin = () => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+  const columns = [
+    { field: "name", headerName: "Name", width: 200 },
+    { field: "email", headerName: "Email Address", width: 250 },
+    {
+      field: "address",
+      headerName: "Home Address",
+      sortable: false,
+      width: 250,
+      valueGetter: (params) => params.row.address?.name,
+    },
+    {
+      field: "updatedAt",
+      headerName: "Suspension Date",
+      sortable: false,
+      width: 150,
+      valueFormatter: (params) =>
+        moment(params?.value).format("dddd, DD MMMM YYYY"),
+    },
+    {
+      field: "Actions",
+      label: "Actions",
+      minWidth: 120,
+      align: "center",
+      renderCell: (values) => <ActionsColumn row={values} />,
+    },
+  ];
 
   const classes = useStyles();
   return (
@@ -857,72 +889,46 @@ const Signin = () => {
               </Box>
               <TabPanel value={value} index={0}>
                 <div style={styles.container}>
-                  <Paper sx={{ width: "83%", overflow: "scroll" }}>
-                    <TableContainer sx={{ maxHeight: 600 }}>
-                      <Table stickyHeader aria-label="sticky table">
-                        <TableHead>
-                          <TableRow>
-                            {columns.map((column) => (
-                              <TableCell
-                                key={column.id}
-                                align={column.align}
-                                style={{
-                                  minWidth: column.minWidth,
-                                  backgroundColor: "#005D7A",
-                                  color: "#fff",
-                                  fontWeight: "bold",
-                                }}
-                              >
-                                {column.label}
-
-                                {/* <Divider variant="fullWidth" backgroundColor="red" orientation="vertical"/> */}
-                              </TableCell>
-                            ))}
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {rows
-                            .slice(
-                              page * rowsPerPage,
-                              page * rowsPerPage + rowsPerPage
-                            )
-                            .map((row) => {
-                              return (
-                                <TableRow
-                                  hover
-                                  role="checkbox"
-                                  tabIndex={-1}
-                                  key={row.code}
-                                >
-                                  {columns.map((column) => {
-                                    const value = row[column.id];
-                                    return (
-                                      <TableCell
-                                        key={column.id}
-                                        align={column.align}
-                                      >
-                                        {column.format &&
-                                        typeof value === "number"
-                                          ? column.format(value)
-                                          : value}
-                                      </TableCell>
-                                    );
-                                  })}
-                                </TableRow>
-                              );
-                            })}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                    <TablePagination
-                      rowsPerPageOptions={[15, 20, 50, 100]}
-                      component="div"
-                      count={rows.length}
-                      rowsPerPage={rowsPerPage}
-                      page={page}
-                      onPageChange={handleChangePage}
-                      onRowsPerPageChange={handleChangeRowsPerPage}
-                    />
+                  <Paper
+                    sx={{
+                      width: "83%",
+                      overflow: "scroll",
+                      position: "absolute",
+                      top: isLoading ? 320 : 150,
+                      left: isLoading ? 450 : 4,
+                      background: isLoading && "transparent",
+                      boxShadow: isLoading && "none",
+                    }}
+                  >
+                    <Box>
+                      {isLoading ? (
+                        <Box>
+                          <CircularProgress
+                            style={{ color: "#005D7A", marginLeft: 80 }}
+                            size={25}
+                          />
+                          <Typography sx={{ fontSize: 18, color: "#005D7A" }}>
+                            🚀 Loading Residents
+                          </Typography>
+                        </Box>
+                      ) : (
+                        users && (
+                          <DataGrid
+                            slots={{ toolbar: GridToolbar }}
+                            slotProps={{
+                              toolbar: {
+                                showQuickFilter: true,
+                                quickFilterProps: { debounceMs: 500 },
+                              },
+                            }}
+                            getRowId={(row) => row._id}
+                            rows={inActiveUsers}
+                            columns={columns}
+                            getRowHeight={() => "auto"}
+                          />
+                        )
+                      )}
+                    </Box>
                   </Paper>
                 </div>
               </TabPanel>

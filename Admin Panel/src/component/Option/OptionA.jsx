@@ -1,11 +1,6 @@
 import * as React from "react";
-import {
-  DataGrid,
-  GridToolbar,
-  getDataGridUtilityClass,
-} from "@mui/x-data-grid";
-import SearchIcon from "@mui/icons-material/Search";
-import TextField from "@mui/material/TextField";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+
 import moment from "moment";
 import {
   Switch,
@@ -14,25 +9,11 @@ import {
   DialogTitle,
   Button,
   Box,
-  Divider,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  Tooltip,
   Typography,
   CircularProgress,
 } from "@mui/material";
-import {
-  useGetAllUsersQuery,
-  useGetAllWatchesQuery,
-  useUpdateWatchMutation,
-  useUserUpdateMutation,
-} from "../../redux/api";
+import { useGetAllWatchesQuery, useUpdateWatchMutation } from "../../redux/api";
 import { useNavigate } from "react-router-dom";
 
 function ConfirmationDialog({ open, onClose, onConfirm }) {

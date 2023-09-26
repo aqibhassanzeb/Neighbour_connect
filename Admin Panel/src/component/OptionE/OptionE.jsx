@@ -4,13 +4,6 @@ import {
   DialogTitle,
   Button,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
   CircularProgress,
   Box,
   Typography,
@@ -188,7 +181,16 @@ const OptionA = () => {
   console.log(data);
   return (
     <div style={styles.container}>
-      <Paper sx={{ width: "83%", overflow: "scroll" }}>
+      <Paper
+        sx={{
+          width: "83%",
+          overflow: "scroll",
+          top: isLoading ? 320 : 90,
+          left: isLoading ? 450 : 4,
+          background: isLoading && "transparent",
+          boxShadow: isLoading && "none",
+        }}
+      >
         <Box>
           {isLoading ? (
             <Box>

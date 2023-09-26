@@ -12,7 +12,7 @@ export const api = createApi({
     },
   }),
   reducerPath: "neighbour-api",
-  tagTypes: ["User", "Watch", "LANDF", "Skill", "Sell", "Forum"],
+  tagTypes: ["User", "Watch", "LANDF", "Skill", "Sell", "Forum", "Report"],
   endpoints: (build) => ({
     Register: build.mutation({
       query: (data) => {
@@ -163,6 +163,32 @@ export const api = createApi({
       },
       invalidatesTags: ["Forum"],
     }),
+    getUserStatistics: build.query({
+      query: () => {
+        return {
+          url: "/user_statistics",
+          method: "GET",
+        };
+      },
+    }),
+    getAllUsersReports: build.query({
+      query: () => {
+        return {
+          url: "/user_reports",
+          method: "GET",
+        };
+      },
+      providesTags: ["User"],
+    }),
+    getAllPostsReports: build.query({
+      query: () => {
+        return {
+          url: "/reports",
+          method: "GET",
+        };
+      },
+      providesTags: ["Report"],
+    }),
   }),
 });
 
@@ -182,4 +208,7 @@ export const {
   useUpdateSellsMutation,
   useGetAllForumsQuery,
   useUpdateForumMutation,
+  useGetUserStatisticsQuery,
+  useGetAllUsersReportsQuery,
+  useGetAllPostsReportsQuery,
 } = api;

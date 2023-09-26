@@ -346,7 +346,16 @@ const OptionA = () => {
 
   return (
     <div style={styles.container}>
-      <Paper sx={{ width: "83%", overflow: "scroll" }}>
+      <Paper
+        sx={{
+          width: "83%",
+          overflow: "scroll",
+          top: isLoading ? 320 : 90,
+          left: isLoading ? 450 : 4,
+          background: isLoading && "transparent",
+          boxShadow: isLoading && "none",
+        }}
+      >
         <Box>
           {isLoading ? (
             <Box>
