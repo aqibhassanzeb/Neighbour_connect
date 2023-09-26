@@ -39,14 +39,14 @@ export const lostandfound_Create = async (req, res) => {
     const images = uploadedImages.map((item) => item.secure_url);
     const lostfound = new lostandFound({
       ...req.body,
-      createdBy: req.user?._id,
+      posted_by: req.user?._id,
       location,
       gallary_images: images,
     });
     let item = await lostfound.save();
     if (item) {
       await Activity.create({
-        posted_by: item.createdBy,
+        posted_by: item.posted_by,
         description: "lost & found",
         post_id: item._id,
         title: item.title,
@@ -139,13 +139,13 @@ export const lostandfound_Get = async (req, res) => {
   if (req.query.title) {
     filter.title = req.query.title;
   }
-  if (req.query.createdBy) {
-    filter.createdBy = req.query.createdBy;
+  if (req.query.posted_by) {
+    filter.posted_by = req.query.posted_by;
   }
   try {
     const result = await lostandFound
       .find(filter)
-      .populate("createdBy", "-password")
+      .populate("posted_by", "-password")
       .populate("category");
 
     res.status(200).json({ data: result, count: result.length });
@@ -162,16 +162,16 @@ export const lostandfoundLoc_Get = async (req, res) => {
 
     const result = await lostandFound
       .find({ type })
-      .populate("createdBy", "-password");
+      .populate("posted_by", "-password");
     const filteredData = result.filter((elm) => {
       if (
         elm.visibility === "connections" &&
-        req.user.connections.includes(elm.createdBy)
+        req.user.connections.includes(elm.posted_by)
       ) {
         return true;
       }
-      const docLatitude = parseFloat(elm.createdBy.address.latitude);
-      const docLongitude = parseFloat(elm.createdBy.address.longitude);
+      const docLatitude = parseFloat(elm.posted_by.address.latitude);
+      const docLongitude = parseFloat(elm.posted_by.address.longitude);
 
       // Calculate the distance in kilometers between two points
       const distanceInKm = calculateDistanceInKm(

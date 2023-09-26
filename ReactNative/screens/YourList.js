@@ -93,7 +93,7 @@ const Lostss = ({ navigation }) => {
       let paylaod = {};
       const userData = await AsyncStorage.getItem("userData");
       const parseUserdata = userData && JSON.parse(userData);
-      paylaod.createdBy = parseUserdata.user._id;
+      paylaod.posted_by = parseUserdata.user._id;
       let result = await lostItemGet(paylaod);
 
       if (result.status == 200) {

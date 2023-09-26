@@ -244,7 +244,7 @@ const Losted = ({ navigation, route }) => {
                   marginTop: Default.fixPadding * 1.5,
                 }}
               >
-                {data.createdBy?.name}
+                {data?.posted_by?.name}
               </Text>
 
               <View
@@ -399,7 +399,7 @@ const Losted = ({ navigation, route }) => {
                     paddingBottom: 30,
                   }}
                 >
-                  {data.createdBy?.name}
+                  {data?.posted_by?.name}
                 </Text>
                 <Text
                   style={{
@@ -472,9 +472,9 @@ const Losted = ({ navigation, route }) => {
             onPress={() =>
               navigation.navigate("ChattingScreen", {
                 user: {
-                  recepientId: data.createdBy._id,
-                  recepientName: data.createdBy.name,
-                  recepientImage: data.createdBy.image,
+                  recepientId: data.posted_by._id,
+                  recepientName: data.posted_by.name,
+                  recepientImage: data.posted_by.image,
                   senderId: loggedInUserId,
                 },
               })

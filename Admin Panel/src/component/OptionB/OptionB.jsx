@@ -234,7 +234,7 @@ export default function OptionB() {
         moment(params?.value).format("DD MMMM YYYY, hh:mm A "),
     },
     {
-      field: "createdBy",
+      field: "posted_by",
       headerName: "Posted By",
       sortable: false,
       width: 220,
