@@ -22,3 +22,21 @@
 *{
 scroll-behavior: smooth;
 }
+
+.MuiDataGrid-columnHeaders {
+  color: white !important;
+  background-color: #005D7A !important;
+}
+.MuiDataGrid-cellContent {
+  padding: 10px 0px !important;
+}
+
+.css-1knaqv7-MuiButtonBase-root-MuiButton-root {
+  color: #005D7A !important;
+}
+
+/* .MuiSelect-select{
+  padding: 10px !important;
+  border: 1px solid gray !important;
+  border-radius: 10px !important;
+} */

@@ -207,14 +207,16 @@ const OngoingTab = (props) => {
   const handleGetNeighbours = async () => {
     try {
       let result = await NeighbourMayKnow();
+      console.log(result.data);
       if (result.status == 200) {
-        const filteredYouKnow = [];
-
+        let filteredYouKnow = [];
         for (const user of result.data) {
           if (requests.length > 0) {
             if (!requests.some((request) => request.sender._id === user._id)) {
               filteredYouKnow.push(user);
             }
+          } else {
+            filteredYouKnow = result.data;
           }
         }
         setNeighboursData(filteredYouKnow);
@@ -661,103 +663,105 @@ const OngoingTab = (props) => {
       <Text style={{ marginLeft: 23, fontSize: 19, color: Colors.grey }}>
         Neighbors You May Know
       </Text>
-      {neighboursData &&
-        neighboursData.map((n) => {
-          if (n._id === id) {
-            return;
-          } else {
-            return (
-              <TouchableOpacity
-                key={n._id}
-                onPress={() =>
-                  props.navigation.navigate("Profile1", { user: n })
-                }
-                style={{
-                  ...Default.shadow,
-                  backgroundColor: Colors.white,
-                  marginTop: 10,
-                  marginHorizontal: 13,
-                  marginBottom: 7,
-                  borderRadius: 10,
-                  // overflow: "hidden",
-                  flexDirection: isRtl ? "row-reverse" : "row",
-                  paddingVertical: Default.fixPadding,
-                }}
-              >
-                <View
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {neighboursData &&
+          neighboursData.map((n) => {
+            if (n._id === id) {
+              return;
+            } else {
+              return (
+                <TouchableOpacity
+                  key={n._id}
+                  onPress={() =>
+                    props.navigation.navigate("Profile1", { user: n })
+                  }
                   style={{
-                    flex: 2,
-                    //  paddingHorizontal: Default.fixPadding * 1.5,
-                    justifyContent: "center",
-                    alignItems: "center",
+                    ...Default.shadow,
+                    backgroundColor: Colors.white,
+                    marginTop: 10,
+                    marginHorizontal: 13,
+                    marginBottom: 7,
+                    borderRadius: 10,
+                    // overflow: "hidden",
+                    flexDirection: isRtl ? "row-reverse" : "row",
+                    paddingVertical: Default.fixPadding,
                   }}
                 >
-                  <Image
-                    source={{ uri: n.image }}
-                    style={{
-                      borderRadius: 5,
-                      height: 70,
-                      width: 70,
-                      marginLeft: 36,
-                    }}
-                  />
-                </View>
-                <View
-                  style={{
-                    flex: 5,
-                    justifyContent: "center",
-                    alignItems: isRtl ? "flex-end" : "flex-start",
-                  }}
-                >
-                  <Text
-                    numberOfLines={1}
-                    style={{
-                      ...Fonts.SemiBold15black,
-                      overflow: "hidden",
-                      marginLeft: 36,
-                      marginTop: 20,
-                      fontSize: 18,
-                    }}
-                  >
-                    {n.name}
-                  </Text>
-                  <Text
-                    numberOfLines={1}
-                    style={{
-                      ...Fonts.SemiBold14grey,
-                      overflow: "hidden",
-                      marginLeft: 36,
-                    }}
-                  ></Text>
                   <View
                     style={{
-                      marginVertical: Default.fixPadding * 0.3,
-                      flexDirection: isRtl ? "row-reverse" : "row",
-                      alignItems: "center",
+                      flex: 2,
+                      //  paddingHorizontal: Default.fixPadding * 1.5,
                       justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Image
+                      source={{ uri: n.image }}
+                      style={{
+                        borderRadius: 5,
+                        height: 70,
+                        width: 70,
+                        marginLeft: 36,
+                      }}
+                    />
+                  </View>
+                  <View
+                    style={{
+                      flex: 5,
+                      justifyContent: "center",
+                      alignItems: isRtl ? "flex-end" : "flex-start",
                     }}
                   >
                     <Text
                       numberOfLines={1}
                       style={{
+                        ...Fonts.SemiBold15black,
+                        overflow: "hidden",
+                        marginLeft: 36,
+                        marginTop: 20,
+                        fontSize: 18,
+                      }}
+                    >
+                      {n.name}
+                    </Text>
+                    <Text
+                      numberOfLines={1}
+                      style={{
                         ...Fonts.SemiBold14grey,
-
-                        textAlign: isRtl ? "right" : "left",
+                        overflow: "hidden",
+                        marginLeft: 36,
                       }}
                     ></Text>
-                  </View>
-                </View>
-                <View>
-                  <View>
-                    <View style={styles.contain}>
-                      <View style={{ marginLeft: 70 }}></View>
+                    <View
+                      style={{
+                        marginVertical: Default.fixPadding * 0.3,
+                        flexDirection: isRtl ? "row-reverse" : "row",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text
+                        numberOfLines={1}
+                        style={{
+                          ...Fonts.SemiBold14grey,
+
+                          textAlign: isRtl ? "right" : "left",
+                        }}
+                      ></Text>
                     </View>
                   </View>
-                </View>
-              </TouchableOpacity>
-            );
-          }
-        })}
+                  <View>
+                    <View>
+                      <View style={styles.contain}>
+                        <View style={{ marginLeft: 70 }}></View>
+                      </View>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              );
+            }
+          })}
+      </ScrollView>
     </SafeAreaView>
   );
 };

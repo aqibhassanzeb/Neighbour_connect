@@ -168,9 +168,9 @@ export const getAllWatch = async (req, res) => {
   let { latitude, longitude } = address;
 
   try {
-    const posts = await Watch.find()
+    const posts = await Watch.find({ is_active: true })
       .sort({ createdAt: -1 })
-      .populate("posted_by", "name image helpful_count address")
+      .populate("posted_by", "name email image helpful_count address")
       .populate("category");
 
     const filtered_array = posts.filter((item) => {

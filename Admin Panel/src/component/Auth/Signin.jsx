@@ -5,8 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../../redux/api";
 import { useDispatch } from "react-redux";
 import { setActiveUser, setToken } from "../../redux/reducers/auth";
-import useAlert from "../../hooks/useAlert";
-
+import { toast } from "react-hot-toast";
 const useStyles = makeStyles({
   root: {
     display: "flex",
@@ -42,10 +41,8 @@ const Signin = () => {
   const history = useNavigate();
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { showAlert, handleShowAlert } = useAlert();
 
   const [login, response] = useLoginMutation();
-  console.log(response);
 
   const [type, setType] = useState("");
   const [formValues, setFormValues] = useState({
@@ -96,7 +93,7 @@ const Signin = () => {
       newFormValues.name.error = false;
     }
     setFormValues(newFormValues);
-    if (!(newFormValues.email.error && newFormValues.password.error)) {
+    if (!newFormValues.email.error && !newFormValues.password.error) {
       login({
         email: formValues.email.value,
         password: formValues.password.value,
@@ -106,20 +103,21 @@ const Signin = () => {
 
   useEffect(() => {
     if (response?.isSuccess && response?.data?.user?.status === "user") {
-      return handleShowAlert("invalid email or password");
+      toast.error("invalid email or password");
     } else if (
       response?.isSuccess &&
       response?.data?.user?.status === "admin"
     ) {
-      dispatch(setActiveUser(response?.data?.data?.user));
+      dispatch(setActiveUser(response?.data?.user));
       dispatch(setToken(response?.data?.token));
+      toast.success("Login Successful");
       history("/dashboard");
     }
   }, [response?.isSuccess]);
 
   useEffect(() => {
     if (response?.isError) {
-      handleShowAlert(response?.error?.data?.error);
+      toast.error(response?.error?.data?.error);
     }
   }, [response?.isError]);
 
@@ -140,11 +138,6 @@ const Signin = () => {
               flexDirection={"column"}
               margin={"0px 30px 0px 30px"}
             >
-              {showAlert?.show && (
-                <Alert severity="error" style={{ textTransform: "capitalize" }}>
-                  {showAlert?.text}
-                </Alert>
-              )}
               <form onSubmit={handleSubmit}>
                 <TextField
                   name="email"

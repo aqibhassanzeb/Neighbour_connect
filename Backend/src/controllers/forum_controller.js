@@ -64,9 +64,9 @@ export const getForumsByUser = async (req, res) => {
 
 export const getAllForums = async (req, res) => {
   try {
-    const items = await Forum.find()
+    const items = await Forum.find({ is_active: true })
       .sort({ createdAt: -1 })
-      .populate("posted_by", "name image")
+      .populate("posted_by", "name email image")
       .populate({
         path: "replies.reply_by",
         select: "image name",
@@ -89,12 +89,10 @@ export const addReply = async (req, res) => {
     const newReply = { reply_by, text };
     forum.replies.push(newReply);
     const rep = await forum.save();
-    res
-      .status(201)
-      .json({
-        message: "Reply added successfully",
-        id: rep.replies[rep.replies.length - 1]._id,
-      });
+    res.status(201).json({
+      message: "Reply added successfully",
+      id: rep.replies[rep.replies.length - 1]._id,
+    });
   } catch (error) {
     console.error("Error adding reply:", error);
     res.status(500).json({ message: "Internal server error" });

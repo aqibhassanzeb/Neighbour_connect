@@ -42,7 +42,7 @@ const PayPalScreen = ({ navigation, route }) => {
   const { data } = route.params;
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [oldImages, setOldImages] = useState(data.images);
-  const [selectedOption, setSelectedOption] = useState(data.category.name);
+  const [selectedOption, setSelectedOption] = useState(data.category);
   const [dropdownOpens, setDropdownOpens] = useState(false);
   const [title, setTitle] = useState(data.title);
   const [selectedOptions, setSelectedOptions] = useState("Notify");
@@ -441,7 +441,7 @@ const PayPalScreen = ({ navigation, route }) => {
                           color: "black",
                         }}
                       >
-                        {selectedOption}
+                        {selectedOption.name}
                       </Text>
                       <View
                         style={{

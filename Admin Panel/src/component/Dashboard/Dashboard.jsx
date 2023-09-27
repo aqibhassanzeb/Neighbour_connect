@@ -48,21 +48,11 @@ import EventSeatRoundedIcon from "@mui/icons-material/EventSeatRounded";
 import Diversity1RoundedIcon from "@mui/icons-material/Diversity1Rounded";
 import ContentPasteOffOutlinedIcon from "@mui/icons-material/ContentPasteOffOutlined";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useGetUserStatisticsQuery } from "../../redux/api";
+
 // chart data
-let data = [
-  { month: "Jan", Accounts: 35 },
-  { month: "Feb", Accounts: 28 },
-  { month: "Mar", Accounts: 34 },
-  { month: "Apr", Accounts: 32 },
-  { month: "May", Accounts: 40 },
-  { month: "Jun", Accounts: 32 },
-  { month: "Jul", Accounts: 35 },
-  { month: "Aug", Accounts: 55 },
-  { month: "Sep", Accounts: 38 },
-  { month: "Oct", Accounts: 30 },
-  { month: "Nov", Accounts: 25 },
-  { month: "Dec", Accounts: 32 },
-];
+
 const dataDist = [
   {
     name: "A",
@@ -210,6 +200,8 @@ const Search = styled("div")(({ theme }) => ({
 }));
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { name, image } = useSelector((state) => state.authReducer.activeUser);
+  const { data, isLoading } = useGetUserStatisticsQuery();
 
   const handleShowPost = () => {
     // Navigate to the desired page
@@ -284,10 +276,10 @@ const Dashboard = () => {
                 sx={{ position: "relative", cursor: "pointer" }}
                 onClick={(e) => setBasicMenu(true)}
               >
-                <Avatar alt="Pankaj" src={RecentMessage[2].image} />
+                <Avatar alt={name} src={image} />
               </ListItemAvatar>
 
-              <ListItemText primary="Nisa Waheed" />
+              <ListItemText primary={name} />
             </ListItem>
           </Paper>
 

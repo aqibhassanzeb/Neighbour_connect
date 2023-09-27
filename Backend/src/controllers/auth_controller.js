@@ -199,7 +199,7 @@ export const userPassUpdate = async (req, res) => {
 };
 
 export const userGet = async (req, res) => {
-  let filter = { isActive: true };
+  let filter = { status: "user" };
   if (req.query._id) {
     filter._id = req.query._id.split(",");
   }
@@ -210,6 +210,7 @@ export const userGet = async (req, res) => {
     res.status(400).json({ message: "something went wrong!" });
   }
 };
+
 export const userGetbyId = async (req, res) => {
   let filter = { isActive: true };
   if (req.query._id) {
@@ -506,5 +507,48 @@ export const deleteAccount = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Error Deleting User" });
+  }
+};
+
+export const getUserStatistics = async (req, res) => {
+  try {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1; // Months are 0-based, so add 1.
+
+    const pipeline = [
+      {
+        $match: {
+          createdAt: {
+            $gte: new Date(`${currentYear}-01-01`),
+            $lt: new Date(`${currentYear}-${currentMonth + 1}-01`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: "$createdAt" },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ];
+
+    const result = await User.aggregate(pipeline);
+    const monthData = Array.from({ length: currentMonth }, (_, i) => {
+      const monthNumber = i + 1;
+      const monthName = new Date(
+        `${currentYear}-${monthNumber}-01`
+      ).toLocaleString("en-US", { month: "short" });
+      const monthCount =
+        result.find((item) => item._id === monthNumber)?.count || 0;
+      return { month: monthName, Accounts: monthCount };
+    });
+
+    res.json(monthData);
+  } catch (error) {
+    res.status(400).json({ message: "something went wrong!" });
   }
 };

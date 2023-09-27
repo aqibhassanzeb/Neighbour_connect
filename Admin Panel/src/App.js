@@ -75,6 +75,7 @@ const App = () => {
   } else {
     return (
       <>
+        <Toaster />
         <Routes>
           <Route exact path="/" element={<Signin />} />
           <Route exact path="/forgot-password" element={<ForgotPassword />} />

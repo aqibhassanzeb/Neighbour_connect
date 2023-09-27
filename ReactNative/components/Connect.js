@@ -28,6 +28,7 @@ const OngoingTab = (props) => {
   const [conLoader, setConLoader] = useState(false);
   const [connectionsData, setConnectionsData] = useState([]);
   const [loggedInUserId, setLoggedInUserId] = useState("");
+  console.log({ connectionsData });
 
   const isRtl = i18n.dir() == "rtl";
 
@@ -238,6 +239,32 @@ const OngoingTab = (props) => {
       <Text style={{ marginLeft: 23, fontSize: 19, color: Colors.grey }}>
         {connectionsData && connectionsData.length} connections
       </Text>
+      {connectionsData.length === 0 && !conLoader && (
+        <View
+          style={{
+            ...Default.shadow,
+            backgroundColor: Colors.white,
+            marginTop: 10,
+            marginHorizontal: 13,
+            marginBottom: 7,
+            borderRadius: 10,
+            // overflow: "hidden",
+            flexDirection: isRtl ? "row-reverse" : "row",
+            paddingVertical: Default.fixPadding,
+          }}
+        >
+          <Text
+            style={{
+              marginLeft: 23,
+              fontSize: 19,
+              color: Colors.grey,
+              textAlign: "center",
+            }}
+          >
+            No Connections Yet
+          </Text>
+        </View>
+      )}
       <View
         style={{
           borderTopColor: Colors.primary,
