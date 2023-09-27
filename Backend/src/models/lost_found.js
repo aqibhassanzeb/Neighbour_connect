@@ -49,7 +49,7 @@ const lostFound = new mongoose.Schema(
     date: {
       type: String,
     },
-    createdBy: {
+    posted_by: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
       required: true,

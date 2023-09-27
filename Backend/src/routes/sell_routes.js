@@ -7,6 +7,8 @@ import {
   addSell,
   deleteSell,
   getAllItems,
+  getAllItemsAdmin,
+  getAllItemsDeleted,
   getSellsByCat,
   getSellsByUser,
   markSolded,
@@ -37,6 +39,8 @@ routes.delete("/delete_sell/:_id", deleteSell);
 routes.get("/sell_category/:_id", protect, getSellsByCat);
 routes.get("/sells/:user_id", getSellsByUser);
 routes.get("/all_items", protect, getAllItems);
+routes.get("/all_items_admin", protect, getAllItemsAdmin);
+routes.get("/all_items_deleted", protect, getAllItemsDeleted);
 
 // Mark Sold
 routes.post("/solded/:_id", protect, markSolded);

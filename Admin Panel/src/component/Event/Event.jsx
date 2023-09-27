@@ -9,7 +9,6 @@ import {
   CircularProgress,
 } from "@mui/material";
 import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core";
 import "../Option/Option.css";
 import { useGetAllPostsReportsQuery } from "../../redux/api";
 import moment from "moment";
@@ -117,120 +116,72 @@ const EnlargedImageView = ({ imageUrls, onClose }) => (
         &times;
       </span>
       <div style={{ display: "flex", flexDirection: "row" }}>
-        {imageUrls.map((imageUrl, index) =>
-          imageUrl.endsWith(".mp4") ? (
-            <video
-              key={index}
-              src={imageUrl}
-              alt="User"
-              width="300"
-              height="auto"
-              style={{ marginRight: "10px" }}
-              controls
-            />
-          ) : (
-            <img
-              key={index}
-              src={imageUrl}
-              alt="User"
-              width="300"
-              height="auto"
-              style={{ marginRight: "10px" }}
-            />
-          )
-        )}
-      </div>
-    </div>
-  </div>
-);
-
-function formatEmail(emails) {
-  const formattedEmails = emails.map((email) => (
-    <div style={{ borderRight: "1px solid black", paddingRight: "5px" }}>
-      {email}
-    </div>
-  ));
-  return formattedEmails;
-}
-const ImageContainer = ({ images }) => {
-  const [selectedImage, setSelectedImage] = useState(null);
-
-  const handleImageClick = (imageUrl) => {
-    setSelectedImage(imageUrl);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedImage(null);
-  };
-
-  let imageElement;
-  if (Array.isArray(images)) {
-    imageElement = (
-      <div style={{ display: "flex", flexDirection: "row" }}>
-        {images.map((imageUrl, index) => {
-          if (imageUrl.endsWith(".mp4")) {
-            return (
+        {imageUrls.map((url, index) => {
+          if (typeof url === "object") {
+            return url.source.endsWith(".mp4") ? (
               <video
                 key={index}
-                src={imageUrl}
+                src={url.source}
                 alt="User"
-                width="90"
-                height="100"
-                style={{ marginRight: "10px", cursor: "pointer" }}
-                onClick={() => handleImageClick(imageUrl)}
+                width="300"
+                height="auto"
+                style={{ marginRight: "10px" }}
+                controls
+              />
+            ) : (
+              <img
+                key={index}
+                src={url.source}
+                alt="User"
+                width="300"
+                height="auto"
+                style={{ marginRight: "10px" }}
               />
             );
           } else {
-            return (
+            return url.endsWith(".mp4") ? (
+              <video
+                key={index}
+                src={url}
+                alt="User"
+                width="300"
+                height="auto"
+                style={{ marginRight: "10px" }}
+                controls
+              />
+            ) : (
               <img
                 key={index}
-                src={imageUrl}
+                src={url}
                 alt="User"
-                width="90"
-                height="100"
-                style={{ marginRight: "10px", cursor: "pointer" }}
-                onClick={() => handleImageClick(imageUrl)}
+                width="300"
+                height="auto"
+                style={{ marginRight: "10px" }}
               />
             );
           }
         })}
       </div>
-    );
-  } else {
-    if (images.endsWith(".mp4")) {
-      imageElement = (
-        <video
-          src={images}
-          alt="User"
-          width="90"
-          height="100"
-          style={{ cursor: "pointer" }}
-          onClick={() => handleImageClick(images)}
-        />
-      );
-    } else {
-      imageElement = (
-        <img
-          src={images}
-          alt="User"
-          width="90"
-          height="100"
-          style={{ cursor: "pointer" }}
-          onClick={() => handleImageClick(images)}
-        />
-      );
-    }
-  }
+    </div>
+  </div>
+);
+
+const ImageContainer = ({ images }) => {
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const handleCloseModal = () => {
+    setSelectedImage(null);
+  };
 
   return (
     <div>
       <img
-        src={images[0]} // Show only the first image in the row
-        alt="User"
+        src={images[0].source || images[0]}
+        alt="Image"
         width="90"
         height="100"
         style={{ marginRight: "10px", cursor: "pointer" }}
-        onClick={() => handleImageClick(images[0])}
+        onClick={() => setSelectedImage(images[0])}
       />
       {selectedImage && (
         <div className="enlarged-image-container">
@@ -243,7 +194,6 @@ const ImageContainer = ({ images }) => {
 
 export default function Event() {
   const { data, isLoading, isError, error } = useGetAllPostsReportsQuery();
-  console.log(data);
 
   const styles = {
     container: {
@@ -256,19 +206,33 @@ export default function Event() {
   };
   const columns = [
     {
+      field: "images",
+      headerName: "Posted by",
+      width: 150,
+      renderCell: (params) => (
+        <ImageContainer
+          images={
+            params.row.reported_post.media ||
+            params.row.reported_post.images ||
+            params.row.reported_post.gallary_images
+          }
+        />
+      ),
+    },
+    {
       field: "reported_post",
       headerName: "Posted by",
       width: 150,
-      valueGetter: (params) => params.row.reported_posted?.posted_by?.name,
+      valueGetter: (params) => params.row.reported_post.posted_by.name,
     },
     {
-      field: "reported_user_one",
+      field: "reported_post_user_email",
       headerName: "Resident Email",
-      width: 200,
+      width: 250,
       valueFormatter: (params) => {
         const item = data.find((item) => item._id === params.id);
         if (item) {
-          return item.reported_user?.email;
+          return item.reported_post?.posted_by?.email;
         }
       },
     },
@@ -412,7 +376,7 @@ export default function Event() {
                   getRowId={(row) => row._id}
                   rows={data}
                   columns={columns}
-                  getRowHeight={() => 80}
+                  getRowHeight={() => 120}
                 />
               )
             )}

@@ -184,6 +184,17 @@ export const getAllSkills = async (req, res) => {
   }
 };
 
+export const getAllDeletedSkills = async (req, res) => {
+  try {
+    const posts = await Skill.find({ is_active: false })
+      .populate("posted_by", "name email image endorse_count endorsed_by")
+      .populate("category");
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching skills " });
+  }
+};
+
 export const getSkillsByUser = async (req, res) => {
   const { user_id } = req.params;
 

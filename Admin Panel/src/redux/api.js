@@ -1,8 +1,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+const baseURL = "http://localhost:3333/api/v1";
 export const api = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:3333/api/v1",
+    baseUrl: baseURL,
     prepareHeaders: (headers, { getState }) => {
       const token = getState().authReducer?.token;
       if (token) {
@@ -64,6 +65,22 @@ export const api = createApi({
       },
       invalidatesTags: ["User"],
     }),
+    pictureUpload: build.mutation({
+      query: (imageFile) => {
+        var bodyFormData = new FormData();
+        bodyFormData.append("file", imageFile);
+        console.log({ bodyFormData, imageFile });
+        return {
+          url: "/picture_upload",
+          method: "POST",
+          headers: {
+            "Content-Type": "multipart/form-data;",
+          },
+          body: { bodyFormData },
+          formData: true,
+        };
+      },
+    }),
     getAllUsers: build.query({
       query: () => "/user_get",
       providesTags: ["User"],
@@ -71,7 +88,16 @@ export const api = createApi({
     getAllWatches: build.query({
       query: () => {
         return {
-          url: "/all_watch",
+          url: "/all_watch_admin",
+          method: "GET",
+        };
+      },
+      providesTags: ["Watch"],
+    }),
+    getAllDeletedWatches: build.query({
+      query: () => {
+        return {
+          url: "/all_watch_deleted",
           method: "GET",
         };
       },
@@ -96,6 +122,15 @@ export const api = createApi({
       },
       providesTags: ["LANDF"],
     }),
+    getAllLostAndFoundDeleted: build.query({
+      query: () => {
+        return {
+          url: "/lostandfound_deleted",
+          method: "GET",
+        };
+      },
+      providesTags: ["LANDF"],
+    }),
     updateLostAndFound: build.mutation({
       query: (param) => {
         return {
@@ -115,6 +150,15 @@ export const api = createApi({
       },
       providesTags: ["Skill"],
     }),
+    getAllSkillsDeleted: build.query({
+      query: () => {
+        return {
+          url: "/all_skills_deleted",
+          method: "GET",
+        };
+      },
+      providesTags: ["Skill"],
+    }),
     updateSkills: build.mutation({
       query: (param) => {
         return {
@@ -128,7 +172,16 @@ export const api = createApi({
     getAllSells: build.query({
       query: () => {
         return {
-          url: "/all_items",
+          url: "/all_items_admin",
+          method: "GET",
+        };
+      },
+      providesTags: ["Sell"],
+    }),
+    getAllSellsDeletd: build.query({
+      query: () => {
+        return {
+          url: "/all_items_deleted",
           method: "GET",
         };
       },
@@ -148,6 +201,15 @@ export const api = createApi({
       query: () => {
         return {
           url: "/all_topics",
+          method: "GET",
+        };
+      },
+      providesTags: ["Forum"],
+    }),
+    getAllForumsDeleted: build.query({
+      query: () => {
+        return {
+          url: "/all_topics_deleted",
           method: "GET",
         };
       },
@@ -211,4 +273,34 @@ export const {
   useGetUserStatisticsQuery,
   useGetAllUsersReportsQuery,
   useGetAllPostsReportsQuery,
+  usePictureUploadMutation,
+  useGetAllLostAndFoundDeletedQuery,
+  useGetAllDeletedWatchesQuery,
+  useGetAllForumsDeletedQuery,
+  useGetAllSellsDeletdQuery,
+  useGetAllSkillsDeletedQuery,
 } = api;
+
+export function uploadImage(file) {
+  return new Promise((resolve, reject) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    fetch(`${baseURL}/picture_upload`, {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((response) => {
+        resolve(response.imageUrls);
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
+}

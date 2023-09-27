@@ -19,8 +19,10 @@ import {
   DialogActions,
   DialogTitle,
   CircularProgress,
+  FormControl,
+  MenuItem,
 } from "@mui/material";
-import { makeStyles } from "@material-ui/core";
+import { Select, makeStyles } from "@material-ui/core";
 import { useNavigate } from "react-router-dom";
 
 import "../Option/Option.css";
@@ -28,6 +30,11 @@ import SearchIcon from "@mui/icons-material/Search";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { useGetAllUsersQuery, useUserUpdateMutation } from "../../redux/api";
 import moment from "moment";
+import OptionA from "../Option/OptionA";
+import OptionB from "../OptionB/OptionB";
+import OptionC from "../OptionC/OptionC";
+import OptionD from "../OptionD/OptionD";
+import OptionE from "../OptionE/OptionE";
 
 const columns = [
   { id: "name", label: "Name", minWidth: 80, option: { order: true } },
@@ -698,9 +705,11 @@ const rowsss = [
 
 const Signin = () => {
   const { data: users, isLoading, isError, error } = useGetAllUsersQuery();
-
   const inActiveUsers =
     users && users.data.filter((user) => user.isActive === false);
+
+  const [selected, setSelected] = useState("Neighbor Watch");
+
   const [value, setValue] = useState(0);
   const history = useNavigate();
   const handleChange = (event, newValue) => {
@@ -829,31 +838,6 @@ const Signin = () => {
         >
           Action History
         </Typography>
-
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            marginRight: 1,
-            backgroundColor: "#fff",
-            borderRadius: "4px",
-            height: 23,
-          }}
-        >
-          <SearchIcon color="action" sx={{ marginLeft: 1 }} />
-          <TextField
-            id="search"
-            label="Search"
-            variant="standard"
-            sx={{
-              marginLeft: 1,
-              width: "100%",
-              "& input": {
-                paddingBottom: "17px", // Adjust the padding value as needed
-              },
-            }}
-          />
-        </Box>
       </Box>
       <Box display="flex" flexDirection="row">
         <Box>
@@ -933,75 +917,53 @@ const Signin = () => {
                 </div>
               </TabPanel>
               <TabPanel value={value} index={1}>
-                <div style={styles.container}>
-                  <Paper sx={{ width: "83%", overflow: "scroll" }}>
-                    <TableContainer sx={{ maxHeight: 600 }}>
-                      <Table stickyHeader aria-label="sticky table">
-                        <TableHead>
-                          <TableRow>
-                            {columnss.map((columnss) => (
-                              <TableCell
-                                key={columnss.id}
-                                align={columnss.align}
-                                style={{
-                                  minWidth: columnss.minWidth,
-                                  backgroundColor: "#005D7A",
-                                  color: "#fff",
-                                  fontWeight: "bold",
-                                }}
-                              >
-                                {columnss.label}
-
-                                {/* <Divider variant="fullWidth" backgroundColor="red" orientation="vertical"/> */}
-                              </TableCell>
-                            ))}
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {rowsss
-                            .slice(
-                              page * rowsPerPage,
-                              page * rowsPerPage + rowsPerPage
-                            )
-                            .map((rowss) => {
-                              return (
-                                <TableRow
-                                  hover
-                                  role="checkbox"
-                                  tabIndex={-1}
-                                  key={rowss.code}
-                                >
-                                  {columnss.map((columnss) => {
-                                    const value = rowss[columnss.id];
-                                    return (
-                                      <TableCell
-                                        key={columnss.id}
-                                        align={columnss.align}
-                                      >
-                                        {columnss.format &&
-                                        typeof value === "number"
-                                          ? columnss.format(value)
-                                          : value}
-                                      </TableCell>
-                                    );
-                                  })}
-                                </TableRow>
-                              );
-                            })}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                    <TablePagination
-                      rowsssPerPageOptions={[15, 20, 50, 100]}
-                      component="div"
-                      count={rowsss.length}
-                      rowsssPerPage={rowsPerPage}
-                      page={page}
-                      onPageChange={handleChangePage}
-                      onRowsssPerPageChange={handleChangeRowsPerPage}
-                    />
-                  </Paper>
-                </div>
+                <Box>
+                  <FormControl
+                    sx={{
+                      width: 200,
+                      marginLeft: 2,
+                      marginBottom: 2,
+                    }}
+                  >
+                    <Select
+                      labelId="select-category"
+                      id="posts-select"
+                      value={selected}
+                      onChange={(e) => setSelected(e.target.value)}
+                      variant="outlined"
+                      style={{ height: 35 }}
+                    >
+                      <MenuItem value={"Neighbor Watch"}>
+                        Neighbor Watch
+                      </MenuItem>
+                      <MenuItem value={"Lost and Found"}>
+                        Lost and Found
+                      </MenuItem>
+                      <MenuItem value={"Skills Hub"}>Skills Hub</MenuItem>
+                      <MenuItem value={"Sell Zone"}>Sell Zone</MenuItem>
+                      <MenuItem value={"Neighbor Forum"}>
+                        Neighbor Forum
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                </Box>
+                <Box>
+                  {selected === "Neighbor Watch" && (
+                    <OptionA activeSkip={true} inActiveSkip={false} />
+                  )}
+                  {selected === "Lost and Found" && (
+                    <OptionB activeSkip={true} inActiveSkip={false} />
+                  )}
+                  {selected === "Skills Hub" && (
+                    <OptionC activeSkip={true} inActiveSkip={false} />
+                  )}
+                  {selected === "Sell Zone" && (
+                    <OptionD activeSkip={true} inActiveSkip={false} />
+                  )}
+                  {selected === "Neighbor Forum" && (
+                    <OptionE activeSkip={true} inActiveSkip={false} />
+                  )}
+                </Box>
               </TabPanel>
             </Box>
           </Box>

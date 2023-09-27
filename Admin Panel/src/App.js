@@ -46,7 +46,6 @@ const App = () => {
     overflowY: "scroll",
     borderRadius: "0px 20px 20px 0px",
   });
-  console.log("set", window.location.pathname);
   if (navigation.pathname != "/" && navigation.pathname != "/forgot-password") {
     return (
       <>

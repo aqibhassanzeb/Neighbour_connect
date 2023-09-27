@@ -78,6 +78,22 @@ export const getAllForums = async (req, res) => {
   }
 };
 
+export const getDeletedForums = async (req, res) => {
+  try {
+    const items = await Forum.find({ is_active: false })
+      .sort({ createdAt: -1 })
+      .populate("posted_by", "name email image")
+      .populate({
+        path: "replies.reply_by",
+        select: "image name",
+      });
+    res.json(items);
+  } catch (error) {
+    console.log("Error fetching posts", error);
+    res.status(500).json({ error: "Error fetching posts" });
+  }
+};
+
 export const addReply = async (req, res) => {
   try {
     const { forumId } = req.params;

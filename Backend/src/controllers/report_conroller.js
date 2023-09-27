@@ -100,7 +100,10 @@ export const getPostReports = async (req, res) => {
   try {
     const reports = await Report.find()
       .populate("reported_post")
-      .populate({ path: "reported_post", populate: { path: "posted_by" } })
+      .populate({
+        path: "reported_post",
+        populate: { path: "posted_by", select: "name email" },
+      })
       .sort({ updatedAt: -1 });
 
     res.status(200).json(reports);

@@ -7,6 +7,7 @@ import {
   deleteForum,
   deleteReply,
   getAllForums,
+  getDeletedForums,
   getForumsByUser,
   updateForum,
 } from "../controllers/forum_controller.js";
@@ -17,6 +18,7 @@ routes.put("/update_topic/:_id", updateForum);
 routes.delete("/delete_topic/:_id", deleteForum);
 routes.get("/topics/:user_id", getForumsByUser);
 routes.get("/all_topics", protect, getAllForums);
+routes.get("/all_topics_deleted", protect, getDeletedForums);
 routes.post("/add-reply/:forumId", addReply);
 routes.delete("/delete-reply/:forumId/:replyId", deleteReply);
 

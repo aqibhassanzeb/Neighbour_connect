@@ -30,6 +30,7 @@ import {
   ImageListItem,
 } from "@mui/material";
 import {
+  useGetAllSkillsDeletedQuery,
   useGetAllSkillsQuery,
   useGetAllUsersQuery,
   useGetAllWatchesQuery,
@@ -60,7 +61,7 @@ function ConfirmationDialog({ open, onClose, onConfirm }) {
   );
 }
 
-function ActionsColumn({ row }) {
+function ActionsColumn({ row, activeSkip }) {
   const [open, setOpen] = React.useState(false);
   const [updatePost, updateResp] = useUpdateSkillsMutation();
 
@@ -80,7 +81,7 @@ function ActionsColumn({ row }) {
   };
 
   function handleRemove(row) {
-    updatePost({ id: row.id, data: { is_active: false } });
+    updatePost({ id: row.id, data: { is_active: activeSkip ? true : false } });
   }
   return (
     <div
@@ -96,7 +97,7 @@ function ActionsColumn({ row }) {
         size="small"
         onClick={handleConfirmation}
       >
-        Delete
+        {activeSkip ? "Undo" : "Delete"}
       </Button>
       <ConfirmationDialog
         open={open}
@@ -248,9 +249,14 @@ const ImageContainer = ({ images }) => {
   );
 };
 
-export default function OptionC() {
-  const { data, isLoading, isError, error } = useGetAllSkillsQuery();
-
+export default function OptionC({ activeSkip, inActiveSkip }) {
+  const { data, isLoading, isError, error } = useGetAllSkillsQuery(undefined, {
+    skip: activeSkip,
+  });
+  const { data: deletedData, isLoading: deleteLoading } =
+    useGetAllSkillsDeletedQuery(undefined, {
+      skip: inActiveSkip,
+    });
   const styles = {
     container: {
       height: "calc(100vh - 80px)", // Adjust the height to fit your needs
@@ -327,7 +333,13 @@ export default function OptionC() {
       label: "Actions",
       minWidth: 120,
       align: "center",
-      renderCell: (values) => <ActionsColumn row={values} />,
+      renderCell: (values) => (
+        <ActionsColumn
+          row={values}
+          activeSkip={activeSkip}
+          inActiveSkip={inActiveSkip}
+        />
+      ),
     },
   ];
 
@@ -339,10 +351,10 @@ export default function OptionC() {
             width: "83%",
             overflow: "scroll",
             // position: "absolute",
-            top: isLoading ? 320 : 90,
-            left: isLoading ? 450 : 4,
-            background: isLoading && "transparent",
-            boxShadow: isLoading && "none",
+            top: isLoading || deleteLoading ? 320 : 90,
+            left: isLoading || deleteLoading ? 450 : 4,
+            background: isLoading || deleteLoading ? "transparent" : "",
+            boxShadow: isLoading || deleteLoading ? "none" : "",
           }}
         >
           <Box>
@@ -373,6 +385,40 @@ export default function OptionC() {
                   columns={columns}
                   getRowHeight={() => "auto"}
                 />
+              )
+            )}
+            {deleteLoading ? (
+              <Box>
+                <CircularProgress
+                  style={{ color: "#005D7A", marginLeft: 500, marginTop: 200 }}
+                  size={25}
+                />
+                <Typography
+                  sx={{ fontSize: 18, color: "#005D7A", marginLeft: 55 }}
+                >
+                  🚀 Loading Posts
+                </Typography>
+              </Box>
+            ) : (
+              deletedData && (
+                <div style={{ height: 450 }}>
+                  <DataGrid
+                    slots={{ toolbar: GridToolbar }}
+                    slotProps={{
+                      toolbar: {
+                        showQuickFilter: true,
+                        quickFilterProps: { debounceMs: 100 },
+                      },
+                    }}
+                    getRowId={(row) => row._id}
+                    rows={deletedData}
+                    columns={columns}
+                    getRowHeight={() => "auto"}
+                    localeText={{
+                      noRowsLabel: "No Deleted Content Yet", // Change this text
+                    }}
+                  />
+                </div>
               )
             )}
           </Box>

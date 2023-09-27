@@ -12,7 +12,11 @@ import React, { useState } from "react";
 
 import { makeStyles } from "@material-ui/core";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { useGetAllForumsQuery, useUpdateForumMutation } from "../../redux/api";
+import {
+  useGetAllForumsDeletedQuery,
+  useGetAllForumsQuery,
+  useUpdateForumMutation,
+} from "../../redux/api";
 import { useNavigate } from "react-router-dom";
 
 function ConfirmationDialog({ open, onClose, onConfirm }) {
@@ -36,14 +40,7 @@ function ConfirmationDialog({ open, onClose, onConfirm }) {
   );
 }
 
-function handleSuspend(row) {
-  // Logic for suspending a resident
-}
-
-function handleRemove(row) {
-  // Logic for removing a resident
-}
-function ActionsColumn({ row }) {
+function ActionsColumn({ row, activeSkip }) {
   const [open, setOpen] = React.useState(false);
   const [updatePost, updateResp] = useUpdateForumMutation();
 
@@ -63,7 +60,7 @@ function ActionsColumn({ row }) {
   };
 
   function handleRemove(row) {
-    updatePost({ id: row.id, data: { is_active: false } });
+    updatePost({ id: row.id, data: { is_active: activeSkip ? true : false } });
   }
   return (
     <div
@@ -79,7 +76,7 @@ function ActionsColumn({ row }) {
         size="small"
         onClick={handleConfirmation}
       >
-        Delete
+        {activeSkip ? "Undo" : "Delete"}
       </Button>
       <ConfirmationDialog
         open={open}
@@ -124,7 +121,7 @@ const useStyles = makeStyles({
   },
 });
 
-const OptionA = () => {
+const OptionA = ({ activeSkip, inActiveSkip }) => {
   const styles = {
     container: {
       height: "calc(100vh - 80px)", // Adjust the height to fit your needs
@@ -136,7 +133,13 @@ const OptionA = () => {
     },
   };
   const classes = useStyles();
-  const { data, isLoading, isError, error } = useGetAllForumsQuery();
+  const { data, isLoading, isError, error } = useGetAllForumsQuery(undefined, {
+    skip: activeSkip,
+  });
+  const { data: deletedData, isLoading: deleteLoading } =
+    useGetAllForumsDeletedQuery(undefined, {
+      skip: inActiveSkip,
+    });
 
   const columns = [
     { field: "topic", headerName: "Topic", width: 200 },
@@ -156,7 +159,14 @@ const OptionA = () => {
       sortable: false,
       width: 220,
       valueFormatter: (params) => {
-        const item = data.find((item) => item._id === params.id);
+        let item;
+        if (data) {
+          const find = data.find((item) => item._id === params.id);
+          item = find;
+        } else {
+          const find = deletedData.find((item) => item._id === params.id);
+          item = find;
+        }
         if (item) {
           return item.replies[item.replies.length - 1].text;
         }
@@ -175,20 +185,26 @@ const OptionA = () => {
       label: "Actions",
       minWidth: 120,
       align: "center",
-      renderCell: (values) => <ActionsColumn row={values} />,
+      renderCell: (values) => (
+        <ActionsColumn
+          row={values}
+          activeSkip={activeSkip}
+          inActiveSkip={inActiveSkip}
+        />
+      ),
     },
   ];
-  console.log(data);
+
   return (
     <div style={styles.container}>
       <Paper
         sx={{
           width: "83%",
           overflow: "scroll",
-          top: isLoading ? 320 : 90,
-          left: isLoading ? 450 : 4,
-          background: isLoading && "transparent",
-          boxShadow: isLoading && "none",
+          top: isLoading || deleteLoading ? 320 : 90,
+          left: isLoading || deleteLoading ? 450 : 4,
+          background: isLoading || deleteLoading ? "transparent" : "",
+          boxShadow: isLoading || deleteLoading ? "none" : "",
         }}
       >
         <Box>
@@ -219,6 +235,40 @@ const OptionA = () => {
                 columns={columns}
                 getRowHeight={() => "auto"}
               />
+            )
+          )}
+          {deleteLoading ? (
+            <Box>
+              <CircularProgress
+                style={{ color: "#005D7A", marginLeft: 500, marginTop: 200 }}
+                size={25}
+              />
+              <Typography
+                sx={{ fontSize: 18, color: "#005D7A", marginLeft: 55 }}
+              >
+                🚀 Loading Posts
+              </Typography>
+            </Box>
+          ) : (
+            deletedData && (
+              <div style={{ height: 450 }}>
+                <DataGrid
+                  slots={{ toolbar: GridToolbar }}
+                  slotProps={{
+                    toolbar: {
+                      showQuickFilter: true,
+                      quickFilterProps: { debounceMs: 100 },
+                    },
+                  }}
+                  getRowId={(row) => row._id}
+                  rows={deletedData}
+                  columns={columns}
+                  getRowHeight={() => "auto"}
+                  localeText={{
+                    noRowsLabel: "No Deleted Content Yet", // Change this text
+                  }}
+                />
+              </div>
             )
           )}
         </Box>
