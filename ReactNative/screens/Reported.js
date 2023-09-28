@@ -12,11 +12,13 @@ import React, { useState, useEffect } from "react";
 import { Colors, Default, Fonts } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
-import { addReport } from "../apis/apis";
+import { addPostReport, addUserReport } from "../apis/apis";
 import Loader from "../components/loader";
 
 const GooglePayScreen = ({ navigation, route }) => {
   const { postId, reportType, module } = route.params;
+  const replyId = route.params?.replyId ?? null;
+
   const [Note, setNote] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -38,22 +40,53 @@ const GooglePayScreen = ({ navigation, route }) => {
       BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
 
-  async function handleReport() {
+  async function handlePostReport() {
     try {
       setIsLoading(true);
-      let response = await addReport({
-        post_id: postId,
-        module,
+      let response = await addPostReport({
+        reported_post: postId,
+        post_type: module,
+        report_type: reportType,
+        optional_note: Note,
+        reply_id: replyId,
+      });
+      if (response.status === 200) {
+        navigation.navigate("SubmitReport");
+      } else if (response.status === 422) {
+        alert(response.data.error);
+      }
+    } catch (error) {
+      console.log("Error While Reporting", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleUserReport() {
+    try {
+      setIsLoading(true);
+      let response = await addUserReport({
+        reported_user: postId,
         report_type: reportType,
         optional_note: Note,
       });
-      if (response.status === 201) {
+      if (response.status === 200) {
         navigation.navigate("SubmitReport");
+      } else if (response.status === 422) {
+        alert(response.data.error);
       }
     } catch (error) {
       console.log("Error While Replying", error);
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  function handleReport() {
+    if (module === "user") {
+      handleUserReport();
+    } else {
+      handlePostReport();
     }
   }
   return (

@@ -737,7 +737,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     marginRight: 20,
     // position:"absolute",
-    //    marginLeft:300,
+    // marginLeft: 300,
     zIndex: 107,
   },
 

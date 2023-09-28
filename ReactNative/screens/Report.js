@@ -16,6 +16,8 @@ import { review } from "../constants";
 
 const ReviewScreen = ({ navigation, route }) => {
   const { postId, module } = route.params;
+  const replyId = route.params?.replyId ?? "";
+
   const { t, i18n } = useTranslation();
 
   const isRtl = i18n.dir() == "rtl";
@@ -120,6 +122,7 @@ const ReviewScreen = ({ navigation, route }) => {
                         postId,
                         module,
                         reportType: item.name,
+                        replyId,
                       })
                     }
                   >

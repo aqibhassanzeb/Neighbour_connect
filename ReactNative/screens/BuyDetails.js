@@ -236,7 +236,7 @@ const Losted = ({ navigation, route }) => {
                 onPress={() =>
                   navigation.navigate("Report", {
                     postId: item._id,
-                    module: "neighbor trade",
+                    module: "sell",
                   })
                 }
                 style={{

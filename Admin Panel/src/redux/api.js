@@ -251,6 +251,14 @@ export const api = createApi({
       },
       providesTags: ["Report"],
     }),
+    getRecentLogins: build.query({
+      query: () => {
+        return {
+          url: "/recent_logins",
+          method: "GET",
+        };
+      },
+    }),
   }),
 });
 
@@ -279,6 +287,7 @@ export const {
   useGetAllForumsDeletedQuery,
   useGetAllSellsDeletdQuery,
   useGetAllSkillsDeletedQuery,
+  useGetRecentLoginsQuery,
 } = api;
 
 export function uploadImage(file) {

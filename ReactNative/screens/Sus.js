@@ -366,7 +366,7 @@ const ServicesScreen = ({ navigation }) => {
                           onPress={() =>
                             navigation.navigate("Report", {
                               postId: post._id,
-                              module: "lost & found",
+                              module: "neighbour-watch",
                             })
                           }
                         >

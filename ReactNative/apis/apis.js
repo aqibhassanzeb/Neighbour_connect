@@ -190,6 +190,11 @@ export const deleteAccount = async () => {
   return result;
 };
 
+export const trackLogin = async (data) => {
+  let result = await apiRequest("POST", "track_login", data, headers);
+  return result;
+};
+
 // lost and found apis
 
 export const lostItemGetbyLoc = async (data) => {
@@ -753,7 +758,13 @@ export const getUserActivities = async (id) => {
 };
 
 // Report Api
-export const addReport = async (data) => {
+export const addUserReport = async (data) => {
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest("POST", "user_report", data, headersWithToken);
+  return result;
+};
+
+export const addPostReport = async (data) => {
   const headersWithToken = await getHeadersWithToken();
   let result = await apiRequest("POST", "report", data, headersWithToken);
   return result;
@@ -777,6 +788,7 @@ export const getNotifications = async (query) => {
   return result;
 };
 
+// Notifications Settings
 export const getSettings = async () => {
   const headersWithToken = await getHeadersWithToken();
   let result = await apiRequest(

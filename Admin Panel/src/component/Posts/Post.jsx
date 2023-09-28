@@ -381,7 +381,7 @@ const Users = () => {
           position: "fixed",
           margin: "0px 0px 10px 0px",
           width: "100%",
-          height: 63,
+          height: 80,
           backgroundColor: "#005D7A",
           display: "flex",
           alignContent: "center",

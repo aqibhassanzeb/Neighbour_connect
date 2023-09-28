@@ -209,7 +209,7 @@ const EditProfileScreen = (props) => {
           {/* Block Menu */}
           {dropdownOpens && (
             <View style={[styles.dropdown]}>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={() => {
                   setCancelModal(true);
                   //  setSelectedId(item.key);
@@ -221,13 +221,18 @@ const EditProfileScreen = (props) => {
               >
                 <Ionicons name="close-circle-outline" size={23} color="black" />
                 <Text style={styles.dropdownButtonText}>Block</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <TouchableOpacity
                 style={[
                   styles.dropdownButton,
                   selectedValue === "button1" && styles.dropdownButtonSelected,
                 ]}
-                onPress={() => props.navigation.navigate("Report")}
+                onPress={() =>
+                  props.navigation.navigate("Report", {
+                    postId: sender.sender._id,
+                    module: "user",
+                  })
+                }
               >
                 <Ionicons name="flag-outline" size={23} color="black" />
                 <Text style={styles.dropdownButtonText}>Report</Text>

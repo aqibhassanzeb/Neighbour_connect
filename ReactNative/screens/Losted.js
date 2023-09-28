@@ -283,7 +283,7 @@ const Losted = ({ navigation, route }) => {
                 onPress={() =>
                   navigation.navigate("Report", {
                     postId: data._id,
-                    module: "suspicious activity",
+                    module: "lost_found",
                   })
                 }
                 style={{
@@ -374,7 +374,7 @@ const Losted = ({ navigation, route }) => {
                     paddingBottom: 30,
                   }}
                 >
-                  {data.description}
+                  {data?.description}
                 </Text>
                 <Text
                   style={{
@@ -424,7 +424,7 @@ const Losted = ({ navigation, route }) => {
                     paddingBottom: 30,
                   }}
                 >
-                  {extractDate(data.date)}
+                  {extractDate(data?.date)}
                 </Text>
                 <Text
                   style={{

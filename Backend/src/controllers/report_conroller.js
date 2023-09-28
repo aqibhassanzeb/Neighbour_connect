@@ -15,7 +15,8 @@ import { UserReport } from "../models/user_report.js";
 
 export const addReport = async (req, res) => {
   const { email } = req.user;
-  const { reported_post, post_type, report_type, optional_note } = req.body;
+  const { reported_post, post_type, report_type, optional_note, reply_id } =
+    req.body;
   try {
     let reported = await Report.findOne({ reported_post });
 
@@ -24,6 +25,7 @@ export const addReport = async (req, res) => {
         reported_post,
         post_type,
         reports: [],
+        reply_id,
       });
     }
 
@@ -92,7 +94,7 @@ export const getUserReports = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(422).json({ error: "something went wrong!" });
+    res.status(422).json({ error: error.message });
   }
 };
 

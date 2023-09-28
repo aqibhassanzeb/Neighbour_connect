@@ -233,7 +233,7 @@ const OptionA = ({ activeSkip, inActiveSkip }) => {
                 getRowId={(row) => row._id}
                 rows={data}
                 columns={columns}
-                getRowHeight={() => "auto"}
+                getRowHeight={() => 80}
               />
             )
           )}
@@ -263,7 +263,7 @@ const OptionA = ({ activeSkip, inActiveSkip }) => {
                   getRowId={(row) => row._id}
                   rows={deletedData}
                   columns={columns}
-                  getRowHeight={() => "auto"}
+                  getRowHeight={() => 80}
                   localeText={{
                     noRowsLabel: "No Deleted Content Yet", // Change this text
                   }}

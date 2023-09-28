@@ -1,4 +1,4 @@
-import { User } from "../models/user.js";
+import { Tracker, User } from "../models/user.js";
 import bycrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { sendMail } from "../middleware/email_send.js";
@@ -550,5 +550,35 @@ export const getUserStatistics = async (req, res) => {
     res.json(monthData);
   } catch (error) {
     res.status(400).json({ message: "something went wrong!" });
+  }
+};
+
+export const handleTrack = async (req, res) => {
+  const { id } = req.body;
+  const track = new Tracker({
+    user: id,
+    login_time: new Date(),
+  });
+
+  try {
+    await track.save();
+    res.status(201).json({ message: "Login tracked successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "An error occurred while tracking login" });
+  }
+};
+
+export const RecentLogins = async (req, res) => {
+  try {
+    const latestLogins = await Tracker.find()
+      .populate("user", "name image")
+      .sort({ login_time: "desc" })
+      .limit(10);
+
+    res.json(latestLogins);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching latest logins" });
   }
 };

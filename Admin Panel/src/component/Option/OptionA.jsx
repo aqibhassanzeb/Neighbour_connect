@@ -19,6 +19,8 @@ import {
   useUpdateWatchMutation,
 } from "../../redux/api";
 import { useNavigate } from "react-router-dom";
+import EnlargedMedia from "../Custom/EnlargedMedia";
+import VideocamIcon from "@mui/icons-material/Videocam";
 
 function ConfirmationDialog({ open, onClose, onConfirm }) {
   const handleConfirm = () => {
@@ -88,130 +90,37 @@ function ActionsColumn({ row, activeSkip, inActiveSkip }) {
   );
 }
 
-const EnlargedImageView = ({ imageUrls, onClose }) => (
-  <div
-    className="modal"
-    style={{
-      position: "fixed",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    }}
-  >
-    <div
-      className="modal-content"
-      style={{
-        position: "relative",
-        padding: "20px",
-      }}
-    >
-      <span
-        className="close"
-        onClick={onClose}
-        style={{
-          position: "absolute",
-          top: "10px",
-          right: "10px",
-          fontSize: "20px",
-          color: "#aaa",
-          cursor: "pointer",
-        }}
-      >
-        &times;
-      </span>
-      <div style={{ display: "flex", flexDirection: "row" }}>
-        {imageUrls.map((url, index) =>
-          url.source.endsWith(".mp4") ? (
-            <video
-              key={index}
-              src={url.source}
-              alt="User"
-              width="300"
-              height="auto"
-              style={{ marginRight: "10px" }}
-              controls
-            />
-          ) : (
-            <img
-              key={index}
-              src={url.source}
-              alt="User"
-              width="300"
-              height="auto"
-              style={{ marginRight: "10px" }}
-            />
-          )
-        )}
-      </div>
-    </div>
-  </div>
-);
-
 const ImageContainer = ({ images }) => {
-  const [selectedImage, setSelectedImage] = React.useState(null);
-
-  const handleImageClick = (imageUrl) => {
-    setSelectedImage(imageUrl);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedImage(null);
-  };
-
-  let imageElement;
-  if (Array.isArray(images)) {
-    imageElement = (
-      <div style={{ display: "flex", flexDirection: "row" }}>
-        {images.map((url, index) => {
-          if (url.source.endsWith(".mp4")) {
-            return (
-              <video
-                key={index}
-                src={url.source}
-                alt="Video"
-                width="90"
-                height="100"
-                style={{ marginRight: "10px", cursor: "pointer" }}
-                onClick={() => handleImageClick(url.source)}
-              />
-            );
-          } else {
-            return (
-              <img
-                key={index}
-                src={url.source}
-                alt="Image"
-                width="90"
-                height="100"
-                style={{ marginRight: "10px", cursor: "pointer" }}
-                onClick={() => handleImageClick(url.source)}
-              />
-            );
-          }
-        })}
-      </div>
-    );
-  }
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   return (
     <div>
-      <img
-        src={images[0].source}
-        alt="Image"
-        width="90"
-        height="100"
-        style={{ marginRight: "10px", cursor: "pointer" }}
-        onClick={() => handleImageClick(images[0])}
-      />
-      {selectedImage && (
-        <div className="enlarged-image-container">
-          <EnlargedImageView imageUrls={images} onClose={handleCloseModal} />
-        </div>
+      {images[0].media_type === "image" ? (
+        <img
+          src={images[0].source}
+          alt="Media"
+          width="80"
+          height="80"
+          style={{ cursor: "pointer" }}
+          onClick={() => handleOpen()}
+        />
+      ) : (
+        <>
+          <VideocamIcon />
+          <video
+            src={images[0].source}
+            alt="Video"
+            width="80"
+            height="80"
+            style={{ marginRight: "10px" }}
+            onClick={handleOpen}
+          />
+        </>
+      )}
+      {open && (
+        <EnlargedMedia media={images} open={open} handleClose={handleClose} />
       )}
     </div>
   );
@@ -312,7 +221,7 @@ export default function OptionA({ activeSkip, inActiveSkip }) {
               </Box>
             ) : (
               data && (
-                <div style={{ height: 520 }}>
+                <div style={{ height: 530 }}>
                   <DataGrid
                     slots={{ toolbar: GridToolbar }}
                     slotProps={{

@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import loanandfoundSlice from "./loanandfoundSlice";
 import globalSlice from "./globalSlice";
-import notificationsReducer from './notificationSlice';
+import notificationsReducer from "./notificationSlice";
 
 export const store = configureStore({
   reducer: {
@@ -9,4 +9,9 @@ export const store = configureStore({
     global: globalSlice,
     notifications: notificationsReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      immutableCheck: false,
+      serializableCheck: false,
+    }),
 });
