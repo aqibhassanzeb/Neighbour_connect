@@ -947,7 +947,11 @@ const Signin = () => {
                     </Select>
                   </FormControl>
                 </Box>
-                <Box>
+                <Box
+                  sx={{
+                    width: "98vw",
+                  }}
+                >
                   {selected === "Neighbor Watch" && (
                     <OptionA activeSkip={true} inActiveSkip={false} />
                   )}

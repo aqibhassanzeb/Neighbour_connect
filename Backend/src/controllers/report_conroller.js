@@ -1,17 +1,10 @@
+import { lostandFound } from "../models/lost_found.js";
 import { Report } from "../models/report.js";
 import { UserReport } from "../models/user_report.js";
-
-// export const addReport = async (req, res) => {
-//   const { _id } = req.user;
-//   try {
-//     const reported = await Report.create({ reported_by: _id, ...req.body });
-//     if (reported) {
-//       res.status(201).json({ message: "reported successfully" });
-//     }
-//   } catch (error) {
-//     res.status(422).json({ error: "something went wrong!" });
-//   }
-// };
+import { Sell } from "../models/sell.js";
+import { Forum } from "../models/forum.js";
+import { Skill } from "../models/skill.js";
+import { Watch } from "../models/watch.js";
 
 export const addReport = async (req, res) => {
   const { email } = req.user;
@@ -112,5 +105,68 @@ export const getPostReports = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const reportAction = async (req, res) => {
+  try {
+    const { post_type, reported_post, _id } = req.body;
+    switch (post_type) {
+      case "lost_found":
+        await lostandFound.findByIdAndUpdate(
+          { _id: reported_post },
+          { is_active: false }
+        );
+        await Report.findByIdAndUpdate({ _id }, { delete_action: true });
+        res
+          .status(200)
+          .json({ message: "post moved to deleted content successfully" });
+        break;
+      case "sell":
+        await Sell.findByIdAndUpdate(
+          { _id: reported_post },
+          { is_active: false }
+        );
+        await Report.findByIdAndUpdate({ _id }, { delete_action: true });
+        res
+          .status(200)
+          .json({ message: "post moved to deleted content successfully" });
+        break;
+      case "neighbour-watch":
+        await Watch.findByIdAndUpdate(
+          { _id: reported_post },
+          { is_active: false }
+        );
+        await Report.findByIdAndUpdate({ _id }, { delete_action: true });
+        res
+          .status(200)
+          .json({ message: "post moved to deleted content successfully" });
+        break;
+      case "skill":
+        await Skill.findByIdAndUpdate(
+          { _id: reported_post },
+          { is_active: false }
+        );
+        await Report.findByIdAndUpdate({ _id }, { delete_action: true });
+        res
+          .status(200)
+          .json({ message: "post moved to deleted content successfully" });
+        break;
+      case "neighbour-forum":
+        await Forum.findByIdAndUpdate(
+          { _id: reported_post },
+          { is_active: false }
+        );
+        await Report.findByIdAndUpdate({ _id }, { delete_action: true });
+        res
+          .status(200)
+          .json({ message: "post moved to deleted content successfully" });
+        break;
+      default:
+        return res.status(400).json({ error: "Invalid input" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
   }
 };

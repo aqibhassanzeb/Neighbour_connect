@@ -251,6 +251,16 @@ export const api = createApi({
       },
       providesTags: ["Report"],
     }),
+    reportAction: build.mutation({
+      query: (data) => {
+        return {
+          url: "/report_action",
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: ["Report"],
+    }),
     getRecentLogins: build.query({
       query: () => {
         return {
@@ -288,6 +298,7 @@ export const {
   useGetAllSellsDeletdQuery,
   useGetAllSkillsDeletedQuery,
   useGetRecentLoginsQuery,
+  useReportActionMutation,
 } = api;
 
 export function uploadImage(file) {

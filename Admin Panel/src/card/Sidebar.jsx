@@ -87,7 +87,12 @@ const Sidebar = () => {
           variant="fullWidth"
           sx={{ bgcolor: "#005D7A", marginTop: 1.8 }}
         />
-        <Stack direction={"row"} gap={1} sx={{ marginTop: 2, marginLeft: 1 }}>
+        <Stack
+          onClick={() => history("/dashboard")}
+          direction={"row"}
+          gap={1}
+          sx={{ marginTop: 2, marginLeft: 1, "&:hover": { cursor: "pointer" } }}
+        >
           <Diversity2TwoToneIcon
             sx={{
               position: "relative",
