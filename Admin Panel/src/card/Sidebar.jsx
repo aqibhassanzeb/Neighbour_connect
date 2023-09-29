@@ -27,6 +27,7 @@ import PlaylistAddCheckCircleTwoToneIcon from "@mui/icons-material/PlaylistAddCh
 import Diversity3TwoToneIcon from "@mui/icons-material/Diversity3TwoTone";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import HistoryIcon from "@mui/icons-material/History";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 import PersonRemoveOutlinedIcon from "@mui/icons-material/PersonRemoveOutlined";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -183,6 +184,17 @@ const Sidebar = () => {
               <ContentPasteOffOutlinedIcon />
             </ItemIcon>
             <ListItemText primary="Spam Content" />
+          </ListItem>
+          <ListItem
+            onClick={(event) => history("/categories")}
+            style={CheckPath("/categories") ? { ...onClick } : {}}
+          >
+            <ItemIcon
+              style={CheckPath("/categories") ? { color: "#ffff" } : {}}
+            >
+              <AddCircleOutlineIcon />
+            </ItemIcon>
+            <ListItemText primary="Categories" />
           </ListItem>
 
           <ListItem

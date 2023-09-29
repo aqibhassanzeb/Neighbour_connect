@@ -48,12 +48,13 @@ import EventSeatRoundedIcon from "@mui/icons-material/EventSeatRounded";
 import Diversity1RoundedIcon from "@mui/icons-material/Diversity1Rounded";
 import ContentPasteOffOutlinedIcon from "@mui/icons-material/ContentPasteOffOutlined";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   useGetRecentLoginsQuery,
   useGetUserStatisticsQuery,
 } from "../../redux/api";
 import moment from "moment";
+import { logout } from "../../redux/reducers/auth";
 
 // chart data
 
@@ -208,6 +209,8 @@ const Dashboard = () => {
   const { data, isLoading } = useGetUserStatisticsQuery();
   const { data: logins } = useGetRecentLoginsQuery();
 
+  const dispatch = useDispatch();
+
   const handleShowPost = () => {
     // Navigate to the desired page
     navigate("/posts");
@@ -236,6 +239,11 @@ const Dashboard = () => {
   const handleChange = (event) => {
     setAge(event.target.value);
   };
+
+  function handleLogout() {
+    dispatch(logout());
+    history("/");
+  }
   return (
     <Box sx={{}}>
       <Box
@@ -304,7 +312,7 @@ const Dashboard = () => {
             style={{ margin: "80px 0px 0px -100px" }}
           >
             <MenuItem onClick={(e) => history("/profile")}>My account</MenuItem>
-            <MenuItem onClick={(e) => history("/")}>Logout</MenuItem>
+            <MenuItem onClick={() => handleLogout()}>Logout</MenuItem>
           </Menu>
         </Box>
       </Box>

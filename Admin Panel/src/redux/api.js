@@ -13,7 +13,19 @@ export const api = createApi({
     },
   }),
   reducerPath: "neighbour-api",
-  tagTypes: ["User", "Watch", "LANDF", "Skill", "Sell", "Forum", "Report"],
+  tagTypes: [
+    "User",
+    "Watch",
+    "LANDF",
+    "Skill",
+    "Sell",
+    "Forum",
+    "Report",
+    "SellCat",
+    "SkillCat",
+    "WatchCat",
+    "LAF",
+  ],
   endpoints: (build) => ({
     Register: build.mutation({
       query: (data) => {
@@ -269,6 +281,122 @@ export const api = createApi({
         };
       },
     }),
+    getSellsCats: build.query({
+      query: () => {
+        return {
+          url: "/sell_cat",
+          method: "GET",
+        };
+      },
+      providesTags: ["SellCat"],
+    }),
+    updateSellCat: build.mutation({
+      query: (param) => {
+        return {
+          url: `/sell_cat_update/${param.id}`,
+          method: "PUT",
+          body: param.data,
+        };
+      },
+      invalidatesTags: ["SellCat"],
+    }),
+    addSellCat: build.mutation({
+      query: (data) => {
+        return {
+          url: "/sell_cat_create",
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: ["SellCat"],
+    }),
+    getSkillCats: build.query({
+      query: () => {
+        return {
+          url: "/skill_cat",
+          method: "GET",
+        };
+      },
+      providesTags: ["SkillCat"],
+    }),
+    updateSkillCat: build.mutation({
+      query: (param) => {
+        return {
+          url: `/skill_cat_update/${param.id}`,
+          method: "PUT",
+          body: param.data,
+        };
+      },
+      invalidatesTags: ["SkillCat"],
+    }),
+    addSkillCat: build.mutation({
+      query: (data) => {
+        return {
+          url: "/skill_cat_create",
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: ["SkillCat"],
+    }),
+    getWatchCats: build.query({
+      query: () => {
+        return {
+          url: "/watch_cat",
+          method: "GET",
+        };
+      },
+      providesTags: ["WatchCat"],
+    }),
+    updateWatchCat: build.mutation({
+      query: (param) => {
+        return {
+          url: `/watch_cat_update/${param.id}`,
+          method: "PUT",
+          body: param.data,
+        };
+      },
+      invalidatesTags: ["WatchCat"],
+    }),
+    addWatchCat: build.mutation({
+      query: (data) => {
+        return {
+          url: "/watch_cat_create",
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: ["WatchCat"],
+    }),
+    getLAFCats: build.query({
+      query: () => {
+        return {
+          url: "/lostfoundCateg",
+          method: "GET",
+        };
+      },
+      providesTags: ["LAF"],
+    }),
+    updateLAFCat: build.mutation({
+      query: (param) => {
+        return {
+          url: `/lostfoundCateg_update/${param.id}`,
+          method: "PUT",
+          body: param.data,
+        };
+      },
+      invalidatesTags: ["LAF"],
+    }),
+    addLAFCat: build.mutation({
+      query: (data) => {
+        return {
+          url: "/lostfoundCateg_create",
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: ["LAF"],
+    }),
   }),
 });
 
@@ -299,6 +427,18 @@ export const {
   useGetAllSkillsDeletedQuery,
   useGetRecentLoginsQuery,
   useReportActionMutation,
+  useGetSellsCatsQuery,
+  useUpdateSellCatMutation,
+  useAddSellCatMutation,
+  useGetSkillCatsQuery,
+  useUpdateSkillCatMutation,
+  useAddSkillCatMutation,
+  useGetWatchCatsQuery,
+  useAddWatchCatMutation,
+  useUpdateWatchCatMutation,
+  useGetLAFCatsQuery,
+  useUpdateLAFCatMutation,
+  useAddLAFCatMutation,
 } = api;
 
 export function uploadImage(file) {
