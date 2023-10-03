@@ -28,7 +28,6 @@ const OngoingTab = (props) => {
   const [conLoader, setConLoader] = useState(false);
   const [connectionsData, setConnectionsData] = useState([]);
   const [loggedInUserId, setLoggedInUserId] = useState("");
-  console.log({ connectionsData });
 
   const isRtl = i18n.dir() == "rtl";
 

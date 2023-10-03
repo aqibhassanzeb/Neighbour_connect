@@ -23,7 +23,6 @@ import Loader from "../../components/loader";
 
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { userUpdate } from "../../apis/apis";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
 

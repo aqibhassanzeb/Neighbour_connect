@@ -62,7 +62,8 @@ const LoginScreen = ({ navigation }) => {
         } else {
           dispatch(handleSetUserinfo(user.data));
           const userData = JSON.stringify(user.data);
-          await AsyncStorage.setItem("userData", userData), setEmail("");
+          await AsyncStorage.setItem("userData", userData);
+          setEmail("");
           setPassword("");
           navigation.navigate("bottomTab", { userinfo2: user.data });
           await trackLogin({ id: user.data.user._id });

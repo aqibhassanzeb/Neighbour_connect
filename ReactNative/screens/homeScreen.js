@@ -48,6 +48,7 @@ const HomeScreen = ({ navigation, route }) => {
   const [userData, setUserData] = useState("");
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const [loader, setLoader] = useState(false);
+
   const toggleSidePanel = () => {
     setIsSidePanelOpen(!isSidePanelOpen);
   };
@@ -158,7 +159,6 @@ const HomeScreen = ({ navigation, route }) => {
   const handleGetSettings = async () => {
     try {
       let result = await getSettings();
-      console.log(result.data);
       if (result.status == 200) {
         dispatch(setSettings({ settings: result.data }));
       }
@@ -221,9 +221,10 @@ const HomeScreen = ({ navigation, route }) => {
                 style={{
                   ...Fonts.Medium14white,
                   paddingTop: 3,
+                  paddingLeft: 2,
                 }}
               >
-                2464 Royal Ln. Mesa, New Jersey 45463
+                {userInfo?.user?.address?.name}
               </Text>
             </TouchableOpacity>
           </View>

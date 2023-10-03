@@ -116,7 +116,6 @@ const Lostss = ({ navigation }) => {
     try {
       setCancelModals(false);
       let result = await deleteSell({ _id: deleteId });
-      console.log({ result });
       if (result.status == 200) {
         const filteredArray = userSells.filter((sell) => sell._id !== deleteId);
         setUserSells(filteredArray);

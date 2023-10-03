@@ -33,6 +33,9 @@ const UserSchema = new mongoose.Schema(
       longitude: {
         type: String,
       },
+      name: {
+        type: String,
+      },
     },
     address_range: {
       type: String,
