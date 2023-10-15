@@ -82,7 +82,6 @@ const MyAccountScreen = (props) => {
       setCancelModal(true);
       setDeleteLoading(true);
       const result = await deleteAccount();
-      console.log(result);
       if (result.status == 200) {
         props.navigation.navigate("Logins1");
       }

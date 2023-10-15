@@ -26,7 +26,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Loader from "../../components/loader";
 import DashedLine from "react-native-dashed-line";
 import { MaterialIcons } from "@expo/vector-icons";
-import { loginUser } from "../../apis/apis";
+import { loginUser, trackLogin } from "../../apis/apis";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { handleSetUserinfo } from "../../redux/loanandfoundSlice";
 import { useDispatch } from "react-redux";
@@ -56,13 +56,18 @@ const LoginScreen = ({ navigation }) => {
     try {
       setLoginLoader(true);
       let user = await loginUser(payload);
-
       if (user.status == 200) {
-        dispatch(handleSetUserinfo(user.data));
-        const userData = JSON.stringify(user.data);
-        await AsyncStorage.setItem("userData", userData), setEmail("");
-        setPassword("");
-        navigation.navigate("bottomTab", { userinfo2: user.data });
+        if (user.data.user.isActive === false) {
+          return alert("Your account has been suspended");
+        } else {
+          dispatch(handleSetUserinfo(user.data));
+          const userData = JSON.stringify(user.data);
+          await AsyncStorage.setItem("userData", userData);
+          setEmail("");
+          setPassword("");
+          navigation.navigate("bottomTab", { userinfo2: user.data });
+          await trackLogin({ id: user.data.user._id });
+        }
       } else {
         alert(user.data.error);
       }

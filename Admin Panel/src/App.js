@@ -19,7 +19,9 @@ import OptionB from "./component/OptionB/OptionB";
 import OptionC from "./component/OptionC/OptionC";
 import OptionD from "./component/OptionD/OptionD";
 import OptionE from "./component/OptionE/OptionE";
+import Categories from "./component/Categories/Categories";
 import { Toaster } from "react-hot-toast";
+import ProtectedRoutes from "./component/Auth/ProtectedRoues";
 
 const App = () => {
   const navigation = useLocation();
@@ -46,7 +48,6 @@ const App = () => {
     overflowY: "scroll",
     borderRadius: "0px 20px 20px 0px",
   });
-  console.log("set", window.location.pathname);
   if (navigation.pathname != "/" && navigation.pathname != "/forgot-password") {
     return (
       <>
@@ -55,19 +56,22 @@ const App = () => {
         <BoxStyle>
           <Routes>
             <Route exact path="/Signin" element={<Signin />} />
-            <Route exact path="/dashboard" element={<Dashboard />} />
-            <Route exact path="/users" element={<Users />} />
-            <Route exact path="/posts" element={<Posts />} />
-            <Route exact path="/story" element={<Stories />} />
-            <Route exact path="/events" element={<Events />} />
-            <Route exact path="/playlist" element={<Playlist />} />
-            <Route exact path="/groups" element={<Groups />} />
-            <Route exact path="/profile" element={<Profile />} />
-            <Route exact path="/OptionA" element={<OptionA />} />
-            <Route exact path="/OptionB" element={<OptionB />} />
-            <Route exact path="/OptionC" element={<OptionC />} />
-            <Route exact path="/OptionD" element={<OptionD />} />
-            <Route exact path="/OptionE" element={<OptionE />} />
+            <Route element={<ProtectedRoutes />}>
+              <Route exact path="/dashboard" element={<Dashboard />} />
+              <Route exact path="/users" element={<Users />} />
+              <Route exact path="/posts" element={<Posts />} />
+              <Route exact path="/story" element={<Stories />} />
+              <Route exact path="/events" element={<Events />} />
+              <Route exact path="/playlist" element={<Playlist />} />
+              <Route exact path="/groups" element={<Groups />} />
+              <Route exact path="/profile" element={<Profile />} />
+              <Route exact path="/OptionA" element={<OptionA />} />
+              <Route exact path="/OptionB" element={<OptionB />} />
+              <Route exact path="/OptionC" element={<OptionC />} />
+              <Route exact path="/OptionD" element={<OptionD />} />
+              <Route exact path="/OptionE" element={<OptionE />} />
+              <Route exact path="/categories" element={<Categories />} />
+            </Route>
           </Routes>
         </BoxStyle>
       </>

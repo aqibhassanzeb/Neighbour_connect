@@ -225,7 +225,12 @@ const EditProfileScreen = (props) => {
                   styles.dropdownButton,
                   selectedValue === "button1" && styles.dropdownButtonSelected,
                 ]}
-                onPress={() => props.navigation.navigate("Report")}
+                onPress={() =>
+                  props.navigation.navigate("Report", {
+                    postId: connectionDetails._id,
+                    module: "user",
+                  })
+                }
               >
                 <Ionicons name="flag-outline" size={23} color="black" />
                 <Text style={styles.dropdownButtonText}>Report</Text>

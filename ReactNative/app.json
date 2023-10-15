@@ -11,15 +11,13 @@
       "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "bundleIdentifier": "com.camelcase.rnhomeservice",
       "buildNumber": "1.0.0",
       "supportsTablet": true,
-      "config":{
-        "googleMapsApiKey":"ENTER_YOUR_GOOGLE_MAP_API_KEY_HERE"
+      "config": {
+        "googleMapsApiKey": "ENTER_YOUR_GOOGLE_MAP_API_KEY_HERE"
       }
     },
     "android": {
@@ -29,14 +27,22 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "config":{
-        "googleMaps":{
-          "apiKey":"AIzaSyDxeLoSv7tRgK2ulIAnW3dxU85tg_cLSjo"
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDxeLoSv7tRgK2ulIAnW3dxU85tg_cLSjo"
         }
       }
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Neighbour Connect to use your location."
+        }
+      ]
+    ]
   }
 }

@@ -378,7 +378,7 @@ const Users = () => {
     <>
       <Box
         sx={{
-          position: "absolute",
+          position: "fixed",
           margin: "0px 0px 10px 0px",
           width: "100%",
           height: 80,
@@ -401,18 +401,6 @@ const Users = () => {
         </Typography>
       </Box>
       <Box sx={{ marginTop: 12 }}>
-        {/* <select
-            className="Space"
-            value={selected}
-            onChange={(e) => handleChange(e)}
-          >
-            {selected === "" && <option>Select Category</option>}
-            <option>Lost and Found</option>
-            <option>Neighbor Watch</option>
-            <option>Skills Hub</option>
-            <option>Sell Zone</option>
-            <option>Neighbor Forum</option>
-          </select> */}
         <FormControl
           sx={{
             width: 200,
@@ -437,11 +425,21 @@ const Users = () => {
         </FormControl>
       </Box>
       <Box>
-        {selected === "Neighbor Watch" && <OptionA />}
-        {selected === "Lost and Found" && <OptionB />}
-        {selected === "Skills Hub" && <OptionC />}
-        {selected === "Sell Zone" && <OptionD />}
-        {selected === "Neighbor Forum" && <OptionE />}
+        {selected === "Neighbor Watch" && (
+          <OptionA activeSkip={false} inActiveSkip={true} />
+        )}
+        {selected === "Lost and Found" && (
+          <OptionB activeSkip={false} inActiveSkip={true} />
+        )}
+        {selected === "Skills Hub" && (
+          <OptionC activeSkip={false} inActiveSkip={true} />
+        )}
+        {selected === "Sell Zone" && (
+          <OptionD activeSkip={false} inActiveSkip={true} />
+        )}
+        {selected === "Neighbor Forum" && (
+          <OptionE activeSkip={false} inActiveSkip={true} />
+        )}
       </Box>
     </>
   );

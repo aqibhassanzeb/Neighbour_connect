@@ -198,6 +198,34 @@ export const getAllWatch = async (req, res) => {
   }
 };
 
+export const getAllWatchAdmin = async (req, res) => {
+  try {
+    const posts = await Watch.find({ is_active: true })
+      .sort({ createdAt: -1 })
+      .populate("posted_by", "name email image helpful_count address")
+      .populate("category");
+
+    res.json(posts);
+  } catch (error) {
+    console.log("Error fetching posts", error);
+    res.status(500).json({ error: "Error fetching posts" });
+  }
+};
+
+export const getAllDeletedWatch = async (req, res) => {
+  try {
+    const posts = await Watch.find({ is_active: false })
+      .sort({ createdAt: -1 })
+      .populate("posted_by", "name email image helpful_count address")
+      .populate("category");
+
+    res.json(posts);
+  } catch (error) {
+    console.log("Error fetching posts", error);
+    res.status(500).json({ error: "Error fetching posts" });
+  }
+};
+
 export const increaseHelpful = async (req, res) => {
   const { _id } = req.params;
   const user_id = req.user._id;

@@ -11,10 +11,11 @@ const Alert = ({ openSnack, handleClose, severity, message }) => {
   return (
     <Snackbar
       open={openSnack}
-      autoHideDuration={3000}
+      autoHideDuration={2000}
       onClose={handleClose}
       anchorOrigin={{ vertical, horizontal }}
       key={vertical + horizontal}
+      severity={severity}
     >
       <MuiAlert
         severity={severity}

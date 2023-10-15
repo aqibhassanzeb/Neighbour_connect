@@ -195,7 +195,7 @@ const ChatScreen = (props) => {
                     onPress={() =>
                       props.navigation.navigate("Report", {
                         postId: topic._id,
-                        module: "neighbor forum",
+                        module: "neighbour-forum",
                       })
                     }
                   >

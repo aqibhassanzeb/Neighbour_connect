@@ -5,20 +5,28 @@ import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 
-import { Box, Divider } from "@mui/material";
+import { Box, CircularProgress, Divider } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import Alert from "../Custom/Alert";
-import { useUserUpdateMutation } from "../../redux/api";
+import {
+  uploadImage,
+  usePictureUploadMutation,
+  useUserUpdateMutation,
+} from "../../redux/api";
 import { setActiveUser } from "../../redux/reducers/auth";
+import { toast } from "react-hot-toast";
 
 const EditDetailsPage = () => {
   const activeUser = useSelector((state) => state.authReducer.activeUser);
+  const [uploadPicture, pictureResp] = usePictureUploadMutation();
 
   const nameParts = activeUser.name.split(" ");
   const [firstName, setFirstName] = useState(nameParts[0]);
   const [lastName, setLastName] = useState(nameParts.slice(1).join(" "));
   const [email, setEmail] = useState(activeUser.email);
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(0);
 
   const [updateUser, updateResp] = useUserUpdateMutation();
 
@@ -34,21 +42,20 @@ const EditDetailsPage = () => {
     setEmail(event.target.value);
   };
 
-  const handlePasswordChange = (event) => {
-    setPassword(event.target.value);
-  };
-
   const dispatch = useDispatch();
   const handleSave = () => {
+    setIsLoading(2);
+
     updateUser({
       id: activeUser._id,
       data: { name: `${firstName} ${lastName}`, email },
     })
       .then((res) => {
         if (res.error) {
-          setShowSnackbar({
-            toggle: true,
-            message: res.error.data.error,
+          toast.error(res.error.data.error, {
+            style: {
+              textTransform: "capitalize",
+            },
           });
         } else if (res.data.message) {
           dispatch(
@@ -58,26 +65,64 @@ const EditDetailsPage = () => {
               email,
             })
           );
-          setShowSnackbar({
-            toggle: true,
-            message: "Saved Successfully !",
-          });
+          toast.success("Saved Successfuly");
         }
       })
       .catch((err) => console.log(err));
   };
 
-  const [selectedFile, setSelectedFile] = useState(null);
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    setSelectedFile(file);
+  const handlePassword = () => {
+    if (password !== confirmPassword) {
+      toast.error("Password does not match");
+    } else if (password.length < 6) {
+      toast.error("Weak password");
+    } else {
+      setIsLoading(1);
+      updateUser({ id: activeUser._id, data: { password } })
+        .then((res) => {
+          if (res.error) {
+            toast.error(res.error.data.error, {
+              style: {
+                textTransform: "capitalize",
+              },
+            });
+          } else if (res.data.message) {
+            toast.success("Password Updated Successfuly");
+          }
+        })
+        .catch((err) => console.log(err));
+    }
   };
 
-  const [openSnack, setShowSnackbar] = useState({ toggle: false, message: "" });
+  const [selectedFile, setSelectedFile] = useState(null);
 
-  const handleClose = () => {
-    setShowSnackbar({ toggle: false, message: "" });
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    setSelectedFile(file);
+    setIsLoading(3);
+    const imageURL = await uploadImage(file);
+    updateUser({
+      id: activeUser._id,
+      data: { image: imageURL },
+    })
+      .then((res) => {
+        if (res.error) {
+          toast.error(res.error.data.error, {
+            style: {
+              textTransform: "capitalize",
+            },
+          });
+        } else if (res.data.message) {
+          dispatch(
+            setActiveUser({
+              ...activeUser,
+              image: imageURL,
+            })
+          );
+          toast.success("Picture Updated");
+        }
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -120,7 +165,7 @@ const EditDetailsPage = () => {
         style={{
           display: "flex",
           justifyContent: "flex-start",
-          padding: "3rem",
+          padding: "1rem",
           margin: 0,
         }}
       >
@@ -131,6 +176,7 @@ const EditDetailsPage = () => {
               boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
               paddingLeft: "4rem",
               paddingRight: "4rem",
+              marginTop: "3rem",
             }}
           >
             <Grid container direction="column" alignItems="center" spacing={3}>
@@ -163,9 +209,19 @@ const EditDetailsPage = () => {
                 <Button
                   variant="contained"
                   component="label"
-                  sx={{ backgroundColor: "#005D7A", color: "white" }}
+                  sx={{
+                    backgroundColor:
+                      updateResp.isLoading && isLoading === 3
+                        ? "white"
+                        : "#005D7A",
+                  }}
                 >
-                  Change Profile Picture
+                  {updateResp.isLoading && isLoading === 2 ? (
+                    <CircularProgress style={{ color: "#005D7A" }} size={25} />
+                  ) : (
+                    "Change Profile Picture"
+                  )}
+
                   <input
                     type="file"
                     accept="image/*"
@@ -176,9 +232,7 @@ const EditDetailsPage = () => {
               </Grid>
               <Grid item>
                 <Typography variant="body2">
-                  {selectedFile
-                    ? `Selected File: ${selectedFile.name}`
-                    : "No file chosen"}
+                  {selectedFile ? `Selected File: ${selectedFile.name}` : ""}
                 </Typography>
               </Grid>
             </Grid>
@@ -211,37 +265,55 @@ const EditDetailsPage = () => {
             fullWidth
             value={email}
             onChange={handleEmailChange}
-            style={{ marginBottom: "1.5rem" }}
           />
-          <Typography variant="body1" align="left" paddingBottom={2}>
-            Change Password
-          </Typography>
+          <Button
+            variant="contained"
+            component="label"
+            sx={{
+              backgroundColor:
+                updateResp.isLoading && isLoading === 2 ? "white" : "#005D7A",
+            }}
+            onClick={handleSave}
+            style={{ marginTop: "1rem", marginBottom: "1.5rem" }}
+          >
+            {updateResp.isLoading && isLoading === 2 ? (
+              <CircularProgress style={{ color: "#005D7A" }} size={25} />
+            ) : (
+              "Update Profile"
+            )}
+          </Button>
           <TextField
             label="Password"
             fullWidth
             type="password"
             value={password}
-            onChange={handlePasswordChange}
+            onChange={(e) => setPassword(e.target.value)}
             style={{ marginBottom: "1.5rem" }}
           />
           <TextField
             label="Confirm Password"
             fullWidth
             type="password"
-            value={password}
-            onChange={handlePasswordChange}
-            style={{ marginBottom: "2rem" }}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            style={{ marginBottom: "1.1em" }}
           />
-          <Button variant="contained" color="primary" onClick={handleSave}>
-            Save
+          <Button
+            variant="contained"
+            component="label"
+            style={{
+              backgroundColor:
+                updateResp.isLoading && isLoading === 1 ? "white" : "#005D7A",
+            }}
+            onClick={handlePassword}
+          >
+            {updateResp.isLoading && isLoading === 1 ? (
+              <CircularProgress style={{ color: "#005D7A" }} size={25} />
+            ) : (
+              "Update Password"
+            )}
           </Button>
         </div>
-        <Alert
-          openSnack={openSnack.toggle}
-          message={openSnack.message}
-          severity="success"
-          handleClose={handleClose}
-        />
       </div>
     </>
   );

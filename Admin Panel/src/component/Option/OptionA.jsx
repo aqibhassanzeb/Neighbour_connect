@@ -13,8 +13,14 @@ import {
   Typography,
   CircularProgress,
 } from "@mui/material";
-import { useGetAllWatchesQuery, useUpdateWatchMutation } from "../../redux/api";
+import {
+  useGetAllDeletedWatchesQuery,
+  useGetAllWatchesQuery,
+  useUpdateWatchMutation,
+} from "../../redux/api";
 import { useNavigate } from "react-router-dom";
+import EnlargedMedia from "../Custom/EnlargedMedia";
+import VideocamIcon from "@mui/icons-material/Videocam";
 
 function ConfirmationDialog({ open, onClose, onConfirm }) {
   const handleConfirm = () => {
@@ -37,7 +43,7 @@ function ConfirmationDialog({ open, onClose, onConfirm }) {
   );
 }
 
-function ActionsColumn({ row }) {
+function ActionsColumn({ row, activeSkip, inActiveSkip }) {
   const [open, setOpen] = React.useState(false);
   const [updatePost, updateResp] = useUpdateWatchMutation();
 
@@ -57,7 +63,7 @@ function ActionsColumn({ row }) {
   };
 
   function handleRemove(row) {
-    updatePost({ id: row.id, data: { is_active: false } });
+    updatePost({ id: row.id, data: { is_active: activeSkip ? true : false } });
   }
   return (
     <div
@@ -73,7 +79,7 @@ function ActionsColumn({ row }) {
         size="small"
         onClick={handleConfirmation}
       >
-        Delete
+        {activeSkip ? "Undo" : "Delete"}
       </Button>
       <ConfirmationDialog
         open={open}
@@ -84,97 +90,51 @@ function ActionsColumn({ row }) {
   );
 }
 
-const EnlargedImageView = ({ imageUrl, onClose }) => (
-  <div className="modal">
-    <div className="modal-content">
-      <span className="close" onClick={onClose}>
-        &times;
-      </span>
-      <div style={{ display: "flex", gap: 10, height: "50vh", width: "50vw" }}>
-        {imageUrl.map((image) => (
-          <img
-            src={image.source}
-            alt="Enlarged User"
-            className="enlarged-image"
-            width={"100%"}
-            height={"auto"}
-            style={{ maxWidth: "400px" }}
-          />
-        ))}
-      </div>
-    </div>
-  </div>
-);
-
 const ImageContainer = ({ images }) => {
-  const [selectedImage, setSelectedImage] = React.useState(null);
-
-  const handleImageClick = (imageUrl) => {
-    setSelectedImage(imageUrl);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedImage(null);
-  };
-
-  let imageElement;
-  imageElement = (
-    <img
-      src={images[0].source}
-      alt="Media"
-      width="80"
-      height="80"
-      style={{ cursor: "pointer" }}
-      onClick={() => handleImageClick(images)}
-    />
-  );
-
-  // if (Array.isArray(images)) {
-  //   imageElement = (
-  //     <div style={{ display: "flex", flexDirection: "row" }}>
-  //       {images.map((imageUrl, index) => (
-  //         <img
-  //           key={index}
-  //           src={imageUrl.source}
-  //           alt="Media"
-  //           width="50"
-  //           height="100"
-  //           style={{ marginRight: "10px", cursor: "pointer" }}
-  //           onClick={() => handleImageClick(imageUrl)}
-  //         />
-  //       ))}
-  //     </div>
-  //   );
-  // } else {
-  // imageElement = (
-  //   <img
-  //     src={images}
-  //     alt="User"
-  //     width="50"
-  //     height="100"
-  //     style={{ cursor: "pointer" }}
-  //     onClick={() => handleImageClick(images)}
-  //   />
-  // );
-  // }
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   return (
     <div>
-      {imageElement}
-      {selectedImage && (
-        <div className="enlarged-image-container">
-          <EnlargedImageView
-            imageUrl={selectedImage}
-            onClose={handleCloseModal}
+      {images[0].media_type === "image" ? (
+        <img
+          src={images[0].source}
+          alt="Media"
+          width="80"
+          height="80"
+          style={{ cursor: "pointer" }}
+          onClick={() => handleOpen()}
+        />
+      ) : (
+        <>
+          <VideocamIcon />
+          <video
+            src={images[0].source}
+            alt="Video"
+            width="80"
+            height="80"
+            style={{ marginRight: "10px" }}
+            onClick={handleOpen}
           />
-        </div>
+        </>
+      )}
+      {open && (
+        <EnlargedMedia media={images} open={open} handleClose={handleClose} />
       )}
     </div>
   );
 };
 
-export default function OptionA() {
-  const { data, isLoading, isError, error } = useGetAllWatchesQuery();
+export default function OptionA({ activeSkip, inActiveSkip }) {
+  const { data, isLoading } = useGetAllWatchesQuery(undefined, {
+    skip: activeSkip,
+  });
+
+  const { data: deletedData, isLoading: deleteLoading } =
+    useGetAllDeletedWatchesQuery(undefined, {
+      skip: inActiveSkip,
+    });
 
   const styles = {
     container: {
@@ -222,7 +182,13 @@ export default function OptionA() {
       label: "Actions",
       minWidth: 120,
       align: "center",
-      renderCell: (values) => <ActionsColumn row={values} />,
+      renderCell: (values) => (
+        <ActionsColumn
+          row={values}
+          activeSkip={activeSkip}
+          inActiveSkip={inActiveSkip}
+        />
+      ),
     },
   ];
 
@@ -234,10 +200,10 @@ export default function OptionA() {
             width: "83%",
             overflow: "scroll",
             // position: "absolute",
-            top: isLoading ? 320 : 90,
-            left: isLoading ? 450 : 4,
-            background: isLoading && "transparent",
-            boxShadow: isLoading && "none",
+            top: isLoading || deleteLoading ? 320 : 90,
+            left: isLoading || deleteLoading ? 450 : 4,
+            background: isLoading || deleteLoading ? "transparent" : "",
+            boxShadow: isLoading || deleteLoading ? "none" : "",
           }}
         >
           <Box>
@@ -255,21 +221,55 @@ export default function OptionA() {
               </Box>
             ) : (
               data && (
-                <DataGrid
-                  slots={{ toolbar: GridToolbar }}
-                  slotProps={{
-                    toolbar: {
-                      showQuickFilter: true,
-                      quickFilterProps: { debounceMs: 100 },
-                    },
-                  }}
-                  getRowId={(row) => row._id}
-                  rows={data}
-                  columns={columns}
-                  getRowHeight={() => "auto"}
-                  loading={isLoading}
-                  x
+                <div style={{ height: 530 }}>
+                  <DataGrid
+                    slots={{ toolbar: GridToolbar }}
+                    slotProps={{
+                      toolbar: {
+                        showQuickFilter: true,
+                        quickFilterProps: { debounceMs: 100 },
+                      },
+                    }}
+                    getRowId={(row) => row._id}
+                    rows={data}
+                    columns={columns}
+                    getRowHeight={() => "auto"}
+                  />
+                </div>
+              )
+            )}
+            {deleteLoading ? (
+              <Box>
+                <CircularProgress
+                  style={{ color: "#005D7A", marginLeft: 500, marginTop: 200 }}
+                  size={25}
                 />
+                <Typography
+                  sx={{ fontSize: 18, color: "#005D7A", marginLeft: 55 }}
+                >
+                  🚀 Loading Posts
+                </Typography>
+              </Box>
+            ) : (
+              deletedData && (
+                <div style={{ height: 450 }}>
+                  <DataGrid
+                    slots={{ toolbar: GridToolbar }}
+                    slotProps={{
+                      toolbar: {
+                        showQuickFilter: true,
+                        quickFilterProps: { debounceMs: 100 },
+                      },
+                    }}
+                    getRowId={(row) => row._id}
+                    rows={deletedData}
+                    columns={columns}
+                    getRowHeight={() => "auto"}
+                    localeText={{
+                      noRowsLabel: "No Deleted Content Yet", // Change this text
+                    }}
+                  />
+                </div>
               )
             )}
           </Box>

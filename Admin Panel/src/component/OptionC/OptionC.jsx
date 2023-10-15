@@ -30,6 +30,7 @@ import {
   ImageListItem,
 } from "@mui/material";
 import {
+  useGetAllSkillsDeletedQuery,
   useGetAllSkillsQuery,
   useGetAllUsersQuery,
   useGetAllWatchesQuery,
@@ -38,6 +39,7 @@ import {
   useUserUpdateMutation,
 } from "../../redux/api";
 import { useNavigate } from "react-router-dom";
+import ImageContainer from "../Custom/ImageContainer";
 
 function ConfirmationDialog({ open, onClose, onConfirm }) {
   const handleConfirm = () => {
@@ -60,7 +62,7 @@ function ConfirmationDialog({ open, onClose, onConfirm }) {
   );
 }
 
-function ActionsColumn({ row }) {
+function ActionsColumn({ row, activeSkip }) {
   const [open, setOpen] = React.useState(false);
   const [updatePost, updateResp] = useUpdateSkillsMutation();
 
@@ -80,7 +82,7 @@ function ActionsColumn({ row }) {
   };
 
   function handleRemove(row) {
-    updatePost({ id: row.id, data: { is_active: false } });
+    updatePost({ id: row.id, data: { is_active: activeSkip ? true : false } });
   }
   return (
     <div
@@ -96,7 +98,7 @@ function ActionsColumn({ row }) {
         size="small"
         onClick={handleConfirmation}
       >
-        Delete
+        {activeSkip ? "Undo" : "Delete"}
       </Button>
       <ConfirmationDialog
         open={open}
@@ -107,150 +109,14 @@ function ActionsColumn({ row }) {
   );
 }
 
-const EnlargedImageView = ({ imageUrls, onClose }) => (
-  <div
-    className="modal"
-    style={{
-      position: "fixed",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    }}
-  >
-    <div
-      className="modal-content"
-      style={{
-        position: "relative",
-        padding: "20px",
-      }}
-    >
-      <span
-        className="close"
-        onClick={onClose}
-        style={{
-          position: "absolute",
-          top: "10px",
-          right: "10px",
-          fontSize: "20px",
-          color: "#aaa",
-          cursor: "pointer",
-        }}
-      >
-        &times;
-      </span>
-      <ImageList sx={{ width: 500, height: 500 }} cols={3} rowHeight={300}>
-        {imageUrls.map((item, index) => (
-          <ImageListItem key={index}>
-            <img
-              srcSet={`${item}?w=300&h=300&fit=crop&auto=format&dpr=2 2x`}
-              src={`${item}?w=300&h=300&fit=crop&auto=format`}
-              alt={item}
-              loading="lazy"
-            />
-          </ImageListItem>
-        ))}
-      </ImageList>
-    </div>
-  </div>
-);
-
-const ImageContainer = ({ images }) => {
-  const [selectedImage, setSelectedImage] = React.useState(null);
-
-  const handleImageClick = (imageUrl) => {
-    setSelectedImage(imageUrl);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedImage(null);
-  };
-
-  let imageElement;
-  if (Array.isArray(images)) {
-    imageElement = (
-      <div style={{ display: "flex", flexDirection: "row" }}>
-        {images.map((imageUrl, index) => {
-          if (imageUrl.endsWith(".mp4")) {
-            return (
-              <video
-                key={index}
-                src={imageUrl}
-                alt="User"
-                width="90"
-                height="100"
-                style={{ marginRight: "10px", cursor: "pointer" }}
-                onClick={() => handleImageClick(imageUrl)}
-              />
-            );
-          } else {
-            return (
-              <img
-                key={index}
-                src={imageUrl}
-                alt="User"
-                width="90"
-                height="100"
-                style={{ marginRight: "10px", cursor: "pointer" }}
-                onClick={() => handleImageClick(imageUrl)}
-              />
-            );
-          }
-        })}
-      </div>
-    );
-  } else {
-    if (images.endsWith(".mp4")) {
-      imageElement = (
-        <video
-          src={images}
-          alt="User"
-          width="90"
-          height="100"
-          style={{ cursor: "pointer" }}
-          onClick={() => handleImageClick(images)}
-        />
-      );
-    } else {
-      imageElement = (
-        <img
-          src={images}
-          alt="User"
-          width="90"
-          height="100"
-          style={{ cursor: "pointer" }}
-          onClick={() => handleImageClick(images)}
-        />
-      );
-    }
-  }
-
-  return (
-    <div>
-      <img
-        src={images[0]} // Show only the first image in the row
-        alt="User"
-        width="90"
-        height="100"
-        style={{ marginRight: "10px", cursor: "pointer" }}
-        onClick={() => handleImageClick(images[0])}
-      />
-      {selectedImage && (
-        <div className="enlarged-image-container">
-          <EnlargedImageView imageUrls={images} onClose={handleCloseModal} />
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default function OptionC() {
-  const { data, isLoading, isError, error } = useGetAllSkillsQuery();
-
+export default function OptionC({ activeSkip, inActiveSkip }) {
+  const { data, isLoading, isError, error } = useGetAllSkillsQuery(undefined, {
+    skip: activeSkip,
+  });
+  const { data: deletedData, isLoading: deleteLoading } =
+    useGetAllSkillsDeletedQuery(undefined, {
+      skip: inActiveSkip,
+    });
   const styles = {
     container: {
       height: "calc(100vh - 80px)", // Adjust the height to fit your needs
@@ -327,7 +193,13 @@ export default function OptionC() {
       label: "Actions",
       minWidth: 120,
       align: "center",
-      renderCell: (values) => <ActionsColumn row={values} />,
+      renderCell: (values) => (
+        <ActionsColumn
+          row={values}
+          activeSkip={activeSkip}
+          inActiveSkip={inActiveSkip}
+        />
+      ),
     },
   ];
 
@@ -339,10 +211,10 @@ export default function OptionC() {
             width: "83%",
             overflow: "scroll",
             // position: "absolute",
-            top: isLoading ? 320 : 90,
-            left: isLoading ? 450 : 4,
-            background: isLoading && "transparent",
-            boxShadow: isLoading && "none",
+            top: isLoading || deleteLoading ? 320 : 90,
+            left: isLoading || deleteLoading ? 450 : 4,
+            background: isLoading || deleteLoading ? "transparent" : "",
+            boxShadow: isLoading || deleteLoading ? "none" : "",
           }}
         >
           <Box>
@@ -373,6 +245,40 @@ export default function OptionC() {
                   columns={columns}
                   getRowHeight={() => "auto"}
                 />
+              )
+            )}
+            {deleteLoading ? (
+              <Box>
+                <CircularProgress
+                  style={{ color: "#005D7A", marginLeft: 500, marginTop: 200 }}
+                  size={25}
+                />
+                <Typography
+                  sx={{ fontSize: 18, color: "#005D7A", marginLeft: 55 }}
+                >
+                  🚀 Loading Posts
+                </Typography>
+              </Box>
+            ) : (
+              deletedData && (
+                <div style={{ height: 450 }}>
+                  <DataGrid
+                    slots={{ toolbar: GridToolbar }}
+                    slotProps={{
+                      toolbar: {
+                        showQuickFilter: true,
+                        quickFilterProps: { debounceMs: 100 },
+                      },
+                    }}
+                    getRowId={(row) => row._id}
+                    rows={deletedData}
+                    columns={columns}
+                    getRowHeight={() => "auto"}
+                    localeText={{
+                      noRowsLabel: "No Deleted Content Yet", // Change this text
+                    }}
+                  />
+                </div>
               )
             )}
           </Box>

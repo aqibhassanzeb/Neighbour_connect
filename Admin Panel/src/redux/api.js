@@ -1,8 +1,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+const baseURL = "http://localhost:3333/api/v1";
 export const api = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:3333/api/v1",
+    baseUrl: baseURL,
     prepareHeaders: (headers, { getState }) => {
       const token = getState().authReducer?.token;
       if (token) {
@@ -12,7 +13,19 @@ export const api = createApi({
     },
   }),
   reducerPath: "neighbour-api",
-  tagTypes: ["User", "Watch", "LANDF", "Skill", "Sell", "Forum", "Report"],
+  tagTypes: [
+    "User",
+    "Watch",
+    "LANDF",
+    "Skill",
+    "Sell",
+    "Forum",
+    "Report",
+    "SellCat",
+    "SkillCat",
+    "WatchCat",
+    "LAF",
+  ],
   endpoints: (build) => ({
     Register: build.mutation({
       query: (data) => {
@@ -64,6 +77,22 @@ export const api = createApi({
       },
       invalidatesTags: ["User"],
     }),
+    pictureUpload: build.mutation({
+      query: (imageFile) => {
+        var bodyFormData = new FormData();
+        bodyFormData.append("file", imageFile);
+        console.log({ bodyFormData, imageFile });
+        return {
+          url: "/picture_upload",
+          method: "POST",
+          headers: {
+            "Content-Type": "multipart/form-data;",
+          },
+          body: { bodyFormData },
+          formData: true,
+        };
+      },
+    }),
     getAllUsers: build.query({
       query: () => "/user_get",
       providesTags: ["User"],
@@ -71,7 +100,16 @@ export const api = createApi({
     getAllWatches: build.query({
       query: () => {
         return {
-          url: "/all_watch",
+          url: "/all_watch_admin",
+          method: "GET",
+        };
+      },
+      providesTags: ["Watch"],
+    }),
+    getAllDeletedWatches: build.query({
+      query: () => {
+        return {
+          url: "/all_watch_deleted",
           method: "GET",
         };
       },
@@ -96,6 +134,15 @@ export const api = createApi({
       },
       providesTags: ["LANDF"],
     }),
+    getAllLostAndFoundDeleted: build.query({
+      query: () => {
+        return {
+          url: "/lostandfound_deleted",
+          method: "GET",
+        };
+      },
+      providesTags: ["LANDF"],
+    }),
     updateLostAndFound: build.mutation({
       query: (param) => {
         return {
@@ -115,6 +162,15 @@ export const api = createApi({
       },
       providesTags: ["Skill"],
     }),
+    getAllSkillsDeleted: build.query({
+      query: () => {
+        return {
+          url: "/all_skills_deleted",
+          method: "GET",
+        };
+      },
+      providesTags: ["Skill"],
+    }),
     updateSkills: build.mutation({
       query: (param) => {
         return {
@@ -128,7 +184,16 @@ export const api = createApi({
     getAllSells: build.query({
       query: () => {
         return {
-          url: "/all_items",
+          url: "/all_items_admin",
+          method: "GET",
+        };
+      },
+      providesTags: ["Sell"],
+    }),
+    getAllSellsDeletd: build.query({
+      query: () => {
+        return {
+          url: "/all_items_deleted",
           method: "GET",
         };
       },
@@ -148,6 +213,15 @@ export const api = createApi({
       query: () => {
         return {
           url: "/all_topics",
+          method: "GET",
+        };
+      },
+      providesTags: ["Forum"],
+    }),
+    getAllForumsDeleted: build.query({
+      query: () => {
+        return {
+          url: "/all_topics_deleted",
           method: "GET",
         };
       },
@@ -189,6 +263,140 @@ export const api = createApi({
       },
       providesTags: ["Report"],
     }),
+    reportAction: build.mutation({
+      query: (data) => {
+        return {
+          url: "/report_action",
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: ["Report"],
+    }),
+    getRecentLogins: build.query({
+      query: () => {
+        return {
+          url: "/recent_logins",
+          method: "GET",
+        };
+      },
+    }),
+    getSellsCats: build.query({
+      query: () => {
+        return {
+          url: "/sell_cat",
+          method: "GET",
+        };
+      },
+      providesTags: ["SellCat"],
+    }),
+    updateSellCat: build.mutation({
+      query: (param) => {
+        return {
+          url: `/sell_cat_update/${param.id}`,
+          method: "PUT",
+          body: param.data,
+        };
+      },
+      invalidatesTags: ["SellCat"],
+    }),
+    addSellCat: build.mutation({
+      query: (data) => {
+        return {
+          url: "/sell_cat_create",
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: ["SellCat"],
+    }),
+    getSkillCats: build.query({
+      query: () => {
+        return {
+          url: "/skill_cat",
+          method: "GET",
+        };
+      },
+      providesTags: ["SkillCat"],
+    }),
+    updateSkillCat: build.mutation({
+      query: (param) => {
+        return {
+          url: `/skill_cat_update/${param.id}`,
+          method: "PUT",
+          body: param.data,
+        };
+      },
+      invalidatesTags: ["SkillCat"],
+    }),
+    addSkillCat: build.mutation({
+      query: (data) => {
+        return {
+          url: "/skill_cat_create",
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: ["SkillCat"],
+    }),
+    getWatchCats: build.query({
+      query: () => {
+        return {
+          url: "/watch_cat",
+          method: "GET",
+        };
+      },
+      providesTags: ["WatchCat"],
+    }),
+    updateWatchCat: build.mutation({
+      query: (param) => {
+        return {
+          url: `/watch_cat_update/${param.id}`,
+          method: "PUT",
+          body: param.data,
+        };
+      },
+      invalidatesTags: ["WatchCat"],
+    }),
+    addWatchCat: build.mutation({
+      query: (data) => {
+        return {
+          url: "/watch_cat_create",
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: ["WatchCat"],
+    }),
+    getLAFCats: build.query({
+      query: () => {
+        return {
+          url: "/lostfoundCateg",
+          method: "GET",
+        };
+      },
+      providesTags: ["LAF"],
+    }),
+    updateLAFCat: build.mutation({
+      query: (param) => {
+        return {
+          url: `/lostfoundCateg_update/${param.id}`,
+          method: "PUT",
+          body: param.data,
+        };
+      },
+      invalidatesTags: ["LAF"],
+    }),
+    addLAFCat: build.mutation({
+      query: (data) => {
+        return {
+          url: "/lostfoundCateg_create",
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: ["LAF"],
+    }),
   }),
 });
 
@@ -211,4 +419,48 @@ export const {
   useGetUserStatisticsQuery,
   useGetAllUsersReportsQuery,
   useGetAllPostsReportsQuery,
+  usePictureUploadMutation,
+  useGetAllLostAndFoundDeletedQuery,
+  useGetAllDeletedWatchesQuery,
+  useGetAllForumsDeletedQuery,
+  useGetAllSellsDeletdQuery,
+  useGetAllSkillsDeletedQuery,
+  useGetRecentLoginsQuery,
+  useReportActionMutation,
+  useGetSellsCatsQuery,
+  useUpdateSellCatMutation,
+  useAddSellCatMutation,
+  useGetSkillCatsQuery,
+  useUpdateSkillCatMutation,
+  useAddSkillCatMutation,
+  useGetWatchCatsQuery,
+  useAddWatchCatMutation,
+  useUpdateWatchCatMutation,
+  useGetLAFCatsQuery,
+  useUpdateLAFCatMutation,
+  useAddLAFCatMutation,
 } = api;
+
+export function uploadImage(file) {
+  return new Promise((resolve, reject) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    fetch(`${baseURL}/picture_upload`, {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((response) => {
+        resolve(response.imageUrls);
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
+}

@@ -21,6 +21,11 @@ const reportSchema = new mongoose.Schema(
     reports: [
       { email: String, reason: String, date: String, optional_note: String },
     ],
+    reply_id: String,
+    delete_action: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

@@ -79,7 +79,8 @@ const RegisterScreen = ({ navigation }) => {
       if (user.status == 200) {
         const userData = JSON.stringify(user.data);
 
-        await AsyncStorage.setItem("userData", userData), setEmail("");
+        await AsyncStorage.setItem("userData", userData);
+        setEmail("");
         setName("");
         setPassword("");
         setPasswords("");

@@ -207,7 +207,6 @@ const OngoingTab = (props) => {
   const handleGetNeighbours = async () => {
     try {
       let result = await NeighbourMayKnow();
-      console.log(result.data);
       if (result.status == 200) {
         let filteredYouKnow = [];
         for (const user of result.data) {

@@ -33,6 +33,9 @@ const UserSchema = new mongoose.Schema(
       longitude: {
         type: String,
       },
+      name: {
+        type: String,
+      },
     },
     address_range: {
       type: String,
@@ -76,3 +79,14 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 export const User = mongoose.model("user", UserSchema);
+
+const trackerSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "user",
+    required: true,
+  },
+  login_time: Date,
+});
+
+export const Tracker = mongoose.model("login-tracker", trackerSchema);

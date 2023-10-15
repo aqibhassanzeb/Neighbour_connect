@@ -6,8 +6,9 @@ import {
   BackHandler,
   TextInput,
   Dimensions,
+  Image,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Colors, Default, Fonts } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
@@ -15,9 +16,11 @@ import { useTranslation } from "react-i18next";
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from "react-native-maps";
 import { useDispatch } from "react-redux";
 import { updateLocation } from "../redux/loanandfoundSlice";
-import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { GOOGLE_APIKEY } from "../config";
 import axios from "axios";
+import * as Location from "expo-location";
+import MapLoading from "../assets/map_loading.gif";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
 const { width, height } = Dimensions.get("window");
 
@@ -31,10 +34,12 @@ const PickAddressScreen = ({ navigation, route }) => {
   const title = route.params?.title || "";
 
   const { t, i18n } = useTranslation();
+  const mapRef = useRef(null);
+
+  const [location, setLocation] = useState(null);
+  const [isNameLoading, setIsNameLoading] = useState(false);
 
   const [poi, setPoi] = useState(null);
-  const [search, setSearch] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
 
   const dispatch = useDispatch();
 
@@ -43,41 +48,80 @@ const PickAddressScreen = ({ navigation, route }) => {
   function tr(key) {
     return t(`pickAddressScreen:${key}`);
   }
+
   const backAction = () => {
     navigation.goBack();
     return true;
   };
+
   useEffect(() => {
     BackHandler.addEventListener("hardwareBackPress", backAction);
-
     return () =>
       BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
 
-  let region = {
-    latitude: LATITUDE,
-    longitude: LONGITUDE,
-    latitudeDelta: LATITUDE_DELTA,
-    longitudeDelta: LONGITUDE_DELTA,
-  };
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        alert("Permission to access location was denied");
+        return;
+      }
+      const { coords } = await Location.getCurrentPositionAsync({});
+      setLocation(coords);
+    })();
+  }, []);
 
   const onPoiClick = (e) => {
     const selectedLocation = e.nativeEvent;
     setPoi(selectedLocation);
-    dispatch(updateLocation(selectedLocation));
   };
 
-  const handleButtonPress = () => {
+  const handleButtonPress = async () => {
+    if (poi === null && location === null) {
+      alert("Please tap on any location");
+      return;
+    }
     if (poi === null) {
+      const placeName = await getPlaceName(
+        location.latitude,
+        location.longitude
+      );
       dispatch(
         updateLocation({
           coordinate: {
-            latitude: LATITUDE,
-            longitude: LONGITUDE,
+            latitude: location.latitude,
+            longitude: location.latitude,
           },
-          name: "Rawalpindi",
+          name: placeName,
         })
       );
+    } else {
+      if (!poi.name) {
+        const placeName = await getPlaceName(
+          poi.coordinate.latitude,
+          poi.coordinate.longitude
+        );
+        dispatch(
+          updateLocation({
+            coordinate: {
+              latitude: poi.coordinate.latitude,
+              longitude: poi.coordinate.latitude,
+            },
+            name: placeName,
+          })
+        );
+      } else {
+        dispatch(
+          updateLocation({
+            coordinate: {
+              latitude: poi.coordinate.latitude,
+              longitude: poi.coordinate.latitude,
+            },
+            name: poi.name,
+          })
+        );
+      }
     }
     if (
       (title && title === "Watch") ||
@@ -92,85 +136,54 @@ const PickAddressScreen = ({ navigation, route }) => {
     }
   };
 
-  const getPlaceName = () => {
-    axios
-      .get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${poi.coordinate.latitude},${poi.coordinate.longitude}&key=`
-      )
-      .then((response) => {
-        // console.log(response.data);
-        // const result = response.data.results[0];
-        // const placeName = result.formatted_address;
-      })
-      .catch((error) => {
-        console.error("Error fetching location:", error);
-      });
-  };
-
-  const handleSearch = async (searchText) => {
-    setSearch(searchText);
+  const getPlaceName = async (latitude, longitude) => {
     try {
-      const apiKey = GOOGLE_APIKEY;
+      setIsNameLoading(true);
       const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchText}&types=geocode&key=${apiKey}`
+        ` https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&sensor=true&key=${GOOGLE_APIKEY}`
       );
-      if (response.data && response.data.predictions) {
-        setSearchResults(response.data.predictions);
-      }
+      setIsNameLoading(false);
+      console.log(response.data);
+      const locationName = response.data.results[0].formatted_address;
+      var result = locationName.split(" ").slice(1).join(" ");
+      return result;
     } catch (error) {
-      console.log("Error fetching search results:", error);
+      setIsNameLoading(false);
+      alert(error.message);
     }
   };
 
-  const handleSelectLocation = (placeId) => {
-    try {
-      const apiKey = GOOGLE_APIKEY;
-      axios
-        .get(
-          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=geometry&key=${apiKey}`
-        )
-        .then((response) => {
-          console.log(response.data);
-          // if (
-          //   response.data &&
-          //   response.data.result &&
-          //   response.data.result.geometry &&
-          //   response.data.result.geometry.location
-          // ) {
-          //   const { location } = response.data.result.geometry;
-          //   setRegion({
-          //     latitude: location.lat,
-          //     longitude: location.lng,
-          //     latitudeDelta: LATITUDE_DELTA,
-          //     longitudeDelta: LONGITUDE_DELTA,
-          //   });
-          //   setPoi({
-          //     coordinate: {
-          //       latitude: location.lat,
-          //       longitude: location.lng,
-          //     },
-          //   });
-          // }
-        })
-        .catch((error) => {
-          console.log("Error fetching location details:", error);
-        });
-    } catch (error) {
-      console.log("Error fetching location details:", error);
+  const handleZoomToLocation = (latitude, longitude) => {
+    if (mapRef.current) {
+      mapRef.current.animateCamera({
+        center: {
+          latitude,
+          longitude,
+        },
+        zoom: 14, // Adjust the zoom level as needed
+        altitude: 2000, // Optional: You can adjust the altitude (zoom level) as needed
+      });
     }
   };
-
+  console.log(poi);
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <MapView
+        ref={mapRef}
         provider={PROVIDER_GOOGLE}
         style={{ flex: 1 }}
-        initialRegion={region}
+        initialRegion={{
+          latitude: LATITUDE,
+          longitude: LONGITUDE,
+          latitudeDelta: 2,
+          longitudeDelta: LONGITUDE_DELTA,
+        }}
         onPoiClick={onPoiClick}
-        // onPress={onPoiClick}
+        onPress={onPoiClick}
         showsUserLocation={true}
+        mapPadding={{ top: 100, right: 0, bottom: 0, left: 0 }}
       >
-        {poi ? (
+        {poi && (
           <Marker
             coordinate={poi.coordinate}
             pinColor={Colors.steelBlue}
@@ -178,15 +191,28 @@ const PickAddressScreen = ({ navigation, route }) => {
           >
             <Callout />
           </Marker>
-        ) : (
+        )}
+        {!poi && location && (
           <Marker
-            coordinate={{ latitude: 33.5651, longitude: 73.0169 }}
+            coordinate={{
+              latitude: location.latitude,
+              longitude: location.longitude,
+            }}
             pinColor={Colors.steelBlue}
             draggable
           />
         )}
       </MapView>
-      {/* Search Area */}
+
+      {/* <View
+          style={{
+            flex: 1,
+            justifyContent: "center", // Vertical centering
+            alignItems: "center",
+          }}
+        >
+          <Image source={MapLoading} />
+        </View> */}
       <View
         style={{
           paddingVertical: Default.fixPadding * 1.6,
@@ -215,44 +241,37 @@ const PickAddressScreen = ({ navigation, route }) => {
             borderRadius: 5,
             flex: 9,
             backgroundColor: Colors.white,
-            padding: Default.fixPadding * 0.8,
+            // padding: Default.fixPadding * 0.8,
             marginVertical: Default.fixPadding * 1.5,
             marginRight: Default.fixPadding * 2,
           }}
         >
-          <Ionicons
-            name="search-outline"
-            size={20}
-            color={Colors.grey}
-            style={{ flex: 0.7, alignSelf: "center" }}
-          />
-          <TextInput
-            style={{
-              ...Fonts.SemiBold16black,
-              flex: 8.3,
-              textAlign: isRtl ? "right" : "left",
-              marginHorizontal: Default.fixPadding * 0.8,
+          <GooglePlacesAutocomplete
+            placeholder="Search"
+            onPress={(data, details = null) => {
+              // 'details' is provided when fetchDetails = true
+              console.log(details.geometry, details.name);
+              handleZoomToLocation(
+                details.geometry.location.lat,
+                details.geometry.location.lng
+              );
+              setPoi({
+                coordinate: {
+                  latitude: details.geometry.location.lat,
+                  longitude: details.geometry.location.lng,
+                },
+                name: details.name,
+              });
             }}
-            onChangeText={(searchItem) => handleSearch(searchItem)}
-            value={search}
-            placeholder={tr("search")}
-            placeholderTextColor={Colors.grey}
-            selectionColor={Colors.primary}
+            query={{
+              key: GOOGLE_APIKEY,
+              language: "en",
+            }}
+            fetchDetails={true}
           />
         </View>
       </View>
 
-      {/* <GooglePlacesAutocomplete
-        placeholder="Search"
-        onPress={(data, details = null) => {
-          // 'details' is provided when fetchDetails = true
-          console.log(data, details);
-        }}
-        query={{
-          key: "",
-          language: "en",
-        }}
-      /> */}
       {/* Location Show and Button  */}
       <View
         style={{
@@ -263,7 +282,7 @@ const PickAddressScreen = ({ navigation, route }) => {
           marginHorizontal: Default.fixPadding * 2,
         }}
       >
-        <View
+        {/* <View
           style={{
             ...Default.shadow,
             backgroundColor: Colors.white,
@@ -299,7 +318,8 @@ const PickAddressScreen = ({ navigation, route }) => {
           >
             {poi ? poi.name : "Rawalpindi"}
           </Text>
-        </View>
+        </View> */}
+
         <TouchableOpacity
           onPress={handleButtonPress}
           style={{
@@ -310,8 +330,11 @@ const PickAddressScreen = ({ navigation, route }) => {
             marginVertical: Default.fixPadding * 2,
             padding: Default.fixPadding * 1.2,
           }}
+          disabled={isNameLoading}
         >
-          <Text style={{ ...Fonts.SemiBold18white }}>{tr("pickLocation")}</Text>
+          <Text style={{ ...Fonts.SemiBold18white }}>
+            {isNameLoading ? "Getting Location Info ..." : tr(`pickLocation`)}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

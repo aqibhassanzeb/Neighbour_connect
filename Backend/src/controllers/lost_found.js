@@ -153,6 +153,35 @@ export const lostandfound_Get = async (req, res) => {
     res.status(400).json({ error: "something went wrong!" });
   }
 };
+export const lostandfound_Deleted_Get = async (req, res) => {
+  let filter = { is_active: false };
+  if (req.query._id) {
+    filter._id = req.query._id.split(",");
+  }
+  if (req.query.type) {
+    filter.type = req.query.type.split(",");
+  }
+  if (req.query.category) {
+    filter.category = req.query.category;
+  }
+  if (req.query.title) {
+    filter.title = req.query.title;
+  }
+  if (req.query.posted_by) {
+    filter.posted_by = req.query.posted_by;
+  }
+  try {
+    const result = await lostandFound
+      .find(filter)
+      .populate("posted_by", "-password")
+      .populate("category");
+
+    res.status(200).json({ data: result, count: result.length });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ error: error.message });
+  }
+};
 
 export const lostandfoundLoc_Get = async (req, res) => {
   let { type } = req.query;

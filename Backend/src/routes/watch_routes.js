@@ -12,7 +12,9 @@ import {
   addWatch,
   decreaseHelpful,
   deleteWatch,
+  getAllDeletedWatch,
   getAllWatch,
+  getAllWatchAdmin,
   getWatchByUser,
   increaseHelpful,
   updateMedia,
@@ -35,6 +37,8 @@ routes.put("/update_media/:_id", upload.array("media", 3), updateMedia);
 routes.delete("/delete_watch/:_id", deleteWatch);
 routes.get("/watch/:user_id", getWatchByUser);
 routes.get("/all_watch", protect, getAllWatch);
+routes.get("/all_watch_admin", protect, getAllWatchAdmin);
+routes.get("/all_watch_deleted", protect, getAllDeletedWatch);
 
 // helpful
 routes.post("/helpful/:_id", protect, increaseHelpful);

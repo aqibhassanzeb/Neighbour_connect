@@ -4,8 +4,6 @@ import {
   GridToolbar,
   getDataGridUtilityClass,
 } from "@mui/x-data-grid";
-import SearchIcon from "@mui/icons-material/Search";
-import TextField from "@mui/material/TextField";
 import moment from "moment";
 import {
   Switch,
@@ -26,8 +24,10 @@ import {
   Tooltip,
   Typography,
   CircularProgress,
+  Modal,
 } from "@mui/material";
 import {
+  useGetAllLostAndFoundDeletedQuery,
   useGetAllLostAndFoundQuery,
   useGetAllUsersQuery,
   useGetAllWatchesQuery,
@@ -36,6 +36,7 @@ import {
   useUserUpdateMutation,
 } from "../../redux/api";
 import { useNavigate } from "react-router-dom";
+import ImageContainer from "../Custom/ImageContainer";
 
 function ConfirmationDialog({ open, onClose, onConfirm }) {
   const handleConfirm = () => {
@@ -58,7 +59,7 @@ function ConfirmationDialog({ open, onClose, onConfirm }) {
   );
 }
 
-function ActionsColumn({ row }) {
+function ActionsColumn({ row, activeSkip, inActiveSkip }) {
   const [open, setOpen] = React.useState(false);
   const [updatePost, updateResp] = useUpdateLostAndFoundMutation();
 
@@ -78,7 +79,7 @@ function ActionsColumn({ row }) {
   };
 
   function handleRemove(row) {
-    updatePost({ id: row.id, data: { is_active: false } });
+    updatePost({ id: row.id, data: { is_active: activeSkip ? true : false } });
   }
   return (
     <div
@@ -94,7 +95,7 @@ function ActionsColumn({ row }) {
         size="small"
         onClick={handleConfirmation}
       >
-        Delete
+        {activeSkip ? "Undo" : "Delete"}
       </Button>
       <ConfirmationDialog
         open={open}
@@ -105,97 +106,17 @@ function ActionsColumn({ row }) {
   );
 }
 
-const EnlargedImageView = ({ imageUrl, onClose }) => (
-  <div className="modal">
-    <div className="modal-content">
-      <span className="close" onClick={onClose}>
-        &times;
-      </span>
-      <div style={{ display: "flex", gap: 10, height: "50vh", width: "50vw" }}>
-        {imageUrl.map((image) => (
-          <img
-            src={image}
-            alt="Enlarged User"
-            className="enlarged-image"
-            width={"100%"}
-            height={"auto"}
-            style={{ maxWidth: "400px" }}
-          />
-        ))}
-      </div>
-    </div>
-  </div>
-);
-
-const ImageContainer = ({ images }) => {
-  const [selectedImage, setSelectedImage] = React.useState(null);
-
-  const handleImageClick = (imageUrl) => {
-    setSelectedImage(imageUrl);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedImage(null);
-  };
-
-  let imageElement;
-  imageElement = (
-    <img
-      src={images[0]}
-      alt="Media"
-      width="80"
-      height="80"
-      style={{ cursor: "pointer" }}
-      onClick={() => handleImageClick(images)}
-    />
+export default function OptionB({ activeSkip, inActiveSkip }) {
+  const { data, isLoading, isError, error } = useGetAllLostAndFoundQuery(
+    undefined,
+    {
+      skip: activeSkip,
+    }
   );
-
-  // if (Array.isArray(images)) {
-  //   imageElement = (
-  //     <div style={{ display: "flex", flexDirection: "row" }}>
-  //       {images.map((imageUrl, index) => (
-  //         <img
-  //           key={index}
-  //           src={imageUrl.source}
-  //           alt="Media"
-  //           width="50"
-  //           height="100"
-  //           style={{ marginRight: "10px", cursor: "pointer" }}
-  //           onClick={() => handleImageClick(imageUrl)}
-  //         />
-  //       ))}
-  //     </div>
-  //   );
-  // } else {
-  // imageElement = (
-  //   <img
-  //     src={images}
-  //     alt="User"
-  //     width="50"
-  //     height="100"
-  //     style={{ cursor: "pointer" }}
-  //     onClick={() => handleImageClick(images)}
-  //   />
-  // );
-  // }
-
-  return (
-    <div>
-      {imageElement}
-      {selectedImage && (
-        <div className="enlarged-image-container">
-          <EnlargedImageView
-            imageUrl={selectedImage}
-            onClose={handleCloseModal}
-          />
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default function OptionB() {
-  const { data, isLoading, isError, error } = useGetAllLostAndFoundQuery();
+  const { data: deletedData, isLoading: deleteLoading } =
+    useGetAllLostAndFoundDeletedQuery(undefined, {
+      skip: inActiveSkip,
+    });
 
   const styles = {
     container: {
@@ -245,7 +166,13 @@ export default function OptionB() {
       label: "Actions",
       minWidth: 120,
       align: "center",
-      renderCell: (values) => <ActionsColumn row={values} />,
+      renderCell: (values) => (
+        <ActionsColumn
+          activeSkip={activeSkip}
+          inActiveSkip={inActiveSkip}
+          row={values}
+        />
+      ),
     },
   ];
 
@@ -257,10 +184,10 @@ export default function OptionB() {
             width: "83%",
             overflow: "scroll",
             // position: "absolute",
-            top: isLoading ? 320 : 90,
-            left: isLoading ? 450 : 4,
-            background: isLoading && "transparent",
-            boxShadow: isLoading && "none",
+            top: isLoading || deleteLoading ? 320 : 90,
+            left: isLoading || deleteLoading ? 450 : 4,
+            background: isLoading || deleteLoading ? "transparent" : "",
+            boxShadow: isLoading || deleteLoading ? "none" : "",
           }}
         >
           {isLoading ? (
@@ -290,6 +217,40 @@ export default function OptionB() {
                 columns={columns}
                 getRowHeight={() => "auto"}
               />
+            )
+          )}
+          {deleteLoading ? (
+            <Box>
+              <CircularProgress
+                style={{ color: "#005D7A", marginLeft: 500, marginTop: 200 }}
+                size={25}
+              />
+              <Typography
+                sx={{ fontSize: 18, color: "#005D7A", marginLeft: 55 }}
+              >
+                🚀 Loading Posts
+              </Typography>
+            </Box>
+          ) : (
+            deletedData && (
+              <div style={{ height: 450 }}>
+                <DataGrid
+                  slots={{ toolbar: GridToolbar }}
+                  slotProps={{
+                    toolbar: {
+                      showQuickFilter: true,
+                      quickFilterProps: { debounceMs: 100 },
+                    },
+                  }}
+                  getRowId={(row) => row._id}
+                  rows={deletedData.data}
+                  columns={columns}
+                  getRowHeight={() => "auto"}
+                  localeText={{
+                    noRowsLabel: "No Deleted Content Yet", // Change this text
+                  }}
+                />
+              </div>
             )
           )}
         </Paper>

@@ -5,6 +5,7 @@ import multer from "multer";
 import {
   lostandfound_Create,
   lostandfound_Delete,
+  lostandfound_Deleted_Get,
   lostandfound_Get,
   lostandfound_Update,
   lostandfoundLoc_Get,
@@ -52,6 +53,7 @@ routes.put(
 );
 routes.put("/lostandfound_update/:_id", lostandfound_Update);
 routes.get("/lostandfound", protect, lostandfound_Get);
+routes.get("/lostandfound_deleted", protect, lostandfound_Deleted_Get);
 routes.get("/lostandfound_byloc", protect, lostandfoundLoc_Get);
 routes.delete("/lostandfound_delete/:_id", lostandfound_Delete);
 

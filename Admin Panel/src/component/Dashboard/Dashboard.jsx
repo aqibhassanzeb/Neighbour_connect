@@ -48,8 +48,13 @@ import EventSeatRoundedIcon from "@mui/icons-material/EventSeatRounded";
 import Diversity1RoundedIcon from "@mui/icons-material/Diversity1Rounded";
 import ContentPasteOffOutlinedIcon from "@mui/icons-material/ContentPasteOffOutlined";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { useGetUserStatisticsQuery } from "../../redux/api";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  useGetRecentLoginsQuery,
+  useGetUserStatisticsQuery,
+} from "../../redux/api";
+import moment from "moment";
+import { logout } from "../../redux/reducers/auth";
 
 // chart data
 
@@ -202,6 +207,9 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { name, image } = useSelector((state) => state.authReducer.activeUser);
   const { data, isLoading } = useGetUserStatisticsQuery();
+  const { data: logins } = useGetRecentLoginsQuery();
+
+  const dispatch = useDispatch();
 
   const handleShowPost = () => {
     // Navigate to the desired page
@@ -231,6 +239,11 @@ const Dashboard = () => {
   const handleChange = (event) => {
     setAge(event.target.value);
   };
+
+  function handleLogout() {
+    dispatch(logout());
+    history("/");
+  }
   return (
     <Box sx={{}}>
       <Box
@@ -299,7 +312,7 @@ const Dashboard = () => {
             style={{ margin: "80px 0px 0px -100px" }}
           >
             <MenuItem onClick={(e) => history("/profile")}>My account</MenuItem>
-            <MenuItem onClick={(e) => history("/")}>Logout</MenuItem>
+            <MenuItem onClick={() => handleLogout()}>Logout</MenuItem>
           </Menu>
         </Box>
       </Box>
@@ -527,25 +540,27 @@ const Dashboard = () => {
               Recent Logins
             </Typography>
             <Box sx={{ overflowY: "scroll", height: 220 }}>
-              {RecentMessage.map((value) => (
-                <ListItem
-                  sx={{
-                    ":hover": {
-                      bgcolor: "#005D7A",
-                      height: 50,
-                      cursor: "pointer",
-                    },
-                  }}
-                >
-                  <ListItemAvatar>
-                    <Avatar alt="Pankaj" src={value.image} />
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={value.primaryText}
-                    secondary={value.secondaryText}
-                  />
-                </ListItem>
-              ))}
+              {logins &&
+                logins.length > 0 &&
+                logins.map((value) => (
+                  <ListItem
+                    sx={{
+                      ":hover": {
+                        bgcolor: "#005D7A",
+                        height: 50,
+                        cursor: "pointer",
+                      },
+                    }}
+                  >
+                    <ListItemAvatar>
+                      <Avatar alt="Pankaj" src={value.user.image} />
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={value.user.name}
+                      secondary={moment(value.login_time).fromNow()}
+                    />
+                  </ListItem>
+                ))}
               {/* sx={{width:200,height:20,bgcolor:"#90a4ae",position:"absolute",}} */}
             </Box>
           </Box>

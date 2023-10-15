@@ -9,11 +9,15 @@ import {
   CircularProgress,
 } from "@mui/material";
 import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core";
 import "../Option/Option.css";
-import { useGetAllPostsReportsQuery } from "../../redux/api";
+import {
+  useGetAllPostsReportsQuery,
+  useReportActionMutation,
+} from "../../redux/api";
 import moment from "moment";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import Enlarged from "../Custom/Enlarged";
+import VideocamIcon from "@mui/icons-material/Videocam";
 
 function ConfirmationDialog({ open, onClose, onConfirm }) {
   const handleConfirm = () => {
@@ -40,10 +44,9 @@ function handleSuspend(row) {
   // Logic for suspending a resident
 }
 
-function handleRemove(row) {
-  // Logic for removing a resident
-}
 function ActionsColumn({ row }) {
+  const [updateAction, updateResp] = useReportActionMutation();
+
   const [open, setOpen] = useState(false);
 
   const handleConfirmations = () => {
@@ -55,6 +58,13 @@ function ActionsColumn({ row }) {
     setOpen(false);
   };
 
+  function handleRemove(row) {
+    updateAction({
+      _id: row._id,
+      reported_post: row.reported_post._id,
+      post_type: row.post_type,
+    });
+  }
   const handleRemoveConfirms = () => {
     handleRemove(row); // Call your remove logic here
     setOpen(false);
@@ -63,12 +73,21 @@ function ActionsColumn({ row }) {
   return (
     <div>
       <Button
-        sx={{ backgroundColor: "#005D7A", color: "white" }}
+        sx={{
+          backgroundColor: "#005D7A",
+          color: "white",
+          "&.Mui-disabled": {
+            backgroundColor: "white",
+            color: "black",
+          },
+        }}
         variant="outlined"
         size="small"
         onClick={handleConfirmations}
+        disabled={row.delete_action}
       >
-        Delete
+        {console.log(row.delete_action)}
+        {row.delete_action ? "Deleted" : "Delete"}
       </Button>
 
       <ConfirmationDialog
@@ -80,162 +99,71 @@ function ActionsColumn({ row }) {
   );
 }
 
-const EnlargedImageView = ({ imageUrls, onClose }) => (
-  <div
-    className="modal"
-    style={{
-      position: "fixed",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    }}
-  >
-    <div
-      className="modal-content"
-      style={{
-        position: "relative",
-        padding: "20px",
-      }}
-    >
-      <span
-        className="close"
-        onClick={onClose}
+const ImageContainer = ({ images }) => {
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const firstImage = images[0];
+
+  let renderedContent;
+
+  if (typeof firstImage === "string") {
+    renderedContent = (
+      <img onClick={handleOpen} src={firstImage} width={80} height={80} />
+    );
+  } else if (firstImage?.media_type === "image") {
+    renderedContent = (
+      <img
+        onClick={handleOpen}
+        src={firstImage?.source}
+        width={80}
+        height={80}
+      />
+    );
+  } else if (firstImage?.media_type === "video") {
+    renderedContent = (
+      <div
+        onClick={handleOpen}
         style={{
-          position: "absolute",
-          top: "10px",
-          right: "10px",
-          fontSize: "20px",
-          color: "#aaa",
-          cursor: "pointer",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
       >
-        &times;
-      </span>
-      <div style={{ display: "flex", flexDirection: "row" }}>
-        {imageUrls.map((imageUrl, index) =>
-          imageUrl.endsWith(".mp4") ? (
-            <video
-              key={index}
-              src={imageUrl}
-              alt="User"
-              width="300"
-              height="auto"
-              style={{ marginRight: "10px" }}
-              controls
-            />
-          ) : (
-            <img
-              key={index}
-              src={imageUrl}
-              alt="User"
-              width="300"
-              height="auto"
-              style={{ marginRight: "10px" }}
-            />
-          )
-        )}
-      </div>
-    </div>
-  </div>
-);
-
-function formatEmail(emails) {
-  const formattedEmails = emails.map((email) => (
-    <div style={{ borderRight: "1px solid black", paddingRight: "5px" }}>
-      {email}
-    </div>
-  ));
-  return formattedEmails;
-}
-const ImageContainer = ({ images }) => {
-  const [selectedImage, setSelectedImage] = useState(null);
-
-  const handleImageClick = (imageUrl) => {
-    setSelectedImage(imageUrl);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedImage(null);
-  };
-
-  let imageElement;
-  if (Array.isArray(images)) {
-    imageElement = (
-      <div style={{ display: "flex", flexDirection: "row" }}>
-        {images.map((imageUrl, index) => {
-          if (imageUrl.endsWith(".mp4")) {
-            return (
-              <video
-                key={index}
-                src={imageUrl}
-                alt="User"
-                width="90"
-                height="100"
-                style={{ marginRight: "10px", cursor: "pointer" }}
-                onClick={() => handleImageClick(imageUrl)}
-              />
-            );
-          } else {
-            return (
-              <img
-                key={index}
-                src={imageUrl}
-                alt="User"
-                width="90"
-                height="100"
-                style={{ marginRight: "10px", cursor: "pointer" }}
-                onClick={() => handleImageClick(imageUrl)}
-              />
-            );
-          }
-        })}
+        <VideocamIcon />
+        <video
+          src={firstImage?.source}
+          alt="Video"
+          width="80"
+          height="80"
+          style={{ marginRight: "10px" }}
+          controls
+        />
       </div>
     );
   } else {
-    if (images.endsWith(".mp4")) {
-      imageElement = (
-        <video
-          src={images}
-          alt="User"
-          width="90"
-          height="100"
-          style={{ cursor: "pointer" }}
-          onClick={() => handleImageClick(images)}
-        />
-      );
-    } else {
-      imageElement = (
-        <img
-          src={images}
-          alt="User"
-          width="90"
-          height="100"
-          style={{ cursor: "pointer" }}
-          onClick={() => handleImageClick(images)}
-        />
-      );
-    }
+    renderedContent = (
+      <div style={{ position: "relative" }}>
+        <img src="/static/my-photo/nntt.png" width={80} height={80} />
+        <span
+          style={{
+            position: "absolute",
+            left: 4,
+            fontWeight: 500,
+            bottom: 0,
+            color: "#005D7A",
+          }}
+        >
+          Forum Post
+        </span>
+      </div>
+    );
   }
-
   return (
     <div>
-      <img
-        src={images[0]} // Show only the first image in the row
-        alt="User"
-        width="90"
-        height="100"
-        style={{ marginRight: "10px", cursor: "pointer" }}
-        onClick={() => handleImageClick(images[0])}
-      />
-      {selectedImage && (
-        <div className="enlarged-image-container">
-          <EnlargedImageView imageUrls={images} onClose={handleCloseModal} />
-        </div>
+      {renderedContent}
+      {open && (
+        <Enlarged images={images} open={open} handleClose={handleClose} />
       )}
     </div>
   );
@@ -243,7 +171,6 @@ const ImageContainer = ({ images }) => {
 
 export default function Event() {
   const { data, isLoading, isError, error } = useGetAllPostsReportsQuery();
-  console.log(data);
 
   const styles = {
     container: {
@@ -256,19 +183,35 @@ export default function Event() {
   };
   const columns = [
     {
+      field: "images",
+      headerName: "Media",
+      width: 150,
+      renderCell: (params) => (
+        <ImageContainer
+          images={
+            params.row.reported_post.media ||
+            params.row.reported_post.images ||
+            params.row.reported_post.gallary_images ||
+            []
+          }
+        />
+      ),
+    },
+
+    {
       field: "reported_post",
       headerName: "Posted by",
       width: 150,
-      valueGetter: (params) => params.row.reported_posted?.posted_by?.name,
+      valueGetter: (params) => params.row.reported_post.posted_by.name,
     },
     {
-      field: "reported_user_one",
+      field: "reported_post_user_email",
       headerName: "Resident Email",
-      width: 200,
+      width: 250,
       valueFormatter: (params) => {
         const item = data.find((item) => item._id === params.id);
         if (item) {
-          return item.reported_user?.email;
+          return item.reported_post?.posted_by?.email;
         }
       },
     },
@@ -344,7 +287,7 @@ export default function Event() {
       label: "Actions",
       minWidth: 120,
       align: "center",
-      renderCell: (values) => <ActionsColumn row={values} />,
+      renderCell: (values) => <ActionsColumn row={values.row} />,
     },
   ];
 
@@ -401,19 +344,21 @@ export default function Event() {
               </Box>
             ) : (
               data && (
-                <DataGrid
-                  slots={{ toolbar: GridToolbar }}
-                  slotProps={{
-                    toolbar: {
-                      showQuickFilter: true,
-                      quickFilterProps: { debounceMs: 500 },
-                    },
-                  }}
-                  getRowId={(row) => row._id}
-                  rows={data}
-                  columns={columns}
-                  getRowHeight={() => 80}
-                />
+                <div style={{ height: 550 }}>
+                  <DataGrid
+                    slots={{ toolbar: GridToolbar }}
+                    slotProps={{
+                      toolbar: {
+                        showQuickFilter: true,
+                        quickFilterProps: { debounceMs: 500 },
+                      },
+                    }}
+                    getRowId={(row) => row._id}
+                    rows={data}
+                    columns={columns}
+                    getRowHeight={() => 120}
+                  />
+                </div>
               )
             )}
           </Box>
