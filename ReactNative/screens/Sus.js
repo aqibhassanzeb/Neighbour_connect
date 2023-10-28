@@ -10,7 +10,6 @@ import {
   TextInput,
   Dimensions,
   Image,
-  FlatList,
 } from "react-native";
 
 import { Video } from "expo-av";
@@ -27,6 +26,7 @@ import Loader from "../components/loader";
 import { extractDate, extractTime } from "../utils";
 import { useFocusEffect } from "@react-navigation/native";
 const { width, height } = Dimensions.get("window");
+import { DotIndicator } from "react-native-indicators";
 
 const ServicesScreen = ({ navigation }) => {
   const [selectedValue, setSelectedValue] = useState("");
@@ -43,6 +43,8 @@ const ServicesScreen = ({ navigation }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState("");
+  const [isFetching, setIsFetching] = useState(false);
+  const [selectedPost, setSelectedPost] = useState("");
 
   const { t, i18n } = useTranslation();
 
@@ -95,6 +97,7 @@ const ServicesScreen = ({ navigation }) => {
       setIsLoading(true);
       let result = await getAllWatches();
       if (result.status == 200) {
+        setIsFetching(true);
         setPosts(result.data);
       }
     } catch (error) {
@@ -161,7 +164,7 @@ const ServicesScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       <ScrollView>
-        {isLoading && <Loader />}
+        {isLoading && !isFetching && <Loader />}
 
         <View
           style={{
@@ -247,17 +250,24 @@ const ServicesScreen = ({ navigation }) => {
           style={{
             paddingTop: Default.fixPadding * 2.5,
             paddingLeft: Default.fixPadding * 2.5,
-            paddingRight: Default.fixPadding * 5,
             fontWeight: 90,
             paddingBottom: 20,
+            flexDirection: "row",
+            alignItems: "center",
           }}
         >
           <Text
             style={{
               ...Fonts.Bold16primary,
+              marginRight: 10,
             }}
           >
             Suspicious Activities
+          </Text>
+          <Text>
+            {isFetching && isLoading && (
+              <DotIndicator color={Colors.primary} size={5} />
+            )}
           </Text>
         </View>
         {filter.length === 0 && !isLoading && (
@@ -289,7 +299,7 @@ const ServicesScreen = ({ navigation }) => {
         <ScrollView showsVerticalScrollIndicator={false}>
           {filter.length > 0 &&
             filter.map((post) => (
-              <View
+              <TouchableOpacity
                 key={post._id}
                 style={{
                   ...Default.shadow,
@@ -299,6 +309,7 @@ const ServicesScreen = ({ navigation }) => {
                   marginRight: 12,
                   marginVertical: 8,
                 }}
+                onPress={() => navigation.navigate("SusItem", { post, userId })}
               >
                 <View
                   style={{
@@ -315,8 +326,8 @@ const ServicesScreen = ({ navigation }) => {
                     <Image
                       source={{ uri: post.posted_by.image }}
                       style={{
-                        height: 56,
-                        width: 56,
+                        height: 46,
+                        width: 46,
                         borderRadius: 75,
                         marginTop: 9,
                       }}
@@ -344,7 +355,10 @@ const ServicesScreen = ({ navigation }) => {
                   </View>
                   <View>
                     <TouchableOpacity
-                      onPress={() => setDropdownOpens(!dropdownOpens)}
+                      onPress={() => {
+                        setSelectedPost(post._id);
+                        setDropdownOpens(!dropdownOpens);
+                      }}
                     >
                       <Ionicons
                         name="ellipsis-vertical"
@@ -354,7 +368,7 @@ const ServicesScreen = ({ navigation }) => {
                         marginTop={10}
                       />
                     </TouchableOpacity>
-                    {dropdownOpens && (
+                    {dropdownOpens && post._id === selectedPost && (
                       <View style={styles.dropdown}>
                         <TouchableOpacity
                           style={[
@@ -386,15 +400,14 @@ const ServicesScreen = ({ navigation }) => {
                   style={{
                     justifyContent: "center",
                     alignItems: isRtl ? "flex-end" : "flex-start",
-                    marginTop: 12,
+                    marginTop: 8,
                     marginLeft: 21,
                     marginRight: 21,
-                    marginBottom: 4,
                     fontSize: 18,
                     fontWeight: "bold",
                   }}
                 >
-                  {post.category.name}: {post.title}
+                  {post.title}
                 </Text>
                 <Text
                   style={{
@@ -403,10 +416,13 @@ const ServicesScreen = ({ navigation }) => {
                     marginTop: 4,
                     marginLeft: 21,
                     marginRight: 21,
-                    marginBottom: 12,
+                    marginBottom: 5,
                   }}
                 >
-                  {post.description}
+                  Cateogry:{" "}
+                  <Text style={{ color: Colors.primary, fontSize: 16 }}>
+                    {post.category.name}
+                  </Text>
                 </Text>
 
                 <View
@@ -419,7 +435,7 @@ const ServicesScreen = ({ navigation }) => {
                   }}
                 >
                   <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                    Date:
+                    <Ionicons name="calendar-outline" size={18} />
                   </Text>
                   <Text style={{ marginLeft: 1, fontSize: 15, marginLeft: 3 }}>
                     {extractDate(post.date)}
@@ -431,126 +447,17 @@ const ServicesScreen = ({ navigation }) => {
                     alignItems: "center",
                     marginLeft: 21,
                     marginTop: 2,
-                    marginBottom: 2,
+                    marginBottom: 10,
                   }}
                 >
                   <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                    Time:
+                    <Ionicons name="time-outline" size={18} />
                   </Text>
                   <Text style={{ marginLeft: 1, fontSize: 15, marginLeft: 3 }}>
                     {extractTime(post.time)}
                   </Text>
                 </View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginLeft: 18,
-                    marginTop: 2,
-                    marginBottom: 2,
-                  }}
-                >
-                  <MaterialCommunityIcons
-                    name="map-marker"
-                    size={24}
-                    color="#005D7A"
-                  />
-                  <Text style={{ marginLeft: 1, fontSize: 15 }}>
-                    {post?.location?.name}
-                  </Text>
-                </View>
-                <View style={{ height: height / 2.8, marginHorizontal: 5 }}>
-                  <Swiper
-                    dot={
-                      <View
-                        style={{
-                          backgroundColor: Colors.white,
-                          width: 10,
-                          height: 10,
-                          borderRadius: 5,
-                          marginHorizontal: Default.fixPadding * 0.3,
-                        }}
-                      />
-                    }
-                    activeDot={
-                      <View
-                        style={{
-                          backgroundColor: Colors.primary,
-                          width: 10,
-                          height: 10,
-                          borderRadius: 5,
-                          marginHorizontal: Default.fixPadding * 0.3,
-                        }}
-                      />
-                    }
-                    paginationStyle={{
-                      marginBottom: Default.fixPadding,
-                      bottom: 0,
-                    }}
-                    loop={true}
-                  >
-                    {post.media.map((media) => {
-                      if (media.media_type === "video") {
-                        return (
-                          <View key={media.source}>
-                            <Video
-                              source={{ uri: media.source }}
-                              style={{ height: height / 2.8 }}
-                              useNativeControls
-                              resizeMode="contain"
-                            />
-                          </View>
-                        );
-                      } else {
-                        return (
-                          <View key={media.source}>
-                            <Image
-                              source={{ uri: media.source }}
-                              style={{ height: height / 2, width: width }}
-                              resizeMode="cover"
-                            />
-                          </View>
-                        );
-                      }
-                    })}
-                  </Swiper>
-                </View>
-
-                <Text style={{ marginLeft: 20, marginTop: 10, fontSize: 15 }}>
-                  {post.helpful_count} neighbors found this helpful
-                </Text>
-
-                <View style={{ flexDirection: "row" }}>
-                  <TouchableOpacity
-                    onPress={() => handleHelpfulClick(post._id)}
-                  >
-                    <MaterialCommunityIcons
-                      name="thumb-up"
-                      size={24}
-                      color={
-                        post.helpful_by.includes(userId) ? "#005D7A" : "black"
-                      }
-                      marginLeft={21}
-                      marginTop={12}
-                    />
-                  </TouchableOpacity>
-
-                  <Text
-                    style={{
-                      justifyContent: "center",
-                      alignItems: isRtl ? "flex-end" : "flex-start",
-                      marginTop: 12,
-                      marginLeft: 10,
-                      marginRight: 21,
-                      marginBottom: 12,
-                      fontSize: 16,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Helpful
-                  </Text>
-                </View>
-              </View>
+              </TouchableOpacity>
             ))}
         </ScrollView>
       </ScrollView>

@@ -101,6 +101,7 @@ import Locat from "./screens/Locat";
 import AddSus from "./screens/AddSus";
 import AddedSus from "./screens/AddedSus";
 import SusUpdated from "./screens/SusUpdated";
+import SusItem from "./screens/SusItem";
 import Notify from "./screens/Notify";
 import AutoMotive from "./screens/AutoMotive";
 import Toy from "./screens/Toy";
@@ -595,6 +596,11 @@ const MainNavigation = (props) => {
         <Stack.Screen
           name="Sus"
           component={Sus}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SusItem"
+          component={SusItem}
           options={{ headerShown: false }}
         />
         <Stack.Screen

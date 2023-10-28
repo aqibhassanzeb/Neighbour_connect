@@ -10,6 +10,7 @@ const initialState = {
   filterWatchPosts: [],
   skillHub: [],
   filterSkillHub: [],
+  watchFirstLoading: true,
 };
 
 export const globalSlice = createSlice({
@@ -111,6 +112,9 @@ export const globalSlice = createSlice({
         );
       }
     },
+    setWatchFirstLoading: (state, action) => {
+      state.watchFirstLoading = false;
+    },
   },
 });
 
@@ -127,6 +131,7 @@ export const {
   handleHelpful,
   setSkillHub,
   setFilterTopics,
+  setWatchFirstLoading,
 } = globalSlice.actions;
 
 export default globalSlice.reducer;

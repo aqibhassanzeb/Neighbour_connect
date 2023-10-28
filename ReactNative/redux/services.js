@@ -1,20 +1,25 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import axios from "axios";
-import { baseUrl } from "../apis/apis";
+import { baseUrl, userGet } from "../apis/apis";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: baseUrl,
-    prepareHeaders: (headers, { getState }) => {
+    prepareHeaders: async (headers, { getState }) => {
       const token = getState().loanandfound?.userInfo.token;
       if (token) {
         headers.set("authorization", `Bearer ${token}`);
+      } else {
+        let userData = await AsyncStorage.getItem("userData");
+        let userInformation = JSON.parse(userData);
+        headers.set("authorization", `Bearer ${userInformation.token}`);
       }
       return headers;
     },
   }),
   reducerPath: "neighbour-api",
-  tagTypes: ["Lost", "Activity"],
+  tagTypes: ["Lost", "Activity", "Watch"],
   endpoints: (build) => ({
     Register: build.mutation({
       query: (data) => {
@@ -29,47 +34,37 @@ export const api = createApi({
     getUserActivities: build.query({
       query: (id) => `user_activities/${id}`,
     }),
-    addEvent: build.mutation({
+    addWatchPost: build.mutation({
       query: (data) => {
         return {
-          url: "/event/create",
+          url: `/add_watch`,
           method: "POST",
           body: data,
         };
       },
-      invalidatesTags: ["Event"],
+      invalidatesTags: ["Watch"],
     }),
-    updateEvent: build.mutation({
-      query: (param) => {
+    getWatchPosts: build.query({
+      query: () => "/all_watch",
+      providesTags: ["Watch"],
+    }),
+    addHelpful: build.mutation({
+      query: (id) => {
         return {
-          url: `/event/update/${param.id}`,
-          method: "PUT",
-          body: param.data,
+          url: `/helpful/${id}`,
+          method: "POST",
+          body: {},
         };
       },
-      invalidatesTags: ["Event"],
     }),
-    AllEvents: build.query({
-      query: () => "/events",
-      providesTags: ["Event"],
-    }),
-    calendarEvents: build.query({
-      query: () => "/events/calendar",
-      providesTags: ["Event"],
-    }),
-    getAllUsers: build.query({
-      query: () => "/users",
-      providesTags: ["User"],
-    }),
-    updateMember: build.mutation({
-      query: (param) => {
+    removeHelpful: build.mutation({
+      query: (id) => {
         return {
-          url: `/users/${param.id}`,
-          method: "PUT",
-          body: param.data,
+          url: `/un_helpfull/${id}`,
+          method: "POST",
+          body: {},
         };
       },
-      invalidatesTags: ["User"],
     }),
     getTodos: build.query({
       query: (page) => `/todos?page=${page}`,
@@ -117,4 +112,12 @@ export const api = createApi({
   }),
 });
 
-export const { useGetUserActivitiesQuery, useLazyGetUserActivitiesQuery } = api;
+export const {
+  useGetUserActivitiesQuery,
+  useLazyGetUserActivitiesQuery,
+  useLazyGetWatchPostsQuery,
+  useGetWatchPostsQuery,
+  useAddHelpfulMutation,
+  useRemoveHelpfulMutation,
+  useAddWatchPostMutation,
+} = api;
