@@ -20,6 +20,7 @@ import Losted from "../screens/Losted";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import moment from "moment";
 
 const { width } = Dimensions.get("window");
 
@@ -357,6 +358,21 @@ const OngoingTab = (props) => {
                     >
                       {` Posted by ${elm?.posted_by?.name} `}
                     </Text>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        paddingLeft: 20,
+                      }}
+                    >
+                      <Text style={{ marginRight: 2 }}>
+                        <Ionicons name="time-outline" size={15} />
+                      </Text>
+                      <Text style={{ fontSize: 13 }}>
+                        {" "}
+                        {moment(elm.createdAt).fromNow()}
+                      </Text>
+                    </View>
                   </View>
                   {elm.mark_found == true && (
                     <View style={styles.container}>

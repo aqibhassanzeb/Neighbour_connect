@@ -18,6 +18,8 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { setItems, setSearchResults } from "../redux/globalSlice";
 import { debounce } from "../utils";
+import moment from "moment";
+import Ionicons from "react-native-vector-icons/Ionicons";
 const { width } = Dimensions.get("window");
 
 const OngoingTab = (props) => {
@@ -138,6 +140,20 @@ const OngoingTab = (props) => {
                 <Text style={{ fontSize: 16, paddingLeft: 4 }}>
                   RS {item.price}
                 </Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text>
+                    <Ionicons name="time-outline" size={15} />
+                  </Text>
+                  <Text style={{ fontSize: 13 }}>
+                    {" "}
+                    {moment(item.createdAt).fromNow()}
+                  </Text>
+                </View>
               </TouchableOpacity>
             </View>
           </View>

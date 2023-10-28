@@ -16,6 +16,7 @@ import { getAllItems, getSellsByCategory } from "../apis/apis";
 const { width } = Dimensions.get("window");
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Loader from "../components/loader";
+import moment from "moment";
 
 const OngoingTab = ({ navigation, route }) => {
   const { item } = route.params;
@@ -175,6 +176,20 @@ const OngoingTab = ({ navigation, route }) => {
                 <Text style={{ fontSize: 16, paddingLeft: 4 }}>
                   RS {item.price}
                 </Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text>
+                    <Ionicons name="time-outline" size={15} />
+                  </Text>
+                  <Text style={{ fontSize: 13 }}>
+                    {" "}
+                    {moment(item.createdAt).fromNow()}
+                  </Text>
+                </View>
               </TouchableOpacity>
             </View>
           </View>

@@ -146,7 +146,8 @@ export const lostandfound_Get = async (req, res) => {
     const result = await lostandFound
       .find(filter)
       .populate("posted_by", "-password")
-      .populate("category");
+      .populate("category")
+      .sort({ createdAt: -1 });
 
     res.status(200).json({ data: result, count: result.length });
   } catch (error) {
@@ -195,7 +196,9 @@ export const lostandfoundLoc_Get = async (req, res) => {
     const result = await lostandFound
       .find(filter)
       .populate("posted_by", "-password")
-      .populate("category");
+      .populate("category")
+      .sort({ createdAt: -1 });
+
     const filteredData = result.filter((elm) => {
       if (
         elm.visibility === "connections" &&

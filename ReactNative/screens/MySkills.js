@@ -18,7 +18,6 @@ import CategorySkill from "../components/CategorySkill";
 import { deleteSkill, getSkillsByUser } from "../apis/apis";
 import { ScrollView } from "react-native-gesture-handler";
 import Loader from "../components/loader";
-import useGetUserId from "../components/useGetUserId";
 
 const CategoryScreen = ({ navigation, route }) => {
   const { t, i18n } = useTranslation();
@@ -177,7 +176,6 @@ const CategoryScreen = ({ navigation, route }) => {
               onPress={() =>
                 navigation.navigate("Shared", {
                   post: { skill },
-                  userId,
                 })
               }
               style={{

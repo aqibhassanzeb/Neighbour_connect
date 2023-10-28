@@ -14,6 +14,7 @@ import { Colors, Default, Fonts } from "../constants/styles";
 import { useTranslation } from "react-i18next";
 import { getSellCategories } from "../apis/apis";
 import Loader from "./loader";
+
 const { width } = Dimensions.get("window");
 
 const OngoingTab = ({ navigation }) => {

@@ -20,6 +20,7 @@ import { getAllTopics } from "../apis/apis";
 import Loader from "../components/loader";
 import { useDispatch, useSelector } from "react-redux";
 import { setFilterTopics, setTopics } from "../redux/globalSlice";
+import moment from "moment";
 
 const { width } = Dimensions.get("window");
 const ChatScreen = (props) => {
@@ -263,23 +264,39 @@ const ChatScreen = (props) => {
                     >
                       {topic.posted_by.name}
                     </Text>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text>
+                        <Ionicons name="time-outline" size={15} />
+                      </Text>
+                      <Text style={{ fontSize: 13 }}>
+                        {" "}
+                        {moment(topic.createdAt).fromNow()}
+                      </Text>
+                    </View>
                   </View>
                 </View>
                 <View>
-                  <TouchableOpacity
-                    onPress={() => {
-                      setSelectedId(topic._id);
-                      setDropdownOpendd(!dropdownOpendd);
-                    }}
-                  >
-                    <Ionicons
-                      name="ellipsis-vertical"
-                      size={24}
-                      color="black"
-                      marginLeft={193}
-                      marginTop={10}
-                    />
-                  </TouchableOpacity>
+                  {props.route.params.userId !== topic.posted_by._id && (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setSelectedId(topic._id);
+                        setDropdownOpendd(!dropdownOpendd);
+                      }}
+                    >
+                      <Ionicons
+                        name="ellipsis-vertical"
+                        size={24}
+                        color="black"
+                        marginLeft={193}
+                        marginTop={10}
+                      />
+                    </TouchableOpacity>
+                  )}
                   {dropdownOpendd && selectedId === topic._id && (
                     <View style={styles.dropdown}>
                       <TouchableOpacity

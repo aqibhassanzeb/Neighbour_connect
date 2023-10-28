@@ -20,6 +20,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import SnackbarToast from "./snackbarToast";
 import { useSelector } from "react-redux";
 import Loader from "./loader";
+import moment from "moment";
 //import Founded from "../screens/Founded";
 const { width } = Dimensions.get("window");
 
@@ -160,6 +161,21 @@ const OngoingTab = (props) => {
                     >
                       {`Posted by ${elm?.posted_by?.name}`}
                     </Text>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        paddingLeft: 20,
+                      }}
+                    >
+                      <Text style={{ marginRight: 2 }}>
+                        <Ionicons name="time-outline" size={15} />
+                      </Text>
+                      <Text style={{ fontSize: 13 }}>
+                        {" "}
+                        {moment(elm.createdAt).fromNow()}
+                      </Text>
+                    </View>
                   </View>
                 </TouchableOpacity>
               </View>

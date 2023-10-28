@@ -556,7 +556,7 @@ const HomeScreen = ({ navigation, route }) => {
           <TouchableOpacity
             onPress={() =>
               navigation.navigate("Form", {
-                title: "Skill Sharing",
+                userId: userData?._id,
               })
             }
             style={{
