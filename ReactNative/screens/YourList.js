@@ -72,6 +72,7 @@ const Lostss = ({ navigation }) => {
 
   const [data, setData] = useState([]);
   const [loader, setLoader] = useState(false);
+  const [userId, setUserId] = useState("");
 
   const handleButtonPress = (buttonValue) => {
     setSelectedValue(buttonValue);
@@ -128,6 +129,20 @@ const Lostss = ({ navigation }) => {
       setLoader(false);
     }
   };
+
+  const handleGetuser = async () => {
+    try {
+      let userData = await AsyncStorage.getItem("userData");
+      let userInformation = JSON.parse(userData);
+      setUserId(userInformation?.user._id);
+    } catch (error) {
+      console.log("error ;", error);
+    }
+  };
+
+  useEffect(() => {
+    handleGetuser();
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
@@ -186,6 +201,7 @@ const Lostss = ({ navigation }) => {
                   onPress={() =>
                     navigation.navigate("Losted", {
                       _id: elm._id,
+                      userId,
                     })
                   }
                   style={{

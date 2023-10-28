@@ -4,6 +4,7 @@ import { Colors, Default, Fonts } from "../constants/styles";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Emoji from "react-native-emoji";
+import useGetUserById from "./useGetUserId";
 
 const SellItemsList = ({
   setCancelModal,
@@ -17,6 +18,7 @@ const SellItemsList = ({
   setDeleteId,
 }) => {
   const [dropdownOpend, setDropdownOpend] = useState(false);
+  const userId = useGetUserById();
   const { _id, is_sold } = sell;
   return (
     <View
@@ -29,6 +31,7 @@ const SellItemsList = ({
           onPress={() =>
             navigation.navigate("BuyDetails", {
               item: sell,
+              userId,
             })
           }
           style={{

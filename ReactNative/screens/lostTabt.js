@@ -36,6 +36,7 @@ const CustomTabBar = ({ state, descriptors, navigation, position }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [categories, setCategories] = useState([]);
   const [selectedCat, setSelectedCat] = useState({ name: "All", id: "123" });
+  const [userId, setUserId] = useState("");
 
   const dispatch = useDispatch();
 

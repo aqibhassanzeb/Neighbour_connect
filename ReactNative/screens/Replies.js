@@ -30,7 +30,7 @@ const ChatScreen = (props) => {
   const { topic } = props.route.params;
   const { topics } = useSelector((state) => state.global);
   const matchingTopic = topics.find((item) => item._id === topic._id);
-  const rep = matchingTopic.replies;
+  const rep = matchingTopic?.replies;
 
   const dispatch = useDispatch();
 

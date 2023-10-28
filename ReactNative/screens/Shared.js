@@ -25,7 +25,7 @@ import { extractDays, extractTime, shortText } from "../utils";
 const { width, height } = Dimensions.get("window");
 
 const Losted = ({ navigation, route }) => {
-  const { post } = route.params;
+  const { post, userId } = route.params;
 
   const { t, i18n } = useTranslation();
 
@@ -237,26 +237,28 @@ const Losted = ({ navigation, route }) => {
                 marginBottom: 40,
               }}
             >
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("Report", {
-                    postId: post.skill._id,
-                    module: "skill",
-                  })
-                }
-                style={{
-                  ...Default.shadow,
-                  height: 40,
-                  width: 40,
-                  borderRadius: 20,
-                  backgroundColor: Colors.white,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  //  marginHorizontal: Default.fixPadding * 1.5,
-                }}
-              >
-                <Ionicons name="ios-flag-outline" size={24} color="black" />
-              </TouchableOpacity>
+              {!id === post.skill?.posted_by._id && (
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("Report", {
+                      postId: post.skill._id,
+                      module: "skill",
+                    })
+                  }
+                  style={{
+                    ...Default.shadow,
+                    height: 40,
+                    width: 40,
+                    borderRadius: 20,
+                    backgroundColor: Colors.white,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    //  marginHorizontal: Default.fixPadding * 1.5,
+                  }}
+                >
+                  <Ionicons name="ios-flag-outline" size={24} color="black" />
+                </TouchableOpacity>
+              )}
             </View>
           </View>
 

@@ -407,7 +407,7 @@ const HomeScreen = ({ navigation, route }) => {
           <TouchableOpacity
             onPress={() =>
               navigation.navigate("lostTabt", {
-                title: "Electrician",
+                userId: userData._id,
               })
             }
             style={{

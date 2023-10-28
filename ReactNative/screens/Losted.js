@@ -270,36 +270,38 @@ const Losted = ({ navigation, route }) => {
               </View>
             </View>
 
-            <View
-              style={{
-                // flex: 3,
-                // flexDirection: isRtl ? "row-reverse" : "row",
-                justifyContent: "center",
-                alignItems: "center",
-                marginRight: 20,
-              }}
-            >
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("Report", {
-                    postId: data._id,
-                    module: "lost_found",
-                  })
-                }
+            {route.params.userId !== data?.posted_by?._id && (
+              <View
                 style={{
-                  ...Default.shadow,
-                  height: 40,
-                  width: 40,
-                  borderRadius: 20,
-                  backgroundColor: Colors.white,
+                  // flex: 3,
+                  // flexDirection: isRtl ? "row-reverse" : "row",
                   justifyContent: "center",
                   alignItems: "center",
-                  //  marginHorizontal: Default.fixPadding * 1.5,
+                  marginRight: 20,
                 }}
               >
-                <Ionicons name="ios-flag-outline" size={24} color="black" />
-              </TouchableOpacity>
-            </View>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("Report", {
+                      postId: data._id,
+                      module: "lost_found",
+                    })
+                  }
+                  style={{
+                    ...Default.shadow,
+                    height: 40,
+                    width: 40,
+                    borderRadius: 20,
+                    backgroundColor: Colors.white,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    //  marginHorizontal: Default.fixPadding * 1.5,
+                  }}
+                >
+                  <Ionicons name="ios-flag-outline" size={24} color="black" />
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
 
           <View
@@ -454,44 +456,46 @@ const Losted = ({ navigation, route }) => {
             </TouchableOpacity>
           </View>
         </View>
-        <View
-          style={{
-            marginLeft: 20,
-          }}
-        >
+        {route.params.userId !== data?.posted_by?._id && (
           <View
             style={{
-              // flexDirection: isRtl ? "row-reverse" : "row",
-              //   justifyContent: "space-between",
-              // marginHorizontal: Default.fixPadding * 2,
-              //     marginBottom: Default.fixPadding * 2,
-              marginTop: Default.fixPadding,
-            }}
-          ></View>
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("ChattingScreen", {
-                user: {
-                  recepientId: data.posted_by._id,
-                  recepientName: data.posted_by.name,
-                  recepientImage: data.posted_by.image,
-                  senderId: loggedInUserId,
-                },
-              })
-            }
-            style={{
-              backgroundColor: Colors.primary,
-              borderRadius: 10,
-              justifyContent: "center",
-              alignItems: "center",
-              marginLeft: 2,
-              marginRight: 18,
-              paddingVertical: Default.fixPadding * 1.2,
+              marginLeft: 20,
             }}
           >
-            <Text style={{ ...Fonts.SemiBold18white }}>{"Message"}</Text>
-          </TouchableOpacity>
-        </View>
+            <View
+              style={{
+                // flexDirection: isRtl ? "row-reverse" : "row",
+                //   justifyContent: "space-between",
+                // marginHorizontal: Default.fixPadding * 2,
+                //     marginBottom: Default.fixPadding * 2,
+                marginTop: Default.fixPadding,
+              }}
+            ></View>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("ChattingScreen", {
+                  user: {
+                    recepientId: data.posted_by._id,
+                    recepientName: data.posted_by.name,
+                    recepientImage: data.posted_by.image,
+                    senderId: loggedInUserId,
+                  },
+                })
+              }
+              style={{
+                backgroundColor: Colors.primary,
+                borderRadius: 10,
+                justifyContent: "center",
+                alignItems: "center",
+                marginLeft: 2,
+                marginRight: 18,
+                paddingVertical: Default.fixPadding * 1.2,
+              }}
+            >
+              <Text style={{ ...Fonts.SemiBold18white }}>{"Message"}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

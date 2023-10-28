@@ -24,7 +24,7 @@ import { getId } from "../apis/apis";
 const { width, height } = Dimensions.get("window");
 
 const Losted = ({ navigation, route }) => {
-  const { item } = route.params;
+  const { item, userId } = route.params;
   const [loggedInUserId, setLoggedInUserId] = useState("");
 
   const { t, i18n } = useTranslation();
@@ -232,25 +232,27 @@ const Losted = ({ navigation, route }) => {
                 marginRight: 20,
               }}
             >
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("Report", {
-                    postId: item._id,
-                    module: "sell",
-                  })
-                }
-                style={{
-                  ...Default.shadow,
-                  height: 40,
-                  width: 40,
-                  borderRadius: 20,
-                  backgroundColor: Colors.white,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Ionicons name="ios-flag-outline" size={24} color="black" />
-              </TouchableOpacity>
+              {userId !== item.posted_by._id && (
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("Report", {
+                      postId: item._id,
+                      module: "sell",
+                    })
+                  }
+                  style={{
+                    ...Default.shadow,
+                    height: 40,
+                    width: 40,
+                    borderRadius: 20,
+                    backgroundColor: Colors.white,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Ionicons name="ios-flag-outline" size={24} color="black" />
+                </TouchableOpacity>
+              )}
             </View>
           </View>
 
@@ -402,40 +404,42 @@ const Losted = ({ navigation, route }) => {
             </TouchableOpacity>
           </View>
         </View>
-        <View
-          style={{
-            marginLeft: 20,
-          }}
-        >
+        {userId !== item.posted_by._id && (
           <View
             style={{
-              marginTop: Default.fixPadding,
-            }}
-          ></View>
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("ChattingScreen", {
-                user: {
-                  recepientId: item.posted_by._id,
-                  recepientName: item.posted_by.name,
-                  recepientImage: item.posted_by.image,
-                  senderId: loggedInUserId,
-                },
-              })
-            }
-            style={{
-              backgroundColor: Colors.primary,
-              borderRadius: 10,
-              justifyContent: "center",
-              alignItems: "center",
-              marginLeft: 2,
-              marginRight: 18,
-              paddingVertical: Default.fixPadding * 1.2,
+              marginLeft: 20,
             }}
           >
-            <Text style={{ ...Fonts.SemiBold18white }}>{"Message"}</Text>
-          </TouchableOpacity>
-        </View>
+            <View
+              style={{
+                marginTop: Default.fixPadding,
+              }}
+            ></View>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("ChattingScreen", {
+                  user: {
+                    recepientId: item.posted_by._id,
+                    recepientName: item.posted_by.name,
+                    recepientImage: item.posted_by.image,
+                    senderId: loggedInUserId,
+                  },
+                })
+              }
+              style={{
+                backgroundColor: Colors.primary,
+                borderRadius: 10,
+                justifyContent: "center",
+                alignItems: "center",
+                marginLeft: 2,
+                marginRight: 18,
+                paddingVertical: Default.fixPadding * 1.2,
+              }}
+            >
+              <Text style={{ ...Fonts.SemiBold18white }}>{"Message"}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
