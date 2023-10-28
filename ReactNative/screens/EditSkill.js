@@ -308,59 +308,6 @@ const PayPalScreen = ({ navigation, route }) => {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        <ScrollView horizontal style={{ margin: 10 }}>
-          {oldImages.map((uri, index) => (
-            <View
-              key={index}
-              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
-            >
-              <Image
-                source={{ uri: uri }}
-                style={{ width: 150, height: 150, borderRadius: 10 }}
-              />
-              <FontAwesome5
-                onPress={() => handleOldRemove(index)}
-                name="times-circle"
-                size={24}
-                color="red"
-                style={{
-                  position: "absolute",
-                  top: -1,
-                  right: 5,
-                  zIndex: 1,
-                }}
-              />
-            </View>
-          ))}
-          {selectedImages.map((uri, index) => (
-            <View
-              key={index}
-              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
-            >
-              <TouchableOpacity
-                onPress={() => handleImageRemove(index)}
-                style={{ marginRight: 10 }}
-              >
-                <Image
-                  source={{ uri: uri.uri }}
-                  style={{ width: 150, height: 150, borderRadius: 10 }}
-                />
-                <FontAwesome5
-                  name="times-circle" // Use the FontAwesome5 cross icon
-                  size={24}
-                  color="red"
-                  style={{
-                    position: "absolute",
-                    top: -1,
-                    right: -1,
-                    zIndex: 1,
-                  }}
-                />
-              </TouchableOpacity>
-            </View>
-          ))}
-        </ScrollView>
-
         <View
           style={{
             alignItems: "center",
@@ -390,6 +337,58 @@ const PayPalScreen = ({ navigation, route }) => {
               Update Pictures
             </Text>
           )}
+          <ScrollView horizontal style={{ margin: 10 }}>
+            {oldImages.map((uri, index) => (
+              <View
+                key={index}
+                style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+              >
+                <Image
+                  source={{ uri: uri }}
+                  style={{ width: 150, height: 150, borderRadius: 10 }}
+                />
+                <FontAwesome5
+                  onPress={() => handleOldRemove(index)}
+                  name="times-circle"
+                  size={24}
+                  color="red"
+                  style={{
+                    position: "absolute",
+                    top: -1,
+                    right: 5,
+                    zIndex: 1,
+                  }}
+                />
+              </View>
+            ))}
+            {selectedImages.map((uri, index) => (
+              <View
+                key={index}
+                style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+              >
+                <TouchableOpacity
+                  onPress={() => handleImageRemove(index)}
+                  style={{ marginRight: 10 }}
+                >
+                  <Image
+                    source={{ uri: uri.uri }}
+                    style={{ width: 150, height: 150, borderRadius: 10 }}
+                  />
+                  <FontAwesome5
+                    name="times-circle" // Use the FontAwesome5 cross icon
+                    size={24}
+                    color="red"
+                    style={{
+                      position: "absolute",
+                      top: -1,
+                      right: -1,
+                      zIndex: 1,
+                    }}
+                  />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </ScrollView>
           {selectedImages.length > 0 && (
             <TouchableOpacity
               onPress={() => handleUpdateImages()}

@@ -252,59 +252,6 @@ const PayPalScreen = ({ navigation, route }) => {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        <ScrollView horizontal style={{ margin: 10 }}>
-          {oldImages.map((media, index) => (
-            <View
-              key={index}
-              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
-            >
-              <Image
-                source={{ uri: media }}
-                style={{ width: 120, height: 150, borderRadius: 10 }}
-              />
-
-              <FontAwesome5
-                onPress={() => handleOldRemove(index)}
-                name="times-circle"
-                size={24}
-                color="red"
-                style={{
-                  position: "absolute",
-                  top: -1,
-                  right: -1,
-                  zIndex: 1,
-                }}
-              />
-            </View>
-          ))}
-          {selectedMedia.map((uri, index) => (
-            <View
-              key={index}
-              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
-            >
-              <TouchableOpacity style={{ marginRight: 10 }}>
-                <Image
-                  source={{ uri: uri.uri }}
-                  style={{ width: 120, height: 150, borderRadius: 10 }}
-                />
-
-                <FontAwesome5
-                  onPress={() => handleMediaRemove(index)}
-                  name="times-circle"
-                  size={24}
-                  color="red"
-                  style={{
-                    position: "absolute",
-                    top: -1,
-                    right: -1,
-                    zIndex: 1,
-                  }}
-                />
-              </TouchableOpacity>
-            </View>
-          ))}
-        </ScrollView>
-
         <View
           style={{
             alignItems: "center",
@@ -333,6 +280,58 @@ const PayPalScreen = ({ navigation, route }) => {
               Upload New Pictures
             </Text>
           )}
+          <ScrollView horizontal style={{ margin: 10 }}>
+            {oldImages.map((media, index) => (
+              <View
+                key={index}
+                style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+              >
+                <Image
+                  source={{ uri: media }}
+                  style={{ width: 120, height: 150, borderRadius: 10 }}
+                />
+
+                <FontAwesome5
+                  onPress={() => handleOldRemove(index)}
+                  name="times-circle"
+                  size={24}
+                  color="red"
+                  style={{
+                    position: "absolute",
+                    top: -1,
+                    right: -1,
+                    zIndex: 1,
+                  }}
+                />
+              </View>
+            ))}
+            {selectedMedia.map((uri, index) => (
+              <View
+                key={index}
+                style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+              >
+                <TouchableOpacity style={{ marginRight: 10 }}>
+                  <Image
+                    source={{ uri: uri.uri }}
+                    style={{ width: 120, height: 150, borderRadius: 10 }}
+                  />
+
+                  <FontAwesome5
+                    onPress={() => handleMediaRemove(index)}
+                    name="times-circle"
+                    size={24}
+                    color="red"
+                    style={{
+                      position: "absolute",
+                      top: -1,
+                      right: -1,
+                      zIndex: 1,
+                    }}
+                  />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </ScrollView>
           {selectedMedia.length > 0 && (
             <TouchableOpacity
               onPress={() => handleUpdateMedia()}

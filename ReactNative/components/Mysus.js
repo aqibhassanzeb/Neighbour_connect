@@ -262,6 +262,7 @@ const CategoryScreen = ({ navigation, route }) => {
                         ]}
                         onPress={() => {
                           navigation.navigate("EditsSus", { data: post });
+                          setDropdownOpend(false);
                         }}
                       >
                         <Ionicons
@@ -281,6 +282,7 @@ const CategoryScreen = ({ navigation, route }) => {
                         onPress={() => {
                           setCancelModal(true);
                           setSelectedId(post._id);
+                          setDropdownOpend(false);
                         }}
                       >
                         <Ionicons
