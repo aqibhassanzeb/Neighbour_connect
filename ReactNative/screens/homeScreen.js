@@ -79,6 +79,7 @@ const HomeScreen = ({ navigation, route }) => {
   }, [query]);
 
   const { userInfo } = useSelector((state) => state.loanandfound);
+  const user = useSelector((state) => state.authReducer.activeUser);
 
   const { t, i18n } = useTranslation();
 
@@ -224,7 +225,7 @@ const HomeScreen = ({ navigation, route }) => {
                   paddingLeft: 2,
                 }}
               >
-                {userInfo?.user?.address?.name}
+                {userData?.address?.name}
               </Text>
             </TouchableOpacity>
           </View>
@@ -625,7 +626,7 @@ const HomeScreen = ({ navigation, route }) => {
           >
             <Text style={styles.panelButtonText}>Customize Radius</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.panelButton}
             onPress={() =>
               navigation.navigate("Appearance", {
@@ -634,7 +635,7 @@ const HomeScreen = ({ navigation, route }) => {
             }
           >
             <Text style={styles.panelButtonText}>Appearance</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity
             style={styles.panelButton}
             onPress={() =>

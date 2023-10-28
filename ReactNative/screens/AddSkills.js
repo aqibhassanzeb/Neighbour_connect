@@ -69,9 +69,12 @@ const PayPalScreen = ({ navigation, route }) => {
   const [pricePerHour, setPricePerHour] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [email, setEmail] = useState();
-  const [timeModal, setTimeModal] = useState(false);
   const [time, setTime] = useState(new Date());
+  const [timeModal, setTimeModal] = useState(false);
+  const [endTime, setEndTime] = useState(new Date());
+  const [endTimeModal, setEndTimeModal] = useState(false);
   const [selectedTime, setSelectedTime] = useState(false);
+  const [selectedEndTime, setSelectedEndTime] = useState(false);
   const [value, setValue] = useState(0);
   const [date, setDate] = useState();
   const [calendarModal, setCalendarModel] = useState(false);
@@ -185,10 +188,11 @@ const PayPalScreen = ({ navigation, route }) => {
         });
       });
 
+      const hours = `${formatTime(time)} to ${formatTime(endTime)}`;
       formData.append("category", selectedOption._id);
       formData.append("description", description);
       formData.append("skill_level", selectedOptions);
-      formData.append("time", String(time));
+      formData.append("time", hours);
       formData.append("price_per_hour", pricePerHour);
       formData.append("selected_day", checkedValues);
       formData.append("selected_visibility", selectedOptionsd);
@@ -219,14 +223,30 @@ const PayPalScreen = ({ navigation, route }) => {
     setSelectedImages(updatedImages);
   };
 
+  function formatTime(value) {
+    const originalDate = new Date(value);
+    const hours = originalDate.getHours();
+    const minutes = originalDate.getMinutes();
+    const formattedTime = `${String(hours).padStart(2, "0")}:${String(
+      minutes
+    ).padStart(2, "0")}`;
+    return formattedTime;
+  }
+
   const onTimeSelected = (event, value) => {
     setTimeModal(false);
     setTime(value);
     setSelectedTime(true);
   };
 
+  const onEndTimeSelect = (event, value) => {
+    setEndTimeModal(false);
+    setEndTime(value);
+    setSelectedEndTime(true);
+  };
+
   const confirmTime = (time) => {
-    return `${time.getHours()}:${time.getMinutes()} `;
+    return time;
   };
 
   const today = moment().format("YYYY-MM-DD");
@@ -666,7 +686,7 @@ const PayPalScreen = ({ navigation, route }) => {
                     textAlign: isRtl ? "right" : "left",
                   }}
                 >
-                  {selectedTime ? confirmTime(time) : "Time"}
+                  {selectedTime ? formatTime(time) : "Start Hours"}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -676,8 +696,53 @@ const PayPalScreen = ({ navigation, route }) => {
               value={time}
               mode={"time"}
               display={Platform.OS === "ios" ? "spinner" : "default"}
-              is24Hour={true}
+              // is24Hour={true}
               onChange={onTimeSelected}
+            />
+          )}
+          <View style={{ flex: 1 }}>
+            <TouchableOpacity
+              onPress={() => setEndTimeModal(true)}
+              style={{
+                ...Default.shadow,
+                borderRadius: 10,
+                backgroundColor: Colors.white,
+                padding: Default.fixPadding * 1.5,
+                flexDirection: isRtl ? "row-reverse" : "row",
+                alignItems: "center",
+                marginTop: Default.fixPadding * 3,
+                paddingRight: 140,
+              }}
+            >
+              <MaterialIcons
+                name="access-time"
+                size={20}
+                color={Colors.grey}
+                style={{ flex: 1.5 }}
+              />
+              <View style={{ flex: 8.5 }}>
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    ...(selectedEndTime
+                      ? Fonts.SemiBold14black
+                      : Fonts.SemiBold14grey),
+                    overflow: "hidden",
+                    textAlign: isRtl ? "right" : "left",
+                  }}
+                >
+                  {selectedEndTime ? formatTime(endTime) : "End Hours"}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+          {endTimeModal && (
+            <DateTimePicker
+              value={endTime}
+              mode={"time"}
+              display={Platform.OS === "ios" ? "spinner" : "default"}
+              // is24Hour={true}
+              onChange={onEndTimeSelect}
             />
           )}
           <View
@@ -921,6 +986,7 @@ const PayPalScreen = ({ navigation, route }) => {
             justifyContent: "center",
             alignItems: "center",
             marginTop: Default.fixPadding * 2,
+            marginBottom: Default.fixPadding * 2,
             padding: Default.fixPadding * 1.2,
             marginHorizontal: Default.fixPadding * 2,
           }}

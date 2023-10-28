@@ -12,16 +12,11 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import ToggleSwitch from "toggle-switch-react-native";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  toggleLost,
-  toggleSuspicious,
-  toggleSell,
-  toggleForum,
-} from "../redux/notificationSlice";
+import { toggleLost, toggleSuspicious } from "../redux/notificationSlice";
 import { updateNotifications } from "../apis/apis";
 
 const AppSettingScreen = ({ navigation }) => {
-  const { lost, suspicious, sell, forum, queryParams } = useSelector(
+  const { lost, suspicious, queryParams } = useSelector(
     (state) => state.notifications
   );
   const dispatch = useDispatch();
@@ -147,7 +142,7 @@ const AppSettingScreen = ({ navigation }) => {
             onToggle={() => dispatch(toggleSuspicious())}
           />
         </View>
-
+        {/* 
         <View
           style={{
             flexDirection: isRtl ? "row-reverse" : "row",
@@ -199,7 +194,7 @@ const AppSettingScreen = ({ navigation }) => {
             size="medium"
             onToggle={() => dispatch(toggleForum())}
           />
-        </View>
+        </View> */}
 
         {/* <View
             style={{

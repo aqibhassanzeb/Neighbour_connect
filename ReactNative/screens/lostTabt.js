@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   ScrollView,
   TextInput,
+  TouchableHighlight,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Colors, Default, Fonts } from "../constants/styles";
@@ -17,7 +18,7 @@ import Founded from "../components/Founded";
 
 import llost from "../components/llost";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { lostItemGetbyLoc } from "../apis/apis";
+import { lostItemGetbyLoc, lostandfoundCategGet } from "../apis/apis";
 import { useDispatch } from "react-redux";
 import {
   clearSearch,
@@ -25,6 +26,7 @@ import {
   handleSearchData,
   updataData,
 } from "../redux/loanandfoundSlice";
+import { FlatList } from "react-native-gesture-handler";
 // import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 const Tab = createMaterialTopTabNavigator();
@@ -32,6 +34,9 @@ const Tab = createMaterialTopTabNavigator();
 const CustomTabBar = ({ state, descriptors, navigation, position }) => {
   const { t, i18n } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [selectedCat, setSelectedCat] = useState({ name: "All", id: "123" });
+
   const dispatch = useDispatch();
 
   const isRtl = i18n.dir() == "rtl";
@@ -43,7 +48,10 @@ const CustomTabBar = ({ state, descriptors, navigation, position }) => {
     try {
       dispatch(handleLoader({ loader: true }));
       let check = state?.index == 0 ? true : false;
-      let result = await lostItemGetbyLoc({ type: check ? "lost" : "found" });
+      let result = await lostItemGetbyLoc({
+        type: check ? "lost" : "found",
+        ...(selectedCat.name !== "All" && { category: selectedCat.id }),
+      });
 
       if (result.status == 200) {
         dispatch(updataData(result.data?.data));
@@ -62,8 +70,30 @@ const CustomTabBar = ({ state, descriptors, navigation, position }) => {
   };
   useEffect(() => {
     handleGetlost();
-  }, [state.index]);
+  }, [state.index, selectedCat]);
 
+  const handleGetCateg = async () => {
+    try {
+      // setFetchingCategLoader(true);
+      let result = await lostandfoundCategGet();
+
+      if (result.status == 200) {
+        setCategories(result.data?.data);
+      }
+    } catch (error) {
+    } finally {
+      // setFetchingCategLoader(false);
+    }
+  };
+
+  useEffect(() => {
+    handleGetCateg();
+  }, []);
+
+  function handleSelectCat(name, id) {
+    setSelectedCat({ name, id });
+  }
+  const allCat = { _id: "0", name: "All" };
   return (
     <SafeAreaView style={{ backgroundColor: Colors.extraLightGrey }}>
       <ScrollView>
@@ -145,6 +175,43 @@ const CustomTabBar = ({ state, descriptors, navigation, position }) => {
             </View>
           </View>
         </View>
+        <FlatList
+          style={{ marginTop: 10, paddingLeft: 15, marginRight: 25 }}
+          horizontal={true}
+          data={[allCat, ...categories]}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              key={item.key}
+              onPress={() => {
+                handleSelectCat(item.name, item._id);
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor:
+                    selectedCat.name === item.name
+                      ? Colors.primary
+                      : Colors.white,
+
+                  padding: 10,
+                  margin: 5,
+                  borderRadius: 5,
+                }}
+              >
+                <Text
+                  style={{
+                    color:
+                      selectedCat.name === item.name
+                        ? Colors.white
+                        : Colors.black,
+                  }}
+                >
+                  {item.name}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
         <View
           style={{
             flexDirection: isRtl ? "row-reverse" : "row",

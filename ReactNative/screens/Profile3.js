@@ -170,7 +170,6 @@ const EditProfileScreen = (props) => {
   useEffect(() => {
     handleGetActivities();
   }, []);
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       <View

@@ -96,11 +96,11 @@ export const getSettings = async (req, res) => {
   try {
     const notification = await Notification.findOne(
       { user_id: _id },
-      "settings" // Projection to select only the 'settings' field
+      "settings"
     );
 
     if (!notification) {
-      return res.json("lost=true&suspicious=true&sell=true&forum=true");
+      return res.json("lost=true&suspicious=true");
     }
 
     return res.status(200).json(notification.settings);

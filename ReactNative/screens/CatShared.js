@@ -400,7 +400,7 @@ const Losted = ({ navigation, route }) => {
                   {"Availability"}
                 </Text>
                 <Text style={{ ...Fonts.Medium14grey }}>
-                  {extractTime(post?.skill?.time)}
+                  {post?.skill?.time}
                 </Text>
 
                 <Text style={{ ...Fonts.Medium14grey }}>{formattedDays}</Text>

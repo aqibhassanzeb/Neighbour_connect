@@ -30,6 +30,7 @@ import { loginUser, trackLogin } from "../../apis/apis";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { handleSetUserinfo } from "../../redux/loanandfoundSlice";
 import { useDispatch } from "react-redux";
+import { setActiveUser } from "../../redux/authSlice";
 
 const { width, height } = Dimensions.get("window");
 
@@ -61,6 +62,7 @@ const LoginScreen = ({ navigation }) => {
           return alert("Your account has been suspended");
         } else {
           dispatch(handleSetUserinfo(user.data));
+          dispatch(setActiveUser(user.data));
           const userData = JSON.stringify(user.data);
           await AsyncStorage.setItem("userData", userData);
           setEmail("");

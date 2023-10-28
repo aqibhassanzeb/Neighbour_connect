@@ -184,14 +184,18 @@ export const lostandfound_Deleted_Get = async (req, res) => {
 };
 
 export const lostandfoundLoc_Get = async (req, res) => {
-  let { type } = req.query;
+  let filter = { is_active: true, type: req.query.type };
+  if (req.query.category !== "undefined") {
+    filter.category = req.query.category;
+  }
   try {
     let { address_range, address } = req.user;
     let { latitude, longitude } = address;
 
     const result = await lostandFound
-      .find({ type })
-      .populate("posted_by", "-password");
+      .find(filter)
+      .populate("posted_by", "-password")
+      .populate("category");
     const filteredData = result.filter((elm) => {
       if (
         elm.visibility === "connections" &&
@@ -213,7 +217,6 @@ export const lostandfoundLoc_Get = async (req, res) => {
       // Check if the distance is within the specified range
       return distanceInKm <= parseFloat(address_range);
     });
-
     res.status(200).json({ data: filteredData, count: filteredData.length });
   } catch (error) {
     res.status(400).json({ error: "something went wrong!" });

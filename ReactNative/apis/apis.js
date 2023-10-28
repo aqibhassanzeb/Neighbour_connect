@@ -198,11 +198,22 @@ export const trackLogin = async (data) => {
 // lost and found apis
 
 export const lostItemGetbyLoc = async (data) => {
-  let { type } = data;
+  let { type, category } = data;
   const headersWithToken = await getHeadersWithToken();
   let result = await apiRequest(
     "GET",
-    `lostandfound_byloc?type=${type}`,
+    `lostandfound_byloc?type=${type}&category=${category}`,
+    null,
+    headersWithToken
+  );
+  return result;
+};
+export const lostItemGetbyCat = async (data) => {
+  let { type, category } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "GET",
+    `lostandfound_byloc?type=${type}&category=${category}`,
     null,
     headersWithToken
   );

@@ -335,7 +335,7 @@ const OngoingTab = (props) => {
                         paddingLeft: 20,
                       }}
                     >
-                      3 keys
+                      {elm?.category?.name}
                     </Text>
                     <Text
                       style={{

@@ -10,7 +10,6 @@ import {
   TextInput,
   FlatList,
   KeyboardAvoidingView,
-  Keyboard,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Colors, Default, Fonts } from "../constants/styles";
