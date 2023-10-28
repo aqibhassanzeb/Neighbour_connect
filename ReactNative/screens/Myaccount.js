@@ -94,7 +94,7 @@ const MyAccountScreen = (props) => {
     try {
       setLoader(true);
       let paylaod = {};
-      paylaod._id = userInfo.user._id;
+      paylaod._id = props.route.params.userData._id;
       let result = await userGetbyId(paylaod);
       if (result.status == 200) {
         setUserData(result.data.data);
