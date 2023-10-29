@@ -157,7 +157,7 @@ const ServicesScreen = ({ navigation }) => {
 
   useEffect(() => {
     const filteredPosts = posts.filter((post) =>
-      post.title.toLowerCase().includes(searchTerm.toLowerCase())
+      post.category.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilter(filteredPosts);
   }, [searchTerm, posts]);
@@ -388,20 +388,22 @@ const ServicesScreen = ({ navigation }) => {
                     </View>
                   </TouchableOpacity>
                   <View>
-                    <TouchableOpacity
-                      onPress={() => {
-                        setSelectedPost(post._id);
-                        setDropdownOpens(!dropdownOpens);
-                      }}
-                    >
-                      <Ionicons
-                        name="ellipsis-vertical"
-                        size={24}
-                        color="black"
-                        marginLeft={193}
-                        marginTop={10}
-                      />
-                    </TouchableOpacity>
+                    {user._id !== post.posted_by._id && (
+                      <TouchableOpacity
+                        onPress={() => {
+                          setSelectedPost(post._id);
+                          setDropdownOpens(!dropdownOpens);
+                        }}
+                      >
+                        <Ionicons
+                          name="ellipsis-vertical"
+                          size={24}
+                          color="black"
+                          marginLeft={193}
+                          marginTop={10}
+                        />
+                      </TouchableOpacity>
+                    )}
                     {dropdownOpens && post._id === selectedPost && (
                       <View style={styles.dropdown}>
                         <TouchableOpacity

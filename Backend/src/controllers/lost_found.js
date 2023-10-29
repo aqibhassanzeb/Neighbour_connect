@@ -52,6 +52,7 @@ export const lostandfound_Create = async (req, res) => {
         title: item.title,
         visibility: item.visibility,
         image: images[0],
+        post_type: "lost_found",
       });
       res.status(200).json({ message: "uploaded successfully" });
     }

@@ -549,6 +549,16 @@ const EditProfileScreen = (props) => {
           </View>
         </TouchableOpacity>
         <TouchableOpacity
+          onPress={() =>
+            props.navigation.navigate("ChattingScreen", {
+              user: {
+                recepientId: sender.sender._id,
+                recepientName: sender.sender.name,
+                recepientImage: sender.sender.image,
+                senderId: props.route.params.userId,
+              },
+            })
+          }
           style={{
             backgroundColor: Colors.primary,
             borderRadius: 10,

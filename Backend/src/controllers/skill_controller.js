@@ -50,6 +50,7 @@ export const addSkill = async (req, res) => {
         title: "",
         visibility: posted.selected_visibility,
         image: images[0],
+        post_type: "skill",
       });
       return res
         .status(200)

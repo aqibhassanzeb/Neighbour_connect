@@ -14,6 +14,7 @@ import {
   Animated,
   PanResponder,
   StatusBar,
+  DevSettings,
 } from "react-native";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ScrollView } from "react-native-virtualized-view";
@@ -96,6 +97,7 @@ const HomeScreen = ({ navigation, route }) => {
       await AsyncStorage.removeItem("userData");
       setCancelModal(false);
       navigation.navigate("Logins1");
+      DevSettings.reload();
     } catch (error) {
       console.error("Error clearing AsyncStorage:", error);
     }

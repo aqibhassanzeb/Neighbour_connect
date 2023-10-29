@@ -15,6 +15,7 @@ export const addForum = async (req, res) => {
         description: "neighbor forum",
         post_id: posted._id,
         title: posted.topic,
+        post_type: "neighbour-forum",
       });
       return res
         .status(200)

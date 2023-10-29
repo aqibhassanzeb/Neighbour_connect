@@ -14,7 +14,14 @@ export const userNotifications = async (req, res) => {
   try {
     const notifications = await Activity.find({
       description: { $in: allow_settings },
-    }).populate("posted_by", "address");
+    })
+      .populate("post_id")
+      .populate({
+        path: "post_id.posted_by",
+        select: "image name",
+      })
+      .populate("posted_by", "name image connections requests address")
+      .sort({ createdAt: -1 });
 
     let deleted_notifications = [];
     const get_deleted = await Notification.findOne({ user_id: _id });

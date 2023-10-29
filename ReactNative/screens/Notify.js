@@ -20,9 +20,11 @@ import moment from "moment";
 import Loader from "../components/loader";
 import { useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import useGetUser from "../components/useGetUser";
 
 const NotificationScreen = ({ navigation }) => {
   const { queryParams } = useSelector((state) => state.notifications);
+  const user = useGetUser();
 
   const { t, i18n } = useTranslation();
 
@@ -79,6 +81,7 @@ const NotificationScreen = ({ navigation }) => {
       title: not.description,
       image: not.image,
       status: moment(not?.createdAt).fromNow(),
+      post: { ...not.post_id, posted_by: not.posted_by },
     };
   });
 
@@ -144,8 +147,23 @@ const NotificationScreen = ({ navigation }) => {
         >
           <TouchableOpacity
             onPress={() =>
-              navigation.navigate(handleNavigation(data.item.title))
-            } // Add your press event handler
+              // navigation.navigate(handleNavigation(data.item.title))
+              {
+                if (data.item.title === "lost & found") {
+                  navigation.navigate("Losted", {
+                    _id: data.item.post._id,
+                    userId: user._id,
+                  });
+                } else if (data.item.title === "suspicious activity") {
+                  console.log(data.item.post);
+                  navigation.navigate("SusItem", {
+                    post: data.item.post,
+                    userId: user._id,
+                    user,
+                  });
+                }
+              }
+            }
             style={{
               flex: 1,
               justifyContent: "center",

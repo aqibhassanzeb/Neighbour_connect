@@ -51,10 +51,12 @@ export const addWatch = async (req, res) => {
         posted_by: posted.posted_by,
         description: "suspicious activity",
         post_id: posted._id,
+        post_type: "neighbour-watch",
         title: posted.title,
         visibility: posted.selected_visibility,
         image: media[0].source,
       });
+
       return res
         .status(200)
         .json({ message: "Posted Successfully", data: posted });

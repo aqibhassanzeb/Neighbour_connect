@@ -81,6 +81,7 @@ import CategorySkill from "./components/CategorySkill";
 import BuySell from "./screens/BuySell";
 import Suspicious from "./screens/Suspicious";
 import Form from "./screens/Form";
+import FormPost from "./screens/FormPost";
 import FormSearch from "./screens/FormSearch";
 import Slocate from "./screens/Slocate";
 import Profile3 from "./screens/Profile3";
@@ -616,6 +617,11 @@ const MainNavigation = (props) => {
         <Stack.Screen
           name="Form"
           component={Form}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="FormPost"
+          component={FormPost}
           options={{ headerShown: false }}
         />
         <Stack.Screen

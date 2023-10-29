@@ -49,6 +49,7 @@ export const addSell = async (req, res) => {
         title: posted.title,
         visibility: posted.selected_visibility,
         image: images[0],
+        post_type: "sell",
       });
       return res
         .status(200)

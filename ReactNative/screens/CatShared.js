@@ -115,9 +115,8 @@ const Losted = ({ navigation, route }) => {
   const formattedDays = extractDays(days);
 
   async function handleShowEndorse() {
-    let id = await getId();
     let endorsedArray = post.skill.posted_by.endorsed_by;
-    let res = endorsedArray.includes(id);
+    let res = endorsedArray.includes(userId);
     setIsEndorsed(res);
   }
 

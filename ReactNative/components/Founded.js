@@ -48,7 +48,8 @@ const OngoingTab = (props) => {
 
   const regexPattern = new RegExp(searchKeyword, "i");
   let newData =
-    data.length > 0 && data.filter((elm) => regexPattern.test(elm.title));
+    data.length > 0 &&
+    data.filter((elm) => regexPattern.test(elm.category.name));
 
   const truncateString = (str) => {
     const words = str.split(" ");

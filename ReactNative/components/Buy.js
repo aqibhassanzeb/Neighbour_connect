@@ -20,10 +20,12 @@ import { setItems, setSearchResults } from "../redux/globalSlice";
 import { debounce } from "../utils";
 import moment from "moment";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import useGetUserId from "./useGetUserId";
 const { width } = Dimensions.get("window");
 
 const OngoingTab = (props) => {
   const { filteredSellZoneItems } = useSelector((state) => state.global);
+  const userId = useGetUserId();
 
   const [cancelModal, setCancelModal] = useState(false);
   const [cancelToast, setCancelToast] = useState(false);
@@ -108,6 +110,7 @@ const OngoingTab = (props) => {
                 onPress={() =>
                   props.navigation.navigate("BuyDetails", {
                     item,
+                    userId,
                   })
                 }
                 style={{

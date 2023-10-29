@@ -10,6 +10,7 @@ import {
   BackHandler,
   TextInput,
   Modal,
+  DevSettings,
 } from "react-native";
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import moment from "moment";
@@ -30,10 +31,10 @@ import { useFocusEffect } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
-export const handleNavigation = (value) => {
-  switch (value) {
-    case "lost & found":
-      return "YourList";
+export const handleNavigation = (activity) => {
+  switch (activity.post_type) {
+    case "lost_found":
+      return 'props.navigation.navigate("Losted",{_id: data.item.post._id,userId: user._id})';
     case "suspicious activity":
       return "Mysus";
     case "neighbor forum":
@@ -220,15 +221,27 @@ const EditProfileScreen = (props) => {
                 </Text>
               </View>
             ) : (
-              <Image
-                style={{
-                  alignSelf: "center",
-                  height: 148,
-                  width: 148,
-                  borderRadius: 74,
-                }}
-                source={{ uri: pickedImage }}
-              />
+              <View style={{ flexDirection: "row" }}>
+                <Image
+                  style={{
+                    height: 88,
+                    width: 88,
+                    borderRadius: 74,
+                    marginLeft: 23,
+                  }}
+                  source={{ uri: pickedImage }}
+                />
+                <Text
+                  style={{
+                    top: 23,
+                    left: 23,
+                    fontSize: 21,
+                    fontWeight: "bold",
+                  }}
+                >
+                  {user.name}
+                </Text>
+              </View>
             )}
           </View>
 
@@ -301,11 +314,35 @@ const EditProfileScreen = (props) => {
                 }}
               >
                 <TouchableOpacity
-                  onPress={() =>
-                    props.navigation.navigate(
-                      handleNavigation(activity.description)
-                    )
-                  }
+                  onPress={() => {
+                    if (activity.post_type === "lost_found") {
+                      props.navigation.navigate("Losted", {
+                        _id: activity.post_id._id,
+                        userId: user._id,
+                      });
+                    } else if (activity.post_type === "neighbour-watch") {
+                      props.navigation.navigate("SusItem", {
+                        post: activity.post_id,
+                        userId: user._id,
+                        user,
+                      });
+                    } else if (activity.post_type === "skill") {
+                      props.navigation.navigate("CatShared", {
+                        post: { skill: activity.post_id },
+                        userId: user._id,
+                      });
+                    } else if (activity.post_type === "sell") {
+                      props.navigation.navigate("BuyDetails", {
+                        item: activity.post_id,
+                        userId: user._id,
+                      });
+                    } else if (activity.post_type === "neighbour-forum") {
+                      props.navigation.navigate("FormPost", {
+                        topic: activity.post_id,
+                        userId: user._id,
+                      });
+                    }
+                  }}
                   style={{
                     flex: 1,
                     justifyContent: "center",
@@ -359,248 +396,6 @@ const EditProfileScreen = (props) => {
               <View style={styles.line}></View>
             </View>
           ))}
-
-        {/* <View
-          style={{
-            flexDirection: isRtl ? "row-reverse" : "row",
-            borderRadius: 10,
-            padding: Default.fixPadding * 1.5,
-            marginHorizontal: Default.fixPadding * 2,
-            marginBottom: Default.fixPadding * 2,
-            alignItems: "center",
-          }}
-        >
-          <TouchableOpacity
-            onPress={() =>
-              props.navigation.navigate("Mysus", {
-                title: "Losted",
-              })
-            }
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-          >
-            <Ionicons name="create-outline" size={54} color="black" />
-
-            <View
-              style={{
-                marginLeft: isRtl ? 0 : Default.fixPadding * 1.5,
-                marginRight: isRtl ? Default.fixPadding * 1.5 : 0,
-                alignItems: isRtl ? "flex-end" : "flex-start",
-                flex: 9,
-              }}
-            >
-              <Text
-                numberOfLines={1}
-                style={{
-                  ...Fonts.SemiBold16black,
-                  overflow: "hidden",
-                  top: 12,
-                }}
-              >
-                Created a Suspicious Activity post.
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={{
-                  ...Fonts.Medium14Black,
-                  marginVertical: Default.fixPadding * 0.3,
-                  overflow: "hidden",
-                  top: 6,
-                }}
-              >
-                I noticed a man wearing a mask and gloves walking around the
-                Neighborhood
-              </Text>
-
-              <Text style={{ ...Fonts.Medium14grey }}>10 min ago</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.line}></View>
-        <View
-          style={{
-            flexDirection: isRtl ? "row-reverse" : "row",
-            borderRadius: 10,
-            padding: Default.fixPadding * 1.5,
-            marginHorizontal: Default.fixPadding * 2,
-            marginBottom: Default.fixPadding * 2,
-            alignItems: "center",
-          }}
-        >
-          <TouchableOpacity
-            onPress={() =>
-              props.navigation.navigate("MySkills", {
-                title: "Losted",
-              })
-            } // Add your press event handler
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-          >
-            <Ionicons name="create-outline" size={54} color="black" />
-
-            <View
-              style={{
-                marginLeft: isRtl ? 0 : Default.fixPadding * 1.5,
-                marginRight: isRtl ? Default.fixPadding * 1.5 : 0,
-                alignItems: isRtl ? "flex-end" : "flex-start",
-                flex: 9,
-              }}
-            >
-              <Text
-                numberOfLines={1}
-                style={{
-                  ...Fonts.SemiBold16black,
-                  overflow: "hidden",
-                  top: 12,
-                }}
-              >
-                Created a skill sharing post.
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={{
-                  ...Fonts.Medium14Black,
-                  marginVertical: Default.fixPadding * 0.3,
-                  overflow: "hidden",
-                  top: 6,
-                }}
-              >
-                About Electrician
-              </Text>
-
-              <Text style={{ ...Fonts.Medium14grey }}>20 min ago</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.line}></View>
-
-        <View
-          style={{
-            flexDirection: isRtl ? "row-reverse" : "row",
-            borderRadius: 10,
-            padding: Default.fixPadding * 1.5,
-            marginHorizontal: Default.fixPadding * 2,
-            marginBottom: Default.fixPadding * 2,
-            alignItems: "center",
-          }}
-        >
-          <TouchableOpacity
-            onPress={() =>
-              props.navigation.navigate("BuyMy", {
-                title: "Losted",
-              })
-            }
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-          >
-            <Ionicons name="create-outline" size={54} color="black" />
-
-            <View
-              style={{
-                marginLeft: isRtl ? 0 : Default.fixPadding * 1.5,
-                marginRight: isRtl ? Default.fixPadding * 1.5 : 0,
-                alignItems: isRtl ? "flex-end" : "flex-start",
-                flex: 9,
-              }}
-            >
-              <Text
-                numberOfLines={1}
-                style={{
-                  ...Fonts.SemiBold16black,
-                  overflow: "hidden",
-                  top: 12,
-                }}
-              >
-                Created a Neighbor Trade post.
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={{
-                  ...Fonts.Medium14Black,
-                  marginVertical: Default.fixPadding * 0.3,
-                  overflow: "hidden",
-                  top: 6,
-                }}
-              >
-                About Vintage Chair
-              </Text>
-
-              <Text style={{ ...Fonts.Medium14grey }}>32 min ago</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.line}></View>
-        <View
-          style={{
-            flexDirection: isRtl ? "row-reverse" : "row",
-            borderRadius: 10,
-            padding: Default.fixPadding * 1.5,
-            marginHorizontal: Default.fixPadding * 2,
-            marginBottom: Default.fixPadding * 2,
-            alignItems: "center",
-          }}
-        >
-          <TouchableOpacity
-            onPress={() =>
-              props.navigation.navigate("MyDis", {
-                title: "Losted",
-              })
-            } // Add your press event handler
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-          >
-            <Ionicons name="create-outline" size={54} color="black" />
-
-            <View
-              style={{
-                marginLeft: isRtl ? 0 : Default.fixPadding * 1.5,
-                marginRight: isRtl ? Default.fixPadding * 1.5 : 0,
-                alignItems: isRtl ? "flex-end" : "flex-start",
-                flex: 9,
-              }}
-            >
-              <Text
-                numberOfLines={1}
-                style={{
-                  ...Fonts.SemiBold16black,
-                  overflow: "hidden",
-                  top: 12,
-                }}
-              >
-                Created a Neighbor Forum post.
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={{
-                  ...Fonts.Medium14Black,
-                  marginVertical: Default.fixPadding * 0.3,
-                  overflow: "hidden",
-                  top: 6,
-                }}
-              >
-                Has anyone installed a security camera?
-              </Text>
-
-              <Text style={{ ...Fonts.Medium14grey }}>2 hrs ago</Text>
-            </View>
-          </TouchableOpacity>
-        </View> */}
       </ScrollView>
 
       <Modal

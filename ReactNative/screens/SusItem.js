@@ -19,7 +19,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 import Swiper from "react-native-swiper";
-import { extractDate, extractTime } from "../utils";
+import { extractDate, extractTime, letterSpacing } from "../utils";
 import {
   useAddHelpfulMutation,
   useRemoveHelpfulMutation,
@@ -30,12 +30,11 @@ const { width, height } = Dimensions.get("window");
 
 const SusItem = ({ navigation, route }) => {
   const { post, userId, user } = route.params;
-  console.log(post);
 
   const [add, ar] = useAddHelpfulMutation();
   const [remove, rr] = useRemoveHelpfulMutation();
 
-  const [isHelpful, setIsHelpful] = useState(post.helpful_by.includes(userId));
+  const [isHelpful, setIsHelpful] = useState(post?.helpful_by.includes(userId));
   const [helpfulCount, setHelpfulCount] = useState(post.helpful_count);
 
   const { t, i18n } = useTranslation();
@@ -200,21 +199,36 @@ const SusItem = ({ navigation, route }) => {
               </View>
             </View>
           </TouchableOpacity>
-
-          <Text
-            style={{
-              justifyContent: "center",
-              alignItems: isRtl ? "flex-end" : "flex-start",
-              marginTop: 12,
-              marginLeft: 21,
-              marginRight: 21,
-              marginBottom: 4,
-              fontSize: 18,
-              fontWeight: "bold",
-            }}
-          >
-            {post.category.name}: {post.title}
-          </Text>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text
+              style={{
+                justifyContent: "center",
+                alignItems: isRtl ? "flex-end" : "flex-start",
+                marginTop: 12,
+                marginLeft: 21,
+                marginBottom: 4,
+                fontSize: 15,
+                fontWeight: "bold",
+                color: Colors.primary,
+              }}
+            >
+              {post.category.name && letterSpacing(post.category.name)}
+            </Text>
+            <Text
+              style={{
+                justifyContent: "center",
+                alignItems: isRtl ? "flex-end" : "flex-start",
+                marginTop: 12,
+                marginLeft: 5,
+                marginRight: 21,
+                marginBottom: 4,
+                fontSize: 18,
+                fontWeight: "bold",
+              }}
+            >
+              {post.title}
+            </Text>
+          </View>
           <Text
             style={{
               justifyContent: "center",

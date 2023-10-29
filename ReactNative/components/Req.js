@@ -30,6 +30,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 //import Founded from "../screens/Founded";
 const { width } = Dimensions.get("window");
+import useGetUser from "./useGetUser";
 
 const OngoingTab = (props) => {
   const { t, i18n } = useTranslation();
@@ -37,6 +38,7 @@ const OngoingTab = (props) => {
   const [requests, setRequests] = useState([]);
   const [neighboursData, setNeighboursData] = useState([]);
   const [id, setId] = useState("");
+  const user = useGetUser();
 
   const isRtl = i18n.dir() == "rtl";
   const [selectedValue, setSelectedValue] = useState("");
@@ -288,7 +290,10 @@ const OngoingTab = (props) => {
               <TouchableOpacity
                 key={index}
                 onPress={() =>
-                  props.navigation.navigate("Profile4", { user: req })
+                  props.navigation.navigate("Profile4", {
+                    user: req,
+                    userId: user._id,
+                  })
                 }
                 style={{
                   ...Default.shadow,
@@ -672,7 +677,10 @@ const OngoingTab = (props) => {
                 <TouchableOpacity
                   key={n._id}
                   onPress={() =>
-                    props.navigation.navigate("Profile1", { user: n })
+                    props.navigation.navigate("Profile1", {
+                      user: n,
+                      userId: user._id,
+                    })
                   }
                   style={{
                     ...Default.shadow,

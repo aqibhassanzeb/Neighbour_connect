@@ -25,10 +25,13 @@ import CameraModule from "../components/cameraModule";
 import { Disconnect, getId, getUserActivities } from "../apis/apis";
 import moment from "moment";
 import { handleNavigation } from "./profileScreen";
+import useGetUser from "../components/useGetUser";
+import { UIActivityIndicator } from "react-native-indicators";
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
 const EditProfileScreen = (props) => {
+  const user = useGetUser();
   const [isConnected, setConnected] = useState(true);
   const connectionDetails = props.route.params?.user || {};
   const [activites, setActivites] = useState([]);
@@ -357,6 +360,32 @@ const EditProfileScreen = (props) => {
         >
           <Text style={{ top: 110, left: 360 }}>SeeAll</Text>
         </TouchableOpacity> */}
+        {isLoading && (
+          <View
+            style={{
+              width: width,
+              borderRadius: 10,
+              alignItems: "center",
+              justifyContent: "center",
+              ...Default.shadow,
+              paddingVertical: Default.fixPadding * 4,
+            }}
+          >
+            <UIActivityIndicator
+              color={Colors.primary}
+              size={35}
+              style={{ marginTop: Default.fixPadding * 1.5 }}
+            />
+            <Text
+              style={{
+                ...Fonts.SemiBold16primary,
+                marginTop: Default.fixPadding * 2,
+              }}
+            >
+              Getting Activites ...
+            </Text>
+          </View>
+        )}
         {activites.length === 0 && !isLoading && (
           <TouchableOpacity
             style={{
@@ -385,6 +414,7 @@ const EditProfileScreen = (props) => {
         )}
 
         {activites.length > 0 &&
+          !isLoading &&
           activites.map((activity) => (
             <View key={activity._id}>
               <View
@@ -398,11 +428,35 @@ const EditProfileScreen = (props) => {
                 }}
               >
                 <TouchableOpacity
-                  // onPress={() =>
-                  //   props.navigation.navigate(
-                  //     handleNavigation(activity.description)
-                  //   )
-                  // }
+                  onPress={() => {
+                    if (activity.post_type === "lost_found") {
+                      props.navigation.navigate("Losted", {
+                        _id: activity.post_id._id,
+                        userId: user._id,
+                      });
+                    } else if (activity.post_type === "neighbour-watch") {
+                      props.navigation.navigate("SusItem", {
+                        post: activity.post_id,
+                        userId: user._id,
+                        user,
+                      });
+                    } else if (activity.post_type === "skill") {
+                      props.navigation.navigate("CatShared", {
+                        post: { skill: activity.post_id },
+                        userId: user._id,
+                      });
+                    } else if (activity.post_type === "sell") {
+                      props.navigation.navigate("BuyDetails", {
+                        item: activity.post_id,
+                        userId: user._id,
+                      });
+                    } else if (activity.post_type === "neighbour-forum") {
+                      props.navigation.navigate("FormPost", {
+                        topic: activity.post_id,
+                        userId: user._id,
+                      });
+                    }
+                  }}
                   style={{
                     flex: 1,
                     justifyContent: "center",

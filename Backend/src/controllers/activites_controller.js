@@ -12,7 +12,16 @@ export const userActivites = async (req, res) => {
     const activites = await Activity.find({
       posted_by: id,
       createdAt: { $gte: today, $lt: new Date() },
-    }).sort({ createdAt: -1 });
+    })
+      .populate({
+        path: "post_id",
+        populate: {
+          path: "posted_by",
+          select:
+            "name email image requests connections endorse_count endorsed_by",
+        },
+      })
+      .sort({ createdAt: -1 });
     if (activites) {
       res.status(200).json(activites);
     }
