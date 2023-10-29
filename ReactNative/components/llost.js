@@ -9,6 +9,7 @@ import {
   FlatList,
   Modal,
   SafeAreaView,
+  BackHandler,
 } from "react-native";
 import React, { useState } from "react";
 import { Colors, Default, Fonts } from "../constants/styles";
@@ -21,10 +22,12 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import moment from "moment";
+import useGetUserId from "./useGetUserId";
 
 const { width } = Dimensions.get("window");
 
 const OngoingTab = (props) => {
+  const userId = useGetUserId();
   const { t, i18n } = useTranslation();
   // console.log("params 2",props)
   const isRtl = i18n.dir() == "rtl";
@@ -46,6 +49,18 @@ const OngoingTab = (props) => {
   const regexPattern = new RegExp(searchKeyword, "i");
   let newData =
     data.length > 0 && data.filter((elm) => regexPattern.test(elm.title));
+
+  const backAction = () => {
+    props.navigation.goBack();
+    return true;
+  };
+
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", backAction);
+
+    return () =>
+      BackHandler.removeEventListener("hardwareBackPress", backAction);
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
@@ -278,6 +293,7 @@ const OngoingTab = (props) => {
                   onPress={() =>
                     props.navigation.navigate("Losted", {
                       _id: elm._id,
+                      userId,
                     })
                   }
                   style={{

@@ -15,12 +15,14 @@ import { useTranslation } from "react-i18next";
 import { getSkillsByCategory } from "../apis/apis";
 import Loader from "../components/loader";
 import { useFocusEffect } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CategoryScreen = ({ navigation, route }) => {
   const { item } = route.params;
 
   const [catSkills, setCatSkills] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [userId, setUserId] = useState("");
 
   const { t, i18n } = useTranslation();
 
@@ -63,6 +65,21 @@ const CategoryScreen = ({ navigation, route }) => {
       handleGetSkillsByCategory();
     }, [])
   );
+
+  async function handleUserId() {
+    try {
+      let userData = await AsyncStorage.getItem("userData");
+      let userInformation = JSON.parse(userData);
+      setUserId(userInformation.user?._id);
+    } catch (error) {
+      console.log("error ;", error);
+      alert("something went wrong!");
+    }
+  }
+  useEffect(() => {
+    handleUserId();
+  }, []);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       {isLoading && <Loader />}
@@ -129,6 +146,7 @@ const CategoryScreen = ({ navigation, route }) => {
               onPress={() =>
                 navigation.navigate("CatShared", {
                   post: { skill },
+                  userId,
                 })
               }
               style={{

@@ -66,10 +66,10 @@ export const getAllForums = async (req, res) => {
   try {
     const items = await Forum.find({ is_active: true })
       .sort({ createdAt: -1 })
-      .populate("posted_by", "name email image")
+      .populate("posted_by", "name email image connections requests")
       .populate({
         path: "replies.reply_by",
-        select: "image name",
+        select: "image name image connections requests",
       });
     res.json(items);
   } catch (error) {

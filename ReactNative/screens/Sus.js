@@ -27,8 +27,10 @@ import { extractDate, extractTime } from "../utils";
 import { useFocusEffect } from "@react-navigation/native";
 const { width, height } = Dimensions.get("window");
 import { DotIndicator } from "react-native-indicators";
+import useGetUser from "../components/useGetUser";
 
 const ServicesScreen = ({ navigation }) => {
+  const user = useGetUser();
   const [selectedValue, setSelectedValue] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dropdownOpens, setDropdownOpens] = useState(false);
@@ -37,7 +39,6 @@ const ServicesScreen = ({ navigation }) => {
   const [clicked, setClicked] = useState(false);
   const [clicks, setClicks] = useState(false);
   const [click, setClick] = useState(false);
-
   const [posts, setPosts] = useState([]);
   const [filter, setFilter] = useState(posts);
   const [searchTerm, setSearchTerm] = useState("");
@@ -160,6 +161,36 @@ const ServicesScreen = ({ navigation }) => {
     );
     setFilter(filteredPosts);
   }, [searchTerm, posts]);
+
+  const handleProfilePress = (post) => {
+    if (post.posted_by.connections.includes(user._id)) {
+      navigation.navigate("Profile3", {
+        user: post.posted_by,
+      });
+    } else if (post.posted_by._id == userId) {
+      navigation.navigate("profileScreen");
+    } else if (user.requests) {
+      user.requests.map((req) => {
+        if (req.sender === post.posted_by._id) {
+          navigation.navigate("Profile4", {
+            user: {
+              sender: {
+                _id: post.posted_by._id,
+                name: post.posted_by.name,
+                image: post.posted_by.image,
+              },
+            },
+          });
+        } else {
+          return;
+        }
+      });
+    } else {
+      navigation.navigate("Profile1", {
+        user: post.posted_by,
+      });
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
@@ -309,14 +340,17 @@ const ServicesScreen = ({ navigation }) => {
                   marginRight: 12,
                   marginVertical: 8,
                 }}
-                onPress={() => navigation.navigate("SusItem", { post, userId })}
+                onPress={() =>
+                  navigation.navigate("SusItem", { post, userId, user })
+                }
               >
                 <View
                   style={{
                     flexDirection: isRtl ? "row-reverse" : "row",
                   }}
                 >
-                  <View
+                  <TouchableOpacity
+                    onPress={() => handleProfilePress(post)}
                     style={{
                       // flex: 7,
                       flexDirection: isRtl ? "row-reverse" : "row",
@@ -352,7 +386,7 @@ const ServicesScreen = ({ navigation }) => {
                         {post.posted_by.name}
                       </Text>
                     </View>
-                  </View>
+                  </TouchableOpacity>
                   <View>
                     <TouchableOpacity
                       onPress={() => {

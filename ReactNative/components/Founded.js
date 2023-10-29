@@ -21,11 +21,13 @@ import SnackbarToast from "./snackbarToast";
 import { useSelector } from "react-redux";
 import Loader from "./loader";
 import moment from "moment";
+import useGetUserId from "./useGetUserId";
 //import Founded from "../screens/Founded";
 const { width } = Dimensions.get("window");
 
 const OngoingTab = (props) => {
   const { t, i18n } = useTranslation();
+  const userId = useGetUserId();
 
   const isRtl = i18n.dir() == "rtl";
 
@@ -81,6 +83,7 @@ const OngoingTab = (props) => {
                     props.navigation.navigate("Losted", {
                       _id: elm._id,
                       name: "Found",
+                      userId,
                     })
                   }
                   style={{

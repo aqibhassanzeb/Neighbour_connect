@@ -172,7 +172,7 @@ const EditProfileScreen = (props) => {
             }}
           >
             <Image
-              source={{ uri: sender.sender.image }}
+              source={{ uri: sender?.sender?.image }}
               style={{ height: 66, width: 66, borderRadius: 33 }}
               resizeMode="contain"
             />
@@ -193,7 +193,7 @@ const EditProfileScreen = (props) => {
                   top: 20,
                 }}
               >
-                {sender.sender.name}
+                {sender?.sender?.name}
               </Text>
             </View>
           </View>

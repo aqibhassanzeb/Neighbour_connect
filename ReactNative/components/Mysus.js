@@ -20,7 +20,7 @@ import Swiper from "react-native-swiper";
 import { Video } from "expo-av";
 import { deleteWatch, getWatchesByUser } from "../apis/apis";
 import Loader from "./loader";
-import { extractDate, extractTime } from "../utils";
+import { extractDate, extractTime, hasPassed15Minutes } from "../utils";
 
 const CategoryScreen = ({ navigation, route }) => {
   const { t, i18n } = useTranslation();
@@ -221,25 +221,27 @@ const CategoryScreen = ({ navigation, route }) => {
 
               <View>
                 <View style={styles.contain}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      setSelectedId(post._id);
-                      setDropdownOpend(!dropdownOpend);
-                    }}
-                  >
-                    <Ionicons
-                      name="ellipsis-vertical"
-                      size={24}
-                      color="black"
-                      // marginLeft={310}
-                      bottom={20}
-                      position="absolute"
-                      style={{ right: 10 }}
-                    />
-                    <Text style={styles.selectedButtonText}>
-                      {selectedValue}
-                    </Text>
-                  </TouchableOpacity>
+                  {!hasPassed15Minutes(post.createdAt) && (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setSelectedId(post._id);
+                        setDropdownOpend(!dropdownOpend);
+                      }}
+                    >
+                      <Ionicons
+                        name="ellipsis-vertical"
+                        size={24}
+                        color="black"
+                        // marginLeft={310}
+                        bottom={20}
+                        position="absolute"
+                        style={{ right: 10 }}
+                      />
+                      <Text style={styles.selectedButtonText}>
+                        {selectedValue}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
 
                   {dropdownOpend && selectedId === post._id && (
                     <View

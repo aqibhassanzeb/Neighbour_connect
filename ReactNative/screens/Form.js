@@ -21,9 +21,11 @@ import Loader from "../components/loader";
 import { useDispatch, useSelector } from "react-redux";
 import { setFilterTopics, setTopics } from "../redux/globalSlice";
 import moment from "moment";
+import useGetUser from "../components/useGetUser";
 
 const { width } = Dimensions.get("window");
 const ChatScreen = (props) => {
+  const user = useGetUser();
   const [selectedId, setSelectedId] = useState("");
   const { filteredTopics } = useSelector((state) => state.global);
   const [selectedValue, setSelectedValue] = useState("");
@@ -89,6 +91,36 @@ const ChatScreen = (props) => {
   const handleSearch = (query) => {
     setSearchQuery(query);
     dispatch(setFilterTopics(query)); // Dispatch the search query to Redux
+  };
+
+  const handleProfilePress = (post) => {
+    if (post.posted_by.connections.includes(user._id)) {
+      props.navigation.navigate("Profile3", {
+        user: post.posted_by,
+      });
+    } else if (post.posted_by._id == user._id) {
+      props.navigation.navigate("profileScreen");
+    } else if (user.requests) {
+      user.requests.map((req) => {
+        if (req.sender === post.posted_by._id) {
+          props.navigation.navigate("Profile4", {
+            user: {
+              sender: {
+                _id: post.posted_by._id,
+                name: post.posted_by.name,
+                image: post.posted_by.image,
+              },
+            },
+          });
+        } else {
+          return;
+        }
+      });
+    } else {
+      props.navigation.navigate("Profile1", {
+        user: post.posted_by,
+      });
+    }
   };
 
   return (
@@ -233,7 +265,8 @@ const ChatScreen = (props) => {
                   flexDirection: isRtl ? "row-reverse" : "row",
                 }}
               >
-                <View
+                <TouchableOpacity
+                  onPress={() => handleProfilePress(topic)}
                   style={{
                     // flex: 7,
                     flexDirection: isRtl ? "row-reverse" : "row",
@@ -279,7 +312,7 @@ const ChatScreen = (props) => {
                       </Text>
                     </View>
                   </View>
-                </View>
+                </TouchableOpacity>
                 <View>
                   {props.route.params.userId !== topic.posted_by._id && (
                     <TouchableOpacity
@@ -350,6 +383,7 @@ const ChatScreen = (props) => {
                 onPress={() =>
                   props.navigation.navigate("Replies", {
                     topic,
+                    user,
                   })
                 }
               >

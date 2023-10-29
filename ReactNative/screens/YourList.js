@@ -23,6 +23,7 @@ import { useTranslation } from "react-i18next";
 import { lostItemGet, lostandfoundUpdate } from "../apis/apis";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Loader from "../components/loader";
+import { hasPassed15Minutes } from "../utils";
 
 const { width, height } = Dimensions.get("window");
 
@@ -313,22 +314,24 @@ const Lostss = ({ navigation }) => {
 
                   {/* <Ionicons name="ellipsis-vertical" size={24} color="black" /> */}
                   <View style={styles.contain}>
-                    <TouchableOpacity
-                      style={styles.selectedButton}
-                      onPress={() => {
-                        setSetselectedEditId(elm._id);
-                        setDropdownOpend(!dropdownOpend);
-                      }}
-                    >
-                      <Ionicons
-                        name="ellipsis-vertical"
-                        size={24}
-                        color="black"
-                      />
-                      <Text style={styles.selectedButtonText}>
-                        {selectedValue}
-                      </Text>
-                    </TouchableOpacity>
+                    {!hasPassed15Minutes(elm.createdAt) && (
+                      <TouchableOpacity
+                        style={styles.selectedButton}
+                        onPress={() => {
+                          setSetselectedEditId(elm._id);
+                          setDropdownOpend(!dropdownOpend);
+                        }}
+                      >
+                        <Ionicons
+                          name="ellipsis-vertical"
+                          size={24}
+                          color="black"
+                        />
+                        <Text style={styles.selectedButtonText}>
+                          {selectedValue}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
 
                     {dropdownOpend && setselectedEditId == elm._id && (
                       <View style={styles.dropdown}>

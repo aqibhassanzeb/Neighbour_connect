@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { deleteTopic, getTopicsByUser } from "../apis/apis";
 import Loader from "../components/loader";
+import { hasPassed15Minutes } from "../utils";
 
 const ChatScreen = (props) => {
   const [topics, setTopics] = useState([]);
@@ -193,20 +194,22 @@ const ChatScreen = (props) => {
                   </View>
                 </View>
                 <View>
-                  <TouchableOpacity
-                    onPress={() => {
-                      setDropdownOpens(!dropdownOpens);
-                      setSelectedId(topic._id);
-                    }}
-                  >
-                    <Ionicons
-                      name="ellipsis-vertical"
-                      size={24}
-                      color="black"
-                      marginLeft={179}
-                      marginTop={10}
-                    />
-                  </TouchableOpacity>
+                  {!hasPassed15Minutes(topic.createdAt) && (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setDropdownOpens(!dropdownOpens);
+                        setSelectedId(topic._id);
+                      }}
+                    >
+                      <Ionicons
+                        name="ellipsis-vertical"
+                        size={24}
+                        color="black"
+                        marginLeft={179}
+                        marginTop={10}
+                      />
+                    </TouchableOpacity>
+                  )}
                   {dropdownOpens && selectedId === topic._id && (
                     <View style={styles.dropdowns}>
                       <TouchableOpacity

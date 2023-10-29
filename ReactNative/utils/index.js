@@ -1,5 +1,6 @@
 import axios from "axios";
 import { CLOUD_NAME, UPLOAD_PRESET } from "../config";
+import moment from "moment";
 
 export const extractTime = (input) => {
   const date = new Date(input);
@@ -123,4 +124,11 @@ export const uploadImageToCloudinary = async (image) => {
 
 export function letterSpacing(string, count = 1) {
   return string.split("").join("\u200A".repeat(count));
+}
+
+export function hasPassed15Minutes(dateTime) {
+  const targetDateTime = moment(dateTime);
+  const currentDateTime = moment();
+  const minutesDifference = currentDateTime.diff(targetDateTime, "minutes");
+  return minutesDifference >= 15;
 }

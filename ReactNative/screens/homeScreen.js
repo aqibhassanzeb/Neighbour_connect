@@ -205,18 +205,19 @@ const HomeScreen = ({ navigation, route }) => {
               //  paddingHorizontal: Default.fixPadding * 2,
             }}
           >
-            <TouchableOpacity
+            <View
               style={{
                 flex: 1,
                 paddingHorizontal: Default.fixPadding * 4.5,
                 flexDirection: isRtl ? "row-reverse" : "row",
               }}
-              onPress={() => navigation.navigate("AdminMain")}
+              // onPress={() => navigation.navigate("AdminMain")}
             >
               <SimpleLineIcons
                 name="location-pin"
                 size={22}
                 color={Colors.white}
+                style={{ marginTop: 10 }}
               />
               <Text
                 style={{
@@ -227,7 +228,7 @@ const HomeScreen = ({ navigation, route }) => {
               >
                 {userData?.address?.name}
               </Text>
-            </TouchableOpacity>
+            </View>
           </View>
         </View>
         <View

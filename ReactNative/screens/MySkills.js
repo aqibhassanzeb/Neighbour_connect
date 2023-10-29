@@ -18,6 +18,7 @@ import CategorySkill from "../components/CategorySkill";
 import { deleteSkill, getSkillsByUser } from "../apis/apis";
 import { ScrollView } from "react-native-gesture-handler";
 import Loader from "../components/loader";
+import { hasPassed15Minutes } from "../utils";
 
 const CategoryScreen = ({ navigation, route }) => {
   const { t, i18n } = useTranslation();
@@ -255,22 +256,24 @@ const CategoryScreen = ({ navigation, route }) => {
               </View>
               <View>
                 <View style={styles.contain}>
-                  <TouchableOpacity
-                    style={styles.selectedButton}
-                    onPress={() => {
-                      setSetselectedSkillforEdit(skill._id);
-                      setDropdownOpend(!dropdownOpend);
-                    }}
-                  >
-                    <Ionicons
-                      name="ellipsis-vertical"
-                      size={24}
-                      color="black"
-                    />
-                    <Text style={styles.selectedButtonText}>
-                      {selectedValue}
-                    </Text>
-                  </TouchableOpacity>
+                  {!hasPassed15Minutes(skill.createdAt) && (
+                    <TouchableOpacity
+                      style={styles.selectedButton}
+                      onPress={() => {
+                        setSetselectedSkillforEdit(skill._id);
+                        setDropdownOpend(!dropdownOpend);
+                      }}
+                    >
+                      <Ionicons
+                        name="ellipsis-vertical"
+                        size={24}
+                        color="black"
+                      />
+                      <Text style={styles.selectedButtonText}>
+                        {selectedValue}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
 
                   {dropdownOpend && setselectedSkillforEdit == skill._id && (
                     <View style={styles.dropdown}>

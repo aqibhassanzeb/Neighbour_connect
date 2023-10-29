@@ -27,7 +27,7 @@ import { addReplyState, deleteReplyState } from "../redux/globalSlice";
 const { width, height } = Dimensions.get("window");
 
 const ChatScreen = (props) => {
-  const { topic } = props.route.params;
+  const { topic, user } = props.route.params;
   const { topics } = useSelector((state) => state.global);
   const matchingTopic = topics.find((item) => item._id === topic._id);
   const rep = matchingTopic?.replies;
@@ -42,7 +42,6 @@ const ChatScreen = (props) => {
   const [dropdownOpend, setDropdownOpend] = useState(false);
   const [dropdownOpendd, setDropdownOpendd] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [user, setUser] = useState({});
   const [selected, setSelected] = useState("");
 
   const [text, setText] = useState("");
@@ -110,17 +109,6 @@ const ChatScreen = (props) => {
     }
   }
 
-  useEffect(() => {
-    const getUser = async () => {
-      const userJSON = await AsyncStorage.getItem("userData");
-      if (userJSON !== null) {
-        const user = JSON.parse(userJSON);
-        setUser(user.user);
-      }
-    };
-    getUser();
-  }, []);
-
   async function handleDelete(replyId) {
     try {
       setDropdownOpens(false);
@@ -139,6 +127,36 @@ const ChatScreen = (props) => {
     } finally {
     }
   }
+
+  const handleProfilePress = (post) => {
+    if (post.reply_by.connections.includes(user._id)) {
+      props.navigation.navigate("Profile3", {
+        user: post.reply_by,
+      });
+    } else if (post.reply_by._id == user._id) {
+      props.navigation.navigate("profileScreen");
+    } else if (user.requests) {
+      user.requests.map((req) => {
+        if (req.sender === post.reply_by._id) {
+          props.navigation.navigate("Profile4", {
+            user: {
+              sender: {
+                _id: post.reply_by._id,
+                name: post.reply_by.name,
+                image: post.reply_by.image,
+              },
+            },
+          });
+        } else {
+          return;
+        }
+      });
+    } else {
+      props.navigation.navigate("Profile1", {
+        user: post.reply_by,
+      });
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.white }}>
@@ -187,7 +205,8 @@ const ChatScreen = (props) => {
                   marginTop: 25,
                 }}
               >
-                <View
+                <TouchableOpacity
+                  onPress={() => handleProfilePress(reply)}
                   style={{
                     flexDirection: isRtl ? "row-reverse" : "row",
                   }}
@@ -309,7 +328,7 @@ const ChatScreen = (props) => {
                       </View>
                     )}
                   </View>
-                </View>
+                </TouchableOpacity>
 
                 <Text
                   style={{

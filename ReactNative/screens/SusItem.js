@@ -29,14 +29,14 @@ import { setWatchPosts } from "../redux/globalSlice";
 const { width, height } = Dimensions.get("window");
 
 const SusItem = ({ navigation, route }) => {
-  const { post, userId } = route.params;
+  const { post, userId, user } = route.params;
+  console.log(post);
 
   const [add, ar] = useAddHelpfulMutation();
   const [remove, rr] = useRemoveHelpfulMutation();
 
   const [isHelpful, setIsHelpful] = useState(post.helpful_by.includes(userId));
   const [helpfulCount, setHelpfulCount] = useState(post.helpful_count);
-  console.log(post.helpful_by);
 
   const { t, i18n } = useTranslation();
   const isRtl = i18n.dir() == "rtl";
@@ -75,6 +75,36 @@ const SusItem = ({ navigation, route }) => {
         isHelpful ? "unhelpful" : "helpful",
         error
       );
+    }
+  };
+
+  const handleProfilePress = (post) => {
+    if (post.posted_by.connections.includes(user._id)) {
+      navigation.navigate("Profile3", {
+        user: post.posted_by,
+      });
+    } else if (post.posted_by._id == userId) {
+      navigation.navigate("profileScreen");
+    } else if (user.requests) {
+      user.requests.map((req) => {
+        if (req.sender === post.posted_by._id) {
+          navigation.navigate("Profile4", {
+            user: {
+              sender: {
+                _id: post.posted_by._id,
+                name: post.posted_by.name,
+                image: post.posted_by.image,
+              },
+            },
+          });
+        } else {
+          return;
+        }
+      });
+    } else {
+      navigation.navigate("Profile1", {
+        user: post.posted_by,
+      });
     }
   };
 
@@ -126,7 +156,8 @@ const SusItem = ({ navigation, route }) => {
             marginVertical: 8,
           }}
         >
-          <View
+          <TouchableOpacity
+            onPress={() => handleProfilePress(post)}
             style={{
               flexDirection: isRtl ? "row-reverse" : "row",
             }}
@@ -168,7 +199,7 @@ const SusItem = ({ navigation, route }) => {
                 </Text>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
 
           <Text
             style={{
