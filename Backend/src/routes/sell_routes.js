@@ -11,6 +11,7 @@ import {
   getAllItemsDeleted,
   getSellsByCat,
   getSellsByUser,
+  markAvailable,
   markSolded,
   updateImages,
   updateSell,
@@ -44,5 +45,6 @@ routes.get("/all_items_deleted", protect, getAllItemsDeleted);
 
 // Mark Sold
 routes.post("/solded/:_id", protect, markSolded);
+routes.post("/available/:_id", protect, markAvailable);
 
 export default routes;

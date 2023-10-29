@@ -120,3 +120,7 @@ export const uploadImageToCloudinary = async (image) => {
   } finally {
   }
 };
+
+export function letterSpacing(string, count = 1) {
+  return string.split("").join("\u200A".repeat(count));
+}

@@ -20,7 +20,12 @@ import { Colors, Default, Fonts } from "../constants/styles";
 import Feather from "react-native-vector-icons/Feather";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
-import { deleteSell, getSellsByUser, handleSold } from "../apis/apis";
+import {
+  deleteSell,
+  getSellsByUser,
+  handleAvailable,
+  handleSold,
+} from "../apis/apis";
 import SellItemsList from "../components/SellItemsList";
 import Loader from "../components/loader";
 
@@ -42,8 +47,8 @@ const Lostss = ({ navigation }) => {
   const [allClear, setAllClear] = useState(false);
   const [search, setSearch] = useState();
   const [soldLoading, setSoldLoading] = useState(false);
-  const [markId, setMarkId] = useState("");
   const [deleteId, setDeleteId] = useState("");
+  const [markItem, setMarkItem] = useState({});
 
   const { t, i18n } = useTranslation();
 
@@ -93,8 +98,31 @@ const Lostss = ({ navigation }) => {
     try {
       setSoldLoading(true);
       setCancelModal(false);
-      let result = await handleSold({ _id: markId });
+      let result = await handleSold({ _id: markItem._id });
       if (result.status == 200) {
+        const newData = result.data;
+        const itemIndex = userSells.findIndex(
+          (item) => item._id === result.data._id
+        );
+        if (itemIndex !== -1) {
+          const updatedItems = [...userSells];
+          updatedItems[itemIndex] = { ...newData };
+          setUserSells(updatedItems);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setSoldLoading(false);
+    }
+  };
+
+  const handleAvailability = async () => {
+    try {
+      setSoldLoading(true);
+      setCancelModal(false);
+      let result = await handleAvailable({ _id: markItem._id });
+      if (result.status === 200) {
         const newData = result.data;
         const itemIndex = userSells.findIndex(
           (item) => item._id === result.data._id
@@ -123,6 +151,14 @@ const Lostss = ({ navigation }) => {
     } catch (error) {
       console.log(error);
     } finally {
+    }
+  }
+
+  function handleClick() {
+    if (markItem.is_sold) {
+      handleAvailability();
+    } else {
+      handleSolding();
     }
   }
 
@@ -190,10 +226,10 @@ const Lostss = ({ navigation }) => {
               navigation={navigation}
               setCancelModals={setCancelModals}
               selectedValue={selectedValue}
-              markId={markId}
-              setMarkId={setMarkId}
               soldLoading={soldLoading}
               setDeleteId={setDeleteId}
+              setMarkItem={setMarkItem}
+              markItem={markItem}
             />
           ))}
         {/* Mark Sold */}
@@ -233,7 +269,9 @@ const Lostss = ({ navigation }) => {
                       marginTop: Default.fixPadding,
                     }}
                   >
-                    {"Are you sure you want to mark this item as sold?"}
+                    {`Are you sure you want to mark this item as ${
+                      markItem?.is_sold ? "avaible" : "sold"
+                    }?`}
                   </Text>
                   <Text
                     numberOfLines={2}
@@ -261,7 +299,7 @@ const Lostss = ({ navigation }) => {
                       borderBottomLeftRadius: isRtl ? 0 : 10,
                       borderBottomRightRadius: isRtl ? 10 : 0,
                     }}
-                    onPress={handleSolding}
+                    onPress={handleClick}
                   >
                     <Text
                       style={{

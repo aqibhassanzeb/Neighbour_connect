@@ -607,6 +607,18 @@ export const handleSold = async (data) => {
   return result;
 };
 
+export const handleAvailable = async (data) => {
+  let { _id } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "POST",
+    `available/${_id}`,
+    {},
+    headersWithToken
+  );
+  return result;
+};
+
 export const getAllItems = async () => {
   const headersWithToken = await getHeadersWithToken();
   let result = await apiRequest("GET", `all_items`, null, headersWithToken);

@@ -1,10 +1,14 @@
 import { Image, StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 import { Colors, Default, Fonts } from "../constants/styles";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import {
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+} from "react-native-gesture-handler";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Emoji from "react-native-emoji";
 import useGetUserById from "./useGetUserId";
+import { letterSpacing } from "../utils";
 
 const SellItemsList = ({
   setCancelModal,
@@ -12,10 +16,10 @@ const SellItemsList = ({
   setCancelModals,
   selectedValue,
   sell,
-  setMarkId,
   soldLoading,
-  markId,
+  markItem,
   setDeleteId,
+  setMarkItem,
 }) => {
   const [dropdownOpend, setDropdownOpend] = useState(false);
   const userId = useGetUserById();
@@ -79,8 +83,16 @@ const SellItemsList = ({
               style={{
                 overflow: "hidden",
                 paddingLeft: 20,
+                marginBottom: 5,
+                fontSize: 16,
+                fontWeight: "semibold",
+                color: sell.is_sold ? "red" : "blue",
               }}
-            ></Text>
+            >
+              {sell.is_sold
+                ? letterSpacing("Sold")
+                : letterSpacing("Available")}
+            </Text>
 
             <View style={styles.container}>
               <View style={styles.buttonContainer}>
@@ -94,9 +106,8 @@ const SellItemsList = ({
                   <TouchableOpacity
                     onPress={() => {
                       setCancelModal(true);
-                      setMarkId(sell._id);
+                      setMarkItem(sell);
                     }}
-                    disabled={sell.is_sold}
                   >
                     <Text
                       numberOfLines={1}
@@ -106,13 +117,13 @@ const SellItemsList = ({
                         overflow: "hidden",
                       }}
                     >
-                      {soldLoading && markId === _id ? (
+                      {soldLoading && markItem._id === _id ? (
                         <Emoji
                           name="hourglass_flowing_sand"
                           style={{ fontSize: 17 }}
                         />
                       ) : is_sold ? (
-                        "Solded"
+                        "Mark Available"
                       ) : (
                         "Mark Sold"
                       )}

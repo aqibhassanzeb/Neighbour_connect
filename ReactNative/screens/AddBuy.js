@@ -102,8 +102,8 @@ const PayPalScreen = ({ navigation }) => {
   };
 
   const pickImageAsync = async () => {
-    if (selectedImages.length >= 3) {
-      alert("You can select a maximum of three images.");
+    if (selectedImages.length >= 6) {
+      alert("You can select a maximum of 6 images.");
       return;
     }
 

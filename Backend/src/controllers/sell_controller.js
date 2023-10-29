@@ -202,6 +202,23 @@ export const markSolded = async (req, res) => {
   }
 };
 
+export const markAvailable = async (req, res) => {
+  const { _id } = req.params;
+  try {
+    const available = await Sell.findByIdAndUpdate(
+      _id,
+      { is_sold: false },
+      { new: true }
+    );
+    if (available) {
+      return res.status(200).json(available);
+    }
+  } catch (error) {
+    console.error("Error Solding:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 export const getAllItems = async (req, res) => {
   let { address_range, address } = req.user;
   let { latitude, longitude } = address;
