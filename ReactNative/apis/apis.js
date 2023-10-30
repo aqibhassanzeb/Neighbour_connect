@@ -681,12 +681,12 @@ export const deleteMessages = async (data) => {
 };
 
 export const deleteChat = async (data) => {
-  const id = await getId();
-  const { recepientId } = data;
+  // const id = await getId();
+  const { senderId, recepientId } = data;
   const headersWithToken = await getHeadersWithToken();
   let result = await apiRequest(
     "DELETE",
-    `/delete_chat/${id}/${recepientId}`,
+    `/delete_chat/${senderId}/${recepientId}`,
     {},
     headersWithToken
   );

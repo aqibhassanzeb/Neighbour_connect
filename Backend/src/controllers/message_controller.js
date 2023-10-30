@@ -114,54 +114,94 @@ export const deleteChat = async (req, res) => {
   }
 };
 
+// export const friendsChat = async (req, res) => {
+//   try {
+//     const userId = req.params.userId;
+
+//     // Fetch the user's connections
+//     const user = await User.findById(userId).populate({
+//       path: "connections",
+//       select: "name image",
+//       model: User,
+//     });
+
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
+
+//     const connectionsWithMessages = [];
+
+//     for (const connection of user.connections) {
+//       const lastMessage = await Message.findOne({
+//         $or: [
+//           { senderId: user._id, recepientId: connection._id },
+//           { senderId: connection._id, recepientId: user._id },
+//         ],
+//       })
+//         .sort({ timeStamp: -1 })
+//         .limit(1);
+//       if (lastMessage) {
+//       }
+//       if (lastMessage) {
+//         connectionsWithMessages.push({
+//           name: connection.name,
+//           _id: connection._id,
+//           image: connection.image,
+//           lastMessage: lastMessage
+//             ? lastMessage.message
+//             : "Empty Chat, Join Now",
+//           timeStamp: lastMessage ? lastMessage.timeStamp : null,
+//         });
+//       }
+//     }
+
+//     res.json(connectionsWithMessages);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// };
+
 export const friendsChat = async (req, res) => {
   try {
     const userId = req.params.userId;
 
-    // Fetch the user's connections
-    const user = await User.findById(userId).populate({
-      path: "connections",
-      select: "name image",
-      model: User,
+    const messages = await Message.find({
+      $or: [{ senderId: userId }, { recepientId: userId }],
+    })
+      .sort({ timeStamp: -1 })
+      .populate("senderId recepientId", "name image");
+
+    const lastMessages = {};
+
+    messages.forEach((msg) => {
+      const { senderId, recepientId, message, timeStamp, _id } = msg;
+      const participants = [senderId, recepientId].sort();
+
+      const conversationKey = participants.join("-");
+
+      if (
+        !lastMessages[conversationKey] ||
+        timeStamp > lastMessages[conversationKey].timeStamp
+      ) {
+        lastMessages[conversationKey] = {
+          _id,
+          senderId: senderId,
+          recepientId: recepientId,
+          message: message,
+          timeStamp: timeStamp,
+        };
+      }
     });
 
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+    const lastMessagesArray = Object.values(lastMessages);
 
-    const connectionsWithMessages = [];
-
-    for (const connection of user.connections) {
-      const lastMessage = await Message.findOne({
-        $or: [
-          { senderId: user._id, recepientId: connection._id },
-          { senderId: connection._id, recepientId: user._id },
-        ],
-      })
-        .sort({ timeStamp: -1 })
-        .limit(1);
-      if (lastMessage) {
-      }
-      if (lastMessage) {
-        connectionsWithMessages.push({
-          name: connection.name,
-          _id: connection._id,
-          image: connection.image,
-          lastMessage: lastMessage
-            ? lastMessage.message
-            : "Empty Chat, Join Now",
-          timeStamp: lastMessage ? lastMessage.timeStamp : null,
-        });
-      }
-    }
-
-    res.json(connectionsWithMessages);
+    res.json(lastMessagesArray);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 export const getFriends = async (req, res) => {
   try {
     const userId = req.params.userId;

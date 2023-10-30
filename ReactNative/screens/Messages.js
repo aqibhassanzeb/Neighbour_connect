@@ -81,9 +81,18 @@ const MessagesScreen = ({ navigation, route }) => {
           onPress={() =>
             navigation.navigate("ChattingScreen", {
               user: {
-                recepientId: item._id,
-                recepientName: item.name,
-                recepientImage: item.image,
+                recepientId:
+                  item.recepientId._id === userId
+                    ? item.senderId._id
+                    : item.recepientId._id,
+                recepientName:
+                  item.recepientId._id === userId
+                    ? item.senderId.name
+                    : item.recepientId.name,
+                recepientImage:
+                  item.recepientId._id === userId
+                    ? item.senderId.image
+                    : item.recepientId.image,
                 senderId: userId,
               },
             })
@@ -111,7 +120,12 @@ const MessagesScreen = ({ navigation, route }) => {
               />
             )}
             <Image
-              source={{ uri: item.image }}
+              source={{
+                uri:
+                  item.recepientId._id === userId
+                    ? item.senderId.image
+                    : item.recepientId.image,
+              }}
               style={{ height: 50, width: 50, borderRadius: 25 }}
             />
             <View
@@ -125,7 +139,9 @@ const MessagesScreen = ({ navigation, route }) => {
                 numberOfLines={1}
                 style={{ ...Fonts.Medium16primary, overflow: "hidden" }}
               >
-                {item.name}
+                {item.recepientId._id === userId
+                  ? item.senderId.name
+                  : item.recepientId.name}
               </Text>
               <Text
                 numberOfLines={1}
@@ -135,7 +151,7 @@ const MessagesScreen = ({ navigation, route }) => {
                   overflow: "hidden",
                 }}
               >
-                {item.lastMessage}
+                {item.message}
               </Text>
             </View>
           </View>
@@ -150,7 +166,7 @@ const MessagesScreen = ({ navigation, route }) => {
               numberOfLines={1}
               style={{ ...Fonts.Medium14grey, overflow: "hidden" }}
             >
-              {item.lastMessage === "Empty Chat, Join Now"
+              {item.message === "Empty Chat, Join Now"
                 ? ""
                 : extractTime(item.timeStamp)}
             </Text>
@@ -207,10 +223,13 @@ const MessagesScreen = ({ navigation, route }) => {
     );
   };
 
+  console.log(selectedMessages);
+
   const handleDeleteMessages = async () => {
     try {
       const response = await deleteChat({
-        recepientId: selectedMessages[0]._id,
+        senderId: selectedMessages[0].senderId._id,
+        recepientId: selectedMessages[0].recepientId._id,
       });
 
       if (response.status === 200) {
