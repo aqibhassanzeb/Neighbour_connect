@@ -288,6 +288,7 @@ const RegisterScreen = ({ navigation }) => {
           </View>
           <Loader visible={registerLoader} />
           <TouchableOpacity
+            disabled={checked === false}
             onPress={handleRegister}
             style={{
               backgroundColor: Colors.primary,
