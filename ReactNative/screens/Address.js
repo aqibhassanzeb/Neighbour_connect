@@ -76,7 +76,7 @@ const PickAddressScreen = ({ navigation, route }) => {
     const selectedLocation = e.nativeEvent;
     setPoi(selectedLocation);
   };
-
+  console.log(poi);
   const handleButtonPress = async () => {
     if (poi === null && location === null) {
       alert("Please tap on any location");
@@ -96,16 +96,13 @@ const PickAddressScreen = ({ navigation, route }) => {
         },
       });
     } else {
-      const placeName = await getPlaceName(
-        poi.coordinate.latitude,
-        poi.coordinate.longitude
-      );
+      console.log("HERE");
       navigation.navigate("Radius", {
         user,
         address: {
           latitude: poi.coordinate.latitude,
           longitude: poi.coordinate.longitude,
-          name: placeName,
+          name: poi.name,
         },
       });
     }
@@ -118,9 +115,13 @@ const PickAddressScreen = ({ navigation, route }) => {
         ` https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&sensor=true&key=${GOOGLE_APIKEY}`
       );
       setIsNameLoading(false);
-      const locationName = response.data.results[0].formatted_address;
-      var result = locationName.split(" ").slice(1).join(" ");
-      return result;
+      const locationName = response.data?.results[0]?.formatted_address;
+      if (locationName) {
+        var result = locationName.split(" ").slice(1).join(" ");
+        return result;
+      } else {
+        alert(response.data.error_message);
+      }
     } catch (error) {
       setIsNameLoading(false);
       alert(error.message);

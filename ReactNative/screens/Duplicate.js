@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Modal,
+  DevSettings,
 } from "react-native";
 
 import { useTranslation } from "react-i18next";
@@ -17,6 +18,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 
 import { Colors, Default, Fonts } from "../constants/styles";
 import { deleteAccount } from "../apis/apis";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const MyAccountScreen = (props) => {
   const { t, i18n } = useTranslation();
@@ -83,6 +85,8 @@ const MyAccountScreen = (props) => {
       setDeleteLoading(true);
       const result = await deleteAccount();
       if (result.status == 200) {
+        await AsyncStorage.removeItem("userDatainfo");
+        await AsyncStorage.removeItem("userData");
         props.navigation.navigate("Logins1");
       }
     } catch (error) {

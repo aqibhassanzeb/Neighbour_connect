@@ -29,6 +29,8 @@ const { width, height } = Dimensions.get("window");
 const RegisterScreen = ({ navigation, route }) => {
   const [value, setValue] = useState(1);
 
+  console.log(route.params.address);
+
   const [checked, setChecked] = useState(false);
   const [user, setUser] = useState("");
 

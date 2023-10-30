@@ -143,10 +143,13 @@ const PickAddressScreen = ({ navigation, route }) => {
         ` https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&sensor=true&key=${GOOGLE_APIKEY}`
       );
       setIsNameLoading(false);
-      console.log(response.data);
-      const locationName = response.data.results[0].formatted_address;
-      var result = locationName.split(" ").slice(1).join(" ");
-      return result;
+      const locationName = response.data?.results[0]?.formatted_address;
+      if (locationName) {
+        var result = locationName.split(" ").slice(1).join(" ");
+        return result;
+      } else {
+        alert(response.data.error_message);
+      }
     } catch (error) {
       setIsNameLoading(false);
       alert(error.message);
@@ -165,7 +168,6 @@ const PickAddressScreen = ({ navigation, route }) => {
       });
     }
   };
-  console.log(poi);
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <MapView

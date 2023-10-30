@@ -80,18 +80,18 @@ const LoginScreen = ({ navigation }) => {
     }
   };
   const handleForgor = () => {
-    setLoginLoader(true);
-    setTimeout(() => {
-      setLoginLoader(false);
-      navigation.navigate("Forgot");
-    }, 800);
+    navigation.navigate("Forgot");
+    // setLoginLoader(true);
+    // setTimeout(() => {
+    //   setLoginLoader(false);
+    // }, 800);
   };
   const handleRegister = () => {
-    setLoginLoader(true);
-    setTimeout(() => {
-      setLoginLoader(false);
-      navigation.navigate("Registers1");
-    }, 800);
+    navigation.navigate("Registers1");
+    // setLoginLoader(true);
+    // setTimeout(() => {
+    //   setLoginLoader(false);
+    // }, 800);
   };
 
   const [exit, setExit] = useState(false);
