@@ -32,6 +32,8 @@ import Loader from "../components/loader";
 import { addSkill, getCategories } from "../apis/apis";
 import { useDispatch, useSelector } from "react-redux";
 import { clearLocation } from "../redux/loanandfoundSlice";
+import { AntDesign } from "@expo/vector-icons";
+import BreadCrumbs from "../components/BreadCrumbs";
 
 const { width, height } = Dimensions.get("window");
 const Checkbox = ({ label, onChange, checked }) => {
@@ -64,9 +66,11 @@ const PayPalScreen = ({ navigation, route }) => {
   const [selectedOptionsds, setSelectedOptionsds] = useState("Days");
   const [dropdownOpensd, setDropdownOpensd] = useState(false);
   const [selectedOptionsd, setSelectedOptionsd] = useState("Visibility");
+  const [price, setPrice] = useState("");
+  const [priceUnit, setPriceUnit] = ["Per /"];
+  const [priceUnitDropdown, setPriceUnitDropdown] = useState(false);
   const [checked, setChecked] = useState(false);
   const [selectedValue, setSelectedValue] = useState("");
-  const [pricePerHour, setPricePerHour] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [email, setEmail] = useState();
   const [time, setTime] = useState(new Date());
@@ -109,6 +113,11 @@ const PayPalScreen = ({ navigation, route }) => {
   const handleOptionSelects = (option) => {
     setSelectedOptions(option);
     setDropdownOpens(false);
+  };
+
+  const handlePriceOption = (option) => {
+    setPriceUnit(option);
+    setPriceUnitDropdown(false);
   };
   const handleOptionSelectsd = (option) => {
     setSelectedOptionsd(option);
@@ -193,7 +202,7 @@ const PayPalScreen = ({ navigation, route }) => {
       formData.append("description", description);
       formData.append("skill_level", selectedOptions);
       formData.append("time", hours);
-      formData.append("price_per_hour", pricePerHour);
+      formData.append("price_per_hour", price);
       formData.append("selected_day", checkedValues);
       formData.append("selected_visibility", selectedOptionsd);
       const mapLocation = {
@@ -305,7 +314,29 @@ const PayPalScreen = ({ navigation, route }) => {
           {"Add Skill"}
         </Text>
       </View>
-
+      <BreadCrumbs>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <TouchableOpacity
+          onPress={() => navigation.navigate("SkillSharing")}
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+          }}
+        >
+          <Text> Skills Hub</Text>
+        </TouchableOpacity>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <Text
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            color: Colors.primary,
+            fontWeight: "bold",
+          }}
+        >
+          Add Skill
+        </Text>
+      </BreadCrumbs>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View
           style={{
@@ -435,6 +466,11 @@ const PayPalScreen = ({ navigation, route }) => {
                   <TouchableOpacity
                     key={cat._id}
                     onPress={() => handleOptionSelect(cat)}
+                    style={{
+                      borderBottomWidth: 1,
+                      borderBottomColor: "#e2e8f0",
+                      paddingVertical: 2,
+                    }}
                   >
                     <Text style={{ padding: 10 }}>{cat.name}</Text>
                   </TouchableOpacity>
@@ -513,39 +549,7 @@ const PayPalScreen = ({ navigation, route }) => {
               </View>
             </TouchableOpacity>
           </View>
-          {/* <View
-              style={{
-                ...Default.shadow,
-                borderRadius: 10,
-                backgroundColor: Colors.white,
-                padding: Default.fixPadding * 1.5,
-                flexDirection: isRtl ? "row-reverse" : "row",
-                alignItems: "center",
-                marginTop: Default.fixPadding * 3,
-              }}
-            >
-                
-              <Ionicons
-                name="options-outline"
-                color={Colors.grey}
-                size={20}
-                style={{
-                  flex: 0.7,
-                }}
-              />
-              <TextInput
-                placeholder={tr("Type")}
-                placeholderTextColor={Colors.grey}
-                selectionColor={Colors.primary}
-                style={{
-                  ...Fonts.Medium16Black,
-                  flex: 9.3,
-                  marginHorizontal: Default.fixPadding,
-                  textAlign: isRtl ? "right" : "left",
-                }}
-              />
-              
-            </View> */}
+
           <View
             style={{
               ...Default.shadow,
@@ -612,50 +616,166 @@ const PayPalScreen = ({ navigation, route }) => {
           </View>
           {dropdownOpens && (
             <View style={styles.dropdowns}>
-              <TouchableOpacity onPress={() => handleOptionSelects("Skilled ")}>
+              <TouchableOpacity
+                onPress={() => handleOptionSelects("Skilled ")}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#e2e8f0",
+                  paddingVertical: 2,
+                }}
+              >
                 <Text style={{ padding: 10 }}>Skilled </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => handleOptionSelects("Semi Skilled ")}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#e2e8f0",
+                  paddingVertical: 2,
+                }}
               >
                 <Text style={{ padding: 10 }}>Semi Skilled</Text>
               </TouchableOpacity>
             </View>
           )}
+          {/* Price & Unit */}
+          <View style={{ flexDirection: "row", gap: 15 }}>
+            <View
+              style={{
+                ...Default.shadow,
+                borderRadius: 10,
+                backgroundColor: Colors.white,
+                padding: Default.fixPadding * 1.5,
+                flexDirection: isRtl ? "row-reverse" : "row",
+                marginTop: Default.fixPadding * 3,
+                width: 200,
+                height: 53,
+              }}
+            >
+              <View>
+                <Ionicons
+                  name="md-pricetag"
+                  color={Colors.grey}
+                  size={20}
+                  style={{
+                    flex: 0.7,
+                    marginRight: 14,
+                  }}
+                />
+              </View>
+              <View>
+                <TextInput
+                  keyboardType="numeric"
+                  placeholder="Price (Rs)"
+                  placeholderTextColor={"gray"}
+                  onChangeText={(text) => setPrice(text)}
+                />
+              </View>
+            </View>
+            <View>
+              <View
+                style={{
+                  ...Default.shadow,
+                  borderRadius: 10,
+                  backgroundColor: Colors.white,
+                  padding: Default.fixPadding * 1.5,
+                  flexDirection: isRtl ? "row-reverse" : "row",
+                  marginTop: Default.fixPadding * 3,
+                  width: 165,
+                }}
+              >
+                <View>
+                  <TouchableOpacity
+                    onPress={() => setPriceUnitDropdown(!priceUnitDropdown)}
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      paddingRight: 1,
+                      color: "grey",
+                    }}
+                  >
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        marginLeft: 15,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          marginTop: 3,
+                          color: "grey",
+                        }}
+                      >
+                        {priceUnit}
+                      </Text>
+                      <View
+                        style={{
+                          color: "grey",
 
-          <View
-            style={{
-              ...Default.shadow,
-              borderRadius: 10,
-              backgroundColor: Colors.white,
-              padding: Default.fixPadding * 1.5,
-              flexDirection: isRtl ? "row-reverse" : "row",
-              alignItems: "center",
-              marginTop: Default.fixPadding * 3,
-            }}
-          >
-            <Ionicons
-              name="document-text-outline"
-              color={Colors.grey}
-              size={20}
-              style={{
-                flex: 0.7,
-              }}
-            />
-            <TextInput
-              placeholder={tr("Description")}
-              onChangeText={(text) => setDescription(text)}
-              placeholderTextColor={Colors.grey}
-              selectionColor={Colors.primary}
-              style={{
-                ...Fonts.Medium16Black,
-                flex: 9.3,
-                marginHorizontal: Default.fixPadding,
-                textAlign: isRtl ? "right" : "left",
-              }}
-            />
+                          position: "absolute",
+                          marginLeft: 290,
+                        }}
+                      >
+                        <Ionicons
+                          name={
+                            priceUnitDropdown ? "chevron-up" : "chevron-down"
+                          }
+                          size={24}
+                          color="grey"
+                        />
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              {priceUnitDropdown && (
+                <View style={styles.dropdowns}>
+                  <TouchableOpacity
+                    onPress={() => handlePriceOption("Hour")}
+                    style={{
+                      borderBottomWidth: 1,
+                      borderBottomColor: "#e2e8f0",
+                      paddingVertical: 2,
+                    }}
+                  >
+                    <Text style={{ padding: 10 }}>Hour</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handlePriceOption("Day")}
+                    style={{
+                      borderBottomWidth: 1,
+                      borderBottomColor: "#e2e8f0",
+                      paddingVertical: 2,
+                    }}
+                  >
+                    <Text style={{ padding: 10 }}>Day</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handlePriceOption("Task")}
+                    style={{
+                      borderBottomWidth: 1,
+                      borderBottomColor: "#e2e8f0",
+                      paddingVertical: 2,
+                    }}
+                  >
+                    <Text style={{ padding: 10 }}>Task</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handlePriceOption("Project")}
+                    style={{
+                      borderBottomWidth: 1,
+                      borderBottomColor: "#e2e8f0",
+                      paddingVertical: 2,
+                    }}
+                  >
+                    <Text style={{ padding: 10 }}>Project</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
           </View>
-          <View style={{ flex: 1 }}>
+
+          {/* <View style={{ flex: 1 }}>
             <TouchableOpacity
               onPress={() => setTimeModal(true)}
               style={{
@@ -744,7 +864,8 @@ const PayPalScreen = ({ navigation, route }) => {
               // is24Hour={true}
               onChange={onEndTimeSelect}
             />
-          )}
+          )} */}
+          {/* Description */}
           <View
             style={{
               ...Default.shadow,
@@ -754,10 +875,11 @@ const PayPalScreen = ({ navigation, route }) => {
               flexDirection: isRtl ? "row-reverse" : "row",
               alignItems: "center",
               marginTop: Default.fixPadding * 3,
+              height: 53,
             }}
           >
             <Ionicons
-              name="md-pricetag"
+              name="document-text-outline"
               color={Colors.grey}
               size={20}
               style={{
@@ -765,32 +887,18 @@ const PayPalScreen = ({ navigation, route }) => {
               }}
             />
             <TextInput
-              keyboardType="numeric"
-              onChangeText={handlePriceChange}
-              value={pricePerHour}
-              placeholder="Price per hour"
+              placeholder={tr("Description")}
+              onChangeText={(text) => setDescription(text)}
               placeholderTextColor={Colors.grey}
               selectionColor={Colors.primary}
               style={{
-                ...Fonts.Medium16Black,
                 flex: 9.3,
                 marginHorizontal: Default.fixPadding,
                 textAlign: isRtl ? "right" : "left",
               }}
             />
-            <Text
-              style={{
-                color: "grey",
-
-                marginHorizontal: Default.fixPadding,
-                textAlign: isRtl ? "right" : "left",
-              }}
-            >
-              {" "}
-              Rs/hr
-            </Text>
           </View>
-
+          {/* Days */}
           <View
             style={{
               ...Default.shadow,
@@ -858,7 +966,9 @@ const PayPalScreen = ({ navigation, route }) => {
           {dropdownOpensds && (
             <View style={styles.dropdownsds}>
               <View style={styles.container}>
-                <Text style={styles.label}>Select Days:</Text>
+                <Text style={{ fontSize: 16, paddingBottom: 10 }}>
+                  Select Days:
+                </Text>
                 <Checkbox
                   label="Monday"
                   checked={checkedValues.includes("Monday")}
@@ -965,11 +1075,21 @@ const PayPalScreen = ({ navigation, route }) => {
             <View style={styles.dropdowns}>
               <TouchableOpacity
                 onPress={() => handleOptionSelectsd("Neighborhood ")}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#e2e8f0",
+                  paddingVertical: 2,
+                }}
               >
                 <Text style={{ padding: 10 }}>Neighborhood </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => handleOptionSelectsd("Connection ")}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#e2e8f0",
+                  paddingVertical: 2,
+                }}
               >
                 <Text style={{ padding: 10 }}>Connection</Text>
               </TouchableOpacity>
@@ -1204,7 +1324,6 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    fontWeight: "bold",
     marginLeft: 10,
   },
   checkboxContainer: {
@@ -1213,36 +1332,27 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   dropdownsd: {
-    width: 390,
-    height: 460,
     backgroundColor: "#fafafa",
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#ddd",
     paddingHorizontal: 10,
-    paddingRight: 100,
     zIndex: 21,
   },
   dropdowns: {
-    width: 390,
-    height: 90,
     backgroundColor: "#fafafa",
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#ddd",
     paddingHorizontal: 10,
-    paddingRight: 100,
     zIndex: 21,
   },
   dropdownsds: {
-    width: 390,
-    height: 300,
     backgroundColor: "#fafafa",
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#ddd",
     paddingHorizontal: 10,
-    paddingRight: 100,
     zIndex: 21,
   },
 });

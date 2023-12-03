@@ -19,6 +19,10 @@ import { deleteSkill, getSkillsByUser } from "../apis/apis";
 import { ScrollView } from "react-native-gesture-handler";
 import Loader from "../components/loader";
 import { hasPassed15Minutes } from "../utils";
+import BreadCrumbs from "../components/BreadCrumbs";
+import { AntDesign } from "@expo/vector-icons";
+import Empty from "../components/Empty";
+import Placeholder from "../components/Placeholders/PlaceholderList";
 
 const CategoryScreen = ({ navigation, route }) => {
   const { t, i18n } = useTranslation();
@@ -138,39 +142,42 @@ const CategoryScreen = ({ navigation, route }) => {
               ...Fonts.SemiBold18white,
               marginHorizontal: Default.fixPadding * 1.2,
             }}
-          ></Text>
+          >
+            My Skills
+          </Text>
         </View>
       </View>
-      {isLoading && <Loader />}
-      {!isLoading && userSkills.length === 0 && (
+      <BreadCrumbs>
+        <AntDesign name="right" size={18} color="#9ca3af" />
         <TouchableOpacity
+          onPress={() => navigation.navigate("SkillSharing")}
           style={{
-            ...Default.shadow,
-            backgroundColor: Colors.white,
-            marginTop: 30,
-            marginHorizontal: 13,
-            //    marginBottom: 27,
-            borderRadius: 10,
-            // overflow: "hidden",
-            flexDirection: isRtl ? "row-reverse" : "row",
-            paddingVertical: Default.fixPadding,
+            paddingHorizontal: 10,
+            paddingVertical: 5,
           }}
         >
-          <View
-            style={{
-              flex: 2,
-              //  paddingHorizontal: Default.fixPadding * 1.5,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Text>{!isLoading && "No Skills"}</Text>
-          </View>
+          <Text> Skills Hub</Text>
         </TouchableOpacity>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <Text
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            color: Colors.primary,
+            fontWeight: "bold",
+          }}
+        >
+          My Skills
+        </Text>
+      </BreadCrumbs>
+      {isLoading && userSkills.length === 0 && <Placeholder />}
+      {!isLoading && userSkills.length === 0 && (
+        <Empty marginTop={200} text="Empty? Share your skill now!" />
       )}
 
       <ScrollView>
-        {userSkills.length > 0 &&
+        {!isLoading &&
+          userSkills.length > 0 &&
           userSkills.map((skill, index) => (
             <TouchableOpacity
               key={skill._id}

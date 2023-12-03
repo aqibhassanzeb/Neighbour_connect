@@ -22,19 +22,19 @@ import Swiper from "react-native-swiper";
 import ChatScreen from "../screens/chatScreen";
 import { addEndorse, getId, removeEndorse } from "../apis/apis";
 import { extractDays, extractTime, shortText } from "../utils";
+import { useSelector } from "react-redux";
 
 const { width, height } = Dimensions.get("window");
 
 const Losted = ({ navigation, route }) => {
   const { post, userId } = route.params;
+  const user = useSelector((state) => state.authReducer.activeUser?.user);
 
   const { t, i18n } = useTranslation();
 
   const isRtl = i18n.dir() == "rtl";
-  const [id, setId] = useState("");
   const [isEndorsed, setIsEndorsed] = useState(false);
   const [endLoading, setEndLoading] = useState(false);
-  const [loggedInUserId, setLoggedInUserId] = useState("");
 
   const handleButtonClick = async () => {
     if (isEndorsed) {
@@ -73,21 +73,6 @@ const Losted = ({ navigation, route }) => {
     return true;
   };
 
-  useEffect(() => {
-    const getUserId = async () => {
-      const id = await getId();
-      setLoggedInUserId(id);
-    };
-    getUserId();
-  }, []);
-
-  useEffect(() => {
-    async function getAsyncId() {
-      const id = await getId();
-      setId(id);
-    }
-    getAsyncId();
-  }, []);
   useEffect(() => {
     BackHandler.addEventListener("hardwareBackPress", backAction);
 
@@ -180,7 +165,7 @@ const Losted = ({ navigation, route }) => {
           }}
           loop={true}
         >
-          {post?.skill?.images.map((image) => (
+          {post?.skill?.images?.map((image) => (
             <View key={image}>
               <Image
                 source={{
@@ -212,7 +197,7 @@ const Losted = ({ navigation, route }) => {
                   marginTop: Default.fixPadding * 1.5,
                 }}
               >
-                {post?.skill?.posted_by.name}
+                {post?.skill?.posted_by?.name}
               </Text>
 
               <View
@@ -233,7 +218,7 @@ const Losted = ({ navigation, route }) => {
                     marginLeft: Default.fixPadding * 0.3,
                   }}
                 >
-                  {post?.skill?.location.name || "No Location"}
+                  {post?.skill?.location?.name || "No Location"}
                 </Text>
               </View>
 
@@ -252,10 +237,10 @@ const Losted = ({ navigation, route }) => {
                     overflow: "hidden",
                   }}
                 >
-                  {post?.skill?.skill_level} {post?.skill?.category.name}
+                  {post?.skill?.skill_level} {post?.skill?.category?.name}
                 </Text>
               </View>
-              {loggedInUserId === post.skill.posted_by._id ? (
+              {user?._id === post?.skill?.posted_by?._id ? (
                 <></>
               ) : (
                 <TouchableOpacity
@@ -288,8 +273,6 @@ const Losted = ({ navigation, route }) => {
             </View>
             <View
               style={{
-                // flex: 3,
-                // flexDirection: isRtl ? "row-reverse" : "row",
                 justifyContent: "center",
                 alignItems: "center",
                 marginRight: 20,
@@ -411,17 +394,17 @@ const Losted = ({ navigation, route }) => {
         </View>
       </ScrollView>
       {/* Chat Screen */}
-      {loggedInUserId === post.skill.posted_by._id ? (
+      {user._id === post?.skill?.posted_by?._id ? (
         <></>
       ) : (
         <TouchableOpacity
           onPress={() =>
             navigation.navigate("ChattingScreen", {
               user: {
-                recepientId: post.skill.posted_by._id,
-                recepientName: post.skill.posted_by.name,
-                recepientImage: post.skill.posted_by.image,
-                senderId: loggedInUserId,
+                recepientId: post?.skill?.posted_by?._id,
+                recepientName: post?.skill?.posted_by?.name,
+                recepientImage: post?.skill?.posted_by?.image,
+                senderId: user?._id,
               },
             })
           }

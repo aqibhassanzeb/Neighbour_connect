@@ -16,6 +16,10 @@ import { getSkillsByCategory } from "../apis/apis";
 import Loader from "../components/loader";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AntDesign } from "@expo/vector-icons";
+import BreadCrumbs from "../components/BreadCrumbs";
+import Placeholder from "../components/Placeholders/PlaceholderList";
+import Empty from "../components/Empty";
 
 const CategoryScreen = ({ navigation, route }) => {
   const { item } = route.params;
@@ -82,7 +86,6 @@ const CategoryScreen = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
-      {isLoading && <Loader />}
       <View
         style={{
           paddingVertical: Default.fixPadding * 1.2,
@@ -112,31 +115,32 @@ const CategoryScreen = ({ navigation, route }) => {
           </Text>
         </View>
       </View>
-      {!isLoading && catSkills.length === 0 && (
+      <BreadCrumbs>
+        <AntDesign name="right" size={18} color="#9ca3af" />
         <TouchableOpacity
+          onPress={() => navigation.navigate("SkillSharing")}
           style={{
-            ...Default.shadow,
-            backgroundColor: Colors.white,
-            marginTop: 30,
-            marginHorizontal: 13,
-            //    marginBottom: 27,
-            borderRadius: 10,
-            // overflow: "hidden",
-            flexDirection: isRtl ? "row-reverse" : "row",
-            paddingVertical: Default.fixPadding,
+            paddingHorizontal: 10,
+            paddingVertical: 5,
           }}
         >
-          <View
-            style={{
-              flex: 2,
-              //  paddingHorizontal: Default.fixPadding * 1.5,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Text>{!isLoading && "Not Skill Yet"}</Text>
-          </View>
+          <Text> Skills Hub</Text>
         </TouchableOpacity>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <Text
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            color: Colors.primary,
+            fontWeight: "bold",
+          }}
+        >
+          {item?.name}
+        </Text>
+      </BreadCrumbs>
+      {isLoading && catSkills.length === 0 && <Placeholder />}
+      {!isLoading && catSkills.length === 0 && (
+        <Empty text="Empty here - be the first to shine!" marginTop={200} />
       )}
       <ScrollView>
         {catSkills.length > 0 &&

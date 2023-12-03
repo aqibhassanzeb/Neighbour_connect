@@ -17,6 +17,9 @@ import { useTranslation } from "react-i18next";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { getCategories } from "../apis/apis";
 import Loader from "../components/loader";
+import BreadCrumbs from "../components/BreadCrumbs";
+import { AntDesign } from "@expo/vector-icons";
+import Placeholder from "../components/Placeholders/PlaceholderFour";
 
 const ServicesScreen = ({ navigation }) => {
   const { t, i18n } = useTranslation();
@@ -76,7 +79,6 @@ const ServicesScreen = ({ navigation }) => {
   };
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
-      {isLoading && <Loader />}
       <>
         <View
           style={{
@@ -135,6 +137,19 @@ const ServicesScreen = ({ navigation }) => {
             </KeyboardAvoidingView>
           </View>
         </View>
+        <BreadCrumbs>
+          <AntDesign name="right" size={18} color="#9ca3af" />
+          <Text
+            style={{
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              color: Colors.primary,
+              fontWeight: "bold",
+            }}
+          >
+            Skills Hub
+          </Text>
+        </BreadCrumbs>
         <View style={styles.container}>
           <View style={styles.buttonContainer}>
             <View flexDirection="row">
@@ -177,6 +192,7 @@ const ServicesScreen = ({ navigation }) => {
           </Text>
         </View>
       </>
+      {isLoading && filteredCategories.length === 0 && <Placeholder />}
       <View>
         <FlatList
           data={filteredCategories && filteredCategories}
@@ -253,7 +269,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     // paddingHorizontal: 10,
-    marginTop: 30,
+    marginTop: 10,
 
     marginHorizontal: Default.fixPadding * 2,
   },

@@ -1,6 +1,5 @@
 import React, { useRef, useEffect } from "react";
 import { View, Text, Animated, Easing, StyleSheet } from "react-native";
-import { COLOURS } from "../../components/items2";
 
 const ShimmerBox = ({ width, height }) => {
   const shimmerValue = useRef(new Animated.Value(0)).current;
@@ -51,55 +50,61 @@ const ShimmerBox = ({ width, height }) => {
   );
 };
 
-const SuppliersList = () => {
+const Placeholder = () => {
   return (
     <View style={styles.container}>
-      <Text
+      <View
         style={{
-          paddingTop: 10,
-          paddingHorizontal: 20,
-          fontSize: 18,
-          fontWeight: "700",
-          color: COLOURS.black,
-          letterSpacing: 1,
-          textAlign: "left",
-          marginBottom: 10,
+          flexDirection: "row",
+          gap: 30,
         }}
       >
-        Categories
-      </Text>
-      <View style={{ flexDirection: "row" }}>
-        <ShimmerBox width={120} height={170} />
-        <ShimmerBox width={120} height={170} />
-        <ShimmerBox width={120} height={170} />
-        <ShimmerBox width={120} height={170} />
-        <ShimmerBox width={120} height={170} />
-        <ShimmerBox width={120} height={170} />
+        <ShimmerBox width={170} height={100} />
+        <ShimmerBox width={170} height={100} />
       </View>
-      <Text
+      <View
         style={{
-          paddingTop: 10,
-          paddingHorizontal: 20,
-          fontSize: 18,
-          fontWeight: "700",
-          color: COLOURS.black,
-          letterSpacing: 1,
-          textAlign: "left",
-          marginBottom: 10,
+          flexDirection: "row",
+          gap: 30,
         }}
       >
-        Items
-      </Text>
-      <ShimmerBox width={420} height={120} />
-      <ShimmerBox width={420} height={120} />
+        <ShimmerBox width={170} height={100} />
+        <ShimmerBox width={170} height={100} />
+      </View>
+      <View
+        style={{
+          flexDirection: "row",
+          gap: 30,
+        }}
+      >
+        <ShimmerBox width={170} height={100} />
+        <ShimmerBox width={170} height={100} />
+      </View>
+      <View
+        style={{
+          flexDirection: "row",
+          gap: 30,
+        }}
+      >
+        <ShimmerBox width={170} height={100} />
+        <ShimmerBox width={170} height={100} />
+      </View>
+      <View
+        style={{
+          flexDirection: "row",
+          gap: 30,
+        }}
+      >
+        <ShimmerBox width={170} height={100} />
+        <ShimmerBox width={170} height={100} />
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    paddingLeft: 25,
+    paddingLeft: 22,
   },
   shimmer: {
     borderRadius: 10,
@@ -112,4 +117,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SuppliersList;
+export default Placeholder;

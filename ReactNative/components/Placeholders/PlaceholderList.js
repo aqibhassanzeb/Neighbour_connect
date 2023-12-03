@@ -31,7 +31,7 @@ const ShimmerBox = ({ width, height }) => {
     inputRange: [0, 0.5, 1],
     outputRange: [
       "rgba(200, 200, 200, 0.5)",
-      "rgba(255, 255, 255, 1)",
+      "rgba(200, 200, 200, 1)",
       "rgba(200, 200, 200, 0.5)",
     ],
   });
@@ -50,21 +50,22 @@ const ShimmerBox = ({ width, height }) => {
   );
 };
 
-const SuppliersList = () => {
+const Placeholder = () => {
   return (
     <View style={styles.container}>
-      <ShimmerBox width={420} height={120} />
-      <ShimmerBox width={420} height={120} />
-      <ShimmerBox width={420} height={120} />
+      <View>
+        <ShimmerBox width={380} height={90} />
+        <ShimmerBox width={380} height={90} />
+        <ShimmerBox width={380} height={90} />
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: "center",
-    padding: 16,
     paddingLeft: 25,
+    paddingTop: 20,
   },
   shimmer: {
     borderRadius: 10,
@@ -77,4 +78,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SuppliersList;
+export default Placeholder;
