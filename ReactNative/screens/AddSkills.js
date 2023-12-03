@@ -8,15 +8,12 @@ import {
   BackHandler,
   StyleSheet,
   Dimensions,
-  Button,
-  image,
   Modal,
   TextInput,
+  Alert,
 } from "react-native";
 
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
-import Octicons from "react-native-vector-icons/Octicons";
-import { Slider } from "react-native-range-slider-expo";
 import CalendarPicker from "react-native-calendar-picker";
 import moment from "moment";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -25,17 +22,16 @@ import React, { useState, useEffect } from "react";
 import { Colors, Default, Fonts } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { FontAwesome5 } from "@expo/vector-icons";
-import axios from "axios";
 import Loader from "../components/loader";
 import { addSkill, getCategories } from "../apis/apis";
 import { useDispatch, useSelector } from "react-redux";
 import { clearLocation } from "../redux/loanandfoundSlice";
 import { AntDesign } from "@expo/vector-icons";
 import BreadCrumbs from "../components/BreadCrumbs";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 const Checkbox = ({ label, onChange, checked }) => {
   return (
     <TouchableOpacity style={styles.checkboxContainer} onPress={onChange}>
@@ -49,13 +45,12 @@ const Checkbox = ({ label, onChange, checked }) => {
   );
 };
 
-const PayPalScreen = ({ navigation, route }) => {
+const PayPalScreen = ({ navigation }) => {
   const { selectedLocation } = useSelector((state) => state.loanandfound);
 
   const [checkedValues, setCheckedValues] = useState([]);
   const [image, setImage] = useState(null);
   const [selectedImages, setSelectedImages] = useState([]);
-
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Category");
   const [showCustomOption, setShowCustomOption] = useState(false);
@@ -67,7 +62,7 @@ const PayPalScreen = ({ navigation, route }) => {
   const [dropdownOpensd, setDropdownOpensd] = useState(false);
   const [selectedOptionsd, setSelectedOptionsd] = useState("Visibility");
   const [price, setPrice] = useState("");
-  const [priceUnit, setPriceUnit] = ["Per /"];
+  const [priceUnit, setPriceUnit] = useState("Per /");
   const [priceUnitDropdown, setPriceUnitDropdown] = useState(false);
   const [checked, setChecked] = useState(false);
   const [selectedValue, setSelectedValue] = useState("");
@@ -86,6 +81,8 @@ const PayPalScreen = ({ navigation, route }) => {
   const [description, setDescription] = useState("");
   const [Categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [timeDetails, setTimeDetails] = useState({});
+  const [days, setDays] = useState([]);
 
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
@@ -124,24 +121,11 @@ const PayPalScreen = ({ navigation, route }) => {
     setDropdownOpensd(false);
   };
 
-  const handleOptionSelectsds = (option) => {
-    setSelectedOptionsds(option);
-    setDropdownOpensds(false);
-  };
-
   const isRtl = i18n.dir() == "rtl";
 
   function tr(key) {
     return t(`payPalScreen:${key}`);
   }
-
-  const handlePriceChange = (price) => {
-    if (/^\d*\.?\d{0,2}/.test(price)) {
-      // validate input is a valid number with max 2 decimal places
-      setPricePerHour(price);
-      setModalVisible(false); // close modal after selection
-    }
-  };
 
   const backAction = () => {
     dispatch(clearLocation());
@@ -175,54 +159,61 @@ const PayPalScreen = ({ navigation, route }) => {
     }
   };
   const handlePost = async () => {
-    if (
-      selectedImages.length === 0 ||
+    if (selectedImages.length === 0) {
+      Alert.alert("Error", "Image Is Required", [
+        { text: "OK", onPress: () => {} },
+      ]);
+    } else if (
       !selectedOption._id ||
       !description ||
-      !checkedValues ||
+      !priceUnit ||
       !selectedOptions ||
-      !pricePerHour
+      !price
     ) {
-      alert("Please fill all fields");
+      Alert.alert("Error", "Please Fill All Fields", [
+        { text: "OK", onPress: () => {} },
+      ]);
     } else {
-      const formData = new FormData();
-      selectedImages.slice(0, 3).forEach((image) => {
-        const extension = image.uri.split(".").pop();
-        const type = `${image.type}/${extension}`;
-        const name = image.uri.split("/").pop();
-        formData.append("photos", {
-          uri: image.uri,
-          type,
-          name,
+      const valid = validateDays();
+      if (valid) {
+        const formData = new FormData();
+        selectedImages.slice(0, 3).forEach((image) => {
+          const extension = image.uri.split(".").pop();
+          const type = `${image.type}/${extension}`;
+          const name = image.uri.split("/").pop();
+          formData.append("photos", {
+            uri: image.uri,
+            type,
+            name,
+          });
         });
-      });
 
-      const hours = `${formatTime(time)} to ${formatTime(endTime)}`;
-      formData.append("category", selectedOption._id);
-      formData.append("description", description);
-      formData.append("skill_level", selectedOptions);
-      formData.append("time", hours);
-      formData.append("price_per_hour", price);
-      formData.append("selected_day", checkedValues);
-      formData.append("selected_visibility", selectedOptionsd);
-      const mapLocation = {
-        ...selectedLocation.coordinate,
-        name: selectedLocation.name,
-      };
-      formData.append("location", JSON.stringify(mapLocation));
+        formData.append("category", selectedOption._id);
+        formData.append("description", description);
+        formData.append("skill_level", selectedOptions);
+        formData.append("days", JSON.stringify(days));
+        formData.append("price", price);
+        formData.append("price_unit", priceUnit);
+        formData.append("selected_visibility", selectedOptionsd);
+        const mapLocation = {
+          ...selectedLocation.coordinate,
+          name: selectedLocation.name,
+        };
+        formData.append("location", JSON.stringify(mapLocation));
 
-      try {
-        setIsLoading(true);
-        let response = await addSkill(formData);
+        try {
+          setIsLoading(true);
+          let response = await addSkill(formData);
 
-        if (response.status === 200) {
-          dispatch(clearLocation());
-          navigation.navigate("SkillPosted");
+          if (response.status === 200) {
+            dispatch(clearLocation());
+            navigation.navigate("SkillPosted");
+          }
+        } catch (error) {
+          console.log("Error While Posting", error);
+        } finally {
+          setIsLoading(false);
         }
-      } catch (error) {
-        console.log("Error While Posting", error);
-      } finally {
-        setIsLoading(false);
       }
     }
   };
@@ -232,41 +223,10 @@ const PayPalScreen = ({ navigation, route }) => {
     setSelectedImages(updatedImages);
   };
 
-  function formatTime(value) {
-    const originalDate = new Date(value);
-    const hours = originalDate.getHours();
-    const minutes = originalDate.getMinutes();
-    const formattedTime = `${String(hours).padStart(2, "0")}:${String(
-      minutes
-    ).padStart(2, "0")}`;
-    return formattedTime;
-  }
-
-  const onTimeSelected = (event, value) => {
-    setTimeModal(false);
-    setTime(value);
-    setSelectedTime(true);
-  };
-
-  const onEndTimeSelect = (event, value) => {
-    setEndTimeModal(false);
-    setEndTime(value);
-    setSelectedEndTime(true);
-  };
-
-  const confirmTime = (time) => {
-    return time;
-  };
-
   const today = moment().format("YYYY-MM-DD");
 
   const handleConfirmCalendar = (date) => {
     setFinalDate(date);
-  };
-
-  const confirmDate = () => {
-    let tempDate = date.toString().split(" ");
-    return date !== "" ? `${tempDate[2]} ${tempDate[1]} ${tempDate[3]}` : "";
   };
 
   const handleGetCategories = async () => {
@@ -285,6 +245,91 @@ const PayPalScreen = ({ navigation, route }) => {
     handleGetCategories();
   }, []);
 
+  const DAYS = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+
+  function setDayTime(value) {
+    const { nativeEvent, type } = value;
+
+    if (type === "dismissed") {
+      setTimeModal(false);
+    } else if (type === "set") {
+      setTimeModal(false);
+
+      const updatedDays = days.map((day) => {
+        if (day.name === timeDetails.day) {
+          if (timeDetails.type === "startHours") {
+            return { ...day, startHours: nativeEvent.timestamp };
+          } else if (timeDetails.type === "endHours") {
+            return { ...day, endHours: nativeEvent.timestamp };
+          }
+        } else {
+          return day;
+        }
+      });
+
+      const dayExists = updatedDays.some((day) => day.name === timeDetails.day);
+
+      if (!dayExists) {
+        const newDay = {
+          name: timeDetails.day,
+          startHours:
+            timeDetails.type === "startHours"
+              ? nativeEvent.timestamp
+              : undefined,
+          endHours:
+            timeDetails.type === "endHours" ? nativeEvent.timestamp : undefined,
+        };
+
+        updatedDays.push(newDay);
+      }
+
+      setDays(updatedDays);
+    }
+  }
+
+  function showStartValue(dayName) {
+    const foundDay = days.find((day) => day.name === dayName);
+    return foundDay && foundDay.startHours
+      ? moment(foundDay.startHours).format("LT")
+      : false;
+  }
+
+  function showEndValue(dayName) {
+    const foundDay = days.find((day) => day.name === dayName);
+    return foundDay && foundDay.endHours
+      ? moment(foundDay.endHours).format("LT")
+      : false;
+  }
+
+  function validateDays() {
+    let errorMessages = "";
+    for (const day of checkedValues) {
+      const dayEntry = days.find((entry) => entry.name === day);
+      if (!dayEntry) {
+        errorMessages += `Empty Start & End Hour for ${day}\n`;
+      } else {
+        if (dayEntry.startHours === undefined) {
+          errorMessages += `Empty Start Hour for ${day}\n `;
+        }
+        if (dayEntry.endHours === undefined) {
+          errorMessages += `Empty End Hour for ${day}\n`;
+        }
+      }
+    }
+    if (errorMessages !== "") {
+      Alert.alert("Error", errorMessages, [{ text: "OK", onPress: () => {} }]);
+      return false;
+    }
+    return true;
+  }
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       {isLoading && <Loader />}
@@ -669,6 +714,7 @@ const PayPalScreen = ({ navigation, route }) => {
                   placeholder="Price (Rs)"
                   placeholderTextColor={"gray"}
                   onChangeText={(text) => setPrice(text)}
+                  style={{ width: 150 }}
                 />
               </View>
             </View>
@@ -684,49 +730,46 @@ const PayPalScreen = ({ navigation, route }) => {
                   width: 165,
                 }}
               >
-                <View>
-                  <TouchableOpacity
-                    onPress={() => setPriceUnitDropdown(!priceUnitDropdown)}
+                <TouchableOpacity
+                  onPress={() => setPriceUnitDropdown(!priceUnitDropdown)}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingRight: 1,
+                    color: "grey",
+                    width: 150,
+                  }}
+                >
+                  <View
                     style={{
                       flexDirection: "row",
-                      alignItems: "center",
-                      paddingRight: 1,
-                      color: "grey",
+                      marginLeft: 15,
                     }}
                   >
-                    <View
+                    <Text
                       style={{
-                        flexDirection: "row",
-                        marginLeft: 15,
+                        marginTop: 3,
+                        color: "grey",
                       }}
                     >
-                      <Text
-                        style={{
-                          marginTop: 3,
-                          color: "grey",
-                        }}
-                      >
-                        {priceUnit}
-                      </Text>
-                      <View
-                        style={{
-                          color: "grey",
+                      {priceUnit}
+                    </Text>
+                    <View
+                      style={{
+                        color: "grey",
 
-                          position: "absolute",
-                          marginLeft: 290,
-                        }}
-                      >
-                        <Ionicons
-                          name={
-                            priceUnitDropdown ? "chevron-up" : "chevron-down"
-                          }
-                          size={24}
-                          color="grey"
-                        />
-                      </View>
+                        position: "absolute",
+                        marginLeft: 290,
+                      }}
+                    >
+                      <Ionicons
+                        name={priceUnitDropdown ? "chevron-up" : "chevron-down"}
+                        size={24}
+                        color="grey"
+                      />
                     </View>
-                  </TouchableOpacity>
-                </View>
+                  </View>
+                </TouchableOpacity>
               </View>
               {priceUnitDropdown && (
                 <View style={styles.dropdowns}>
@@ -759,6 +802,16 @@ const PayPalScreen = ({ navigation, route }) => {
                     }}
                   >
                     <Text style={{ padding: 10 }}>Task</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handlePriceOption("Item")}
+                    style={{
+                      borderBottomWidth: 1,
+                      borderBottomColor: "#e2e8f0",
+                      paddingVertical: 2,
+                    }}
+                  >
+                    <Text style={{ padding: 10 }}>Item</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => handlePriceOption("Project")}
@@ -966,15 +1019,127 @@ const PayPalScreen = ({ navigation, route }) => {
           {dropdownOpensds && (
             <View style={styles.dropdownsds}>
               <View style={styles.container}>
-                <Text style={{ fontSize: 16, paddingBottom: 10 }}>
-                  Select Days:
-                </Text>
-                <Checkbox
-                  label="Monday"
-                  checked={checkedValues.includes("Monday")}
-                  onChange={() => handleCheckboxChange("Monday")}
-                />
-                <Checkbox
+                <View style={{ flexDirection: "row", paddingBottom: 10 }}>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      paddingBottom: 10,
+                    }}
+                  >
+                    Select Days:
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      paddingBottom: 10,
+                      marginLeft: 80,
+                    }}
+                  >
+                    Start Hour
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      paddingBottom: 10,
+                      marginLeft: 25,
+                    }}
+                  >
+                    End Hour
+                  </Text>
+                </View>
+                {DAYS.map((day) => (
+                  <View key={day}>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Checkbox
+                        label={day}
+                        checked={checkedValues.includes(day)}
+                        onChange={() => handleCheckboxChange(day)}
+                      />
+                      <View style={{ flexDirection: "row", gap: 20 }}>
+                        <TouchableOpacity
+                          onPress={() => {
+                            if (checkedValues.includes(day)) {
+                              setTimeModal(true);
+                              setTimeDetails({ day, type: "startHours" });
+                            } else {
+                              Alert.alert("Error", `${day} is not selected`, [
+                                { text: "OK", onPress: () => {} },
+                              ]);
+                            }
+                          }}
+                          style={{ flexDirection: "row", gap: 3 }}
+                        >
+                          <MaterialIcons
+                            name="access-time"
+                            size={20}
+                            color={Colors.grey}
+                          />
+                          <Text
+                            numberOfLines={1}
+                            style={{
+                              color: showStartValue(day) ? "black" : "gray",
+                              fontSize: 14,
+                            }}
+                          >
+                            {showStartValue(day)
+                              ? showStartValue(day)
+                              : "00:00"}
+                          </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => {
+                            if (checkedValues.includes(day)) {
+                              setTimeModal(true);
+                              setTimeDetails({ day, type: "endHours" });
+                            } else {
+                              Alert.alert("Error", `${day} is not selected`, [
+                                { text: "OK", onPress: () => {} },
+                              ]);
+                            }
+                          }}
+                          style={{ flexDirection: "row", gap: 3 }}
+                        >
+                          <MaterialIcons
+                            name="access-time"
+                            size={20}
+                            color={Colors.grey}
+                          />
+                          <Text
+                            numberOfLines={1}
+                            style={{
+                              color: showEndValue(day) ? "black" : "gray",
+                              fontSize: 14,
+                            }}
+                          >
+                            {showEndValue(day) ? showEndValue(day) : "00:00"}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                    <View
+                      style={{
+                        height: 2,
+                        backgroundColor: "lightgray",
+                        marginVertical: 10,
+                      }}
+                    />
+                  </View>
+                ))}
+                {console.log({ timeModal })}
+                {timeModal && (
+                  <DateTimePicker
+                    value={new Date()}
+                    onChange={(value) => setDayTime(value)}
+                    mode="time"
+                  />
+                )}
+                {/* <Checkbox
                   label="Tuesday"
                   checked={checkedValues.includes("Tuesday")}
                   onChange={() => handleCheckboxChange("Tuesday")}
@@ -1003,7 +1168,7 @@ const PayPalScreen = ({ navigation, route }) => {
                   label="Sunday"
                   checked={checkedValues.includes("Sunday")}
                   onChange={() => handleCheckboxChange("Sunday")}
-                />
+                /> */}
               </View>
             </View>
           )}
@@ -1240,6 +1405,7 @@ const PayPalScreen = ({ navigation, route }) => {
 };
 
 export default PayPalScreen;
+
 const styles = StyleSheet.create({
   checkbox: {
     //  borderWidth: 1,

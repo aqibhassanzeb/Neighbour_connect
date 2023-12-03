@@ -6,6 +6,7 @@ import { Activity } from "../models/activity.js";
 
 export const addSkill = async (req, res) => {
   const location = JSON.parse(req.body.location);
+  const days = JSON.parse(req.body.days);
   if (!req.files || req.files.length === 0) {
     return res.status(400).send("No files uploaded.");
   }
@@ -38,6 +39,7 @@ export const addSkill = async (req, res) => {
     const post = new Skill({
       ...req.body,
       location,
+      days,
       images,
     });
 

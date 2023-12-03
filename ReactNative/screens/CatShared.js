@@ -23,6 +23,7 @@ import ChatScreen from "../screens/chatScreen";
 import { addEndorse, getId, removeEndorse } from "../apis/apis";
 import { extractDays, extractTime, shortText } from "../utils";
 import { useSelector } from "react-redux";
+import moment from "moment";
 
 const { width, height } = Dimensions.get("window");
 
@@ -97,8 +98,6 @@ const Losted = ({ navigation, route }) => {
 
   const days = post?.skill?.selected_day;
 
-  const formattedDays = extractDays(days);
-
   async function handleShowEndorse() {
     let endorsedArray = post.skill.posted_by.endorsed_by;
     let res = endorsedArray.includes(userId);
@@ -108,6 +107,29 @@ const Losted = ({ navigation, route }) => {
   useEffect(() => {
     handleShowEndorse();
   }, []);
+
+  function profileNavigation(userId, userInfo) {
+    if (userId === user._id) {
+      navigation.navigate("profileScreen");
+    } else if (user.connections.includes(userId)) {
+      navigation.navigate("Profile3", { user: userInfo });
+    } else if (
+      user.requests &&
+      user.requests.some((req) => req.sender === userId)
+    ) {
+      navigation.navigate("Profile4", {
+        user: {
+          sender: {
+            _id: userId,
+            name: userInfo.name,
+            image: userInfo.image,
+          },
+        },
+      });
+    } else {
+      navigation.navigate("Profile1", { user: userInfo });
+    }
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
@@ -191,20 +213,39 @@ const Losted = ({ navigation, route }) => {
             <View
               style={{ flex: 7, alignItems: isRtl ? "flex-end" : "flex-start" }}
             >
-              <Text
+              <TouchableOpacity
                 style={{
-                  ...Fonts.SemiBold16black,
-                  marginTop: Default.fixPadding * 1.5,
+                  flexDirection: "row",
+                  marginTop: 20,
+                  alignItems: "center",
+                  gap: 10,
                 }}
+                onPress={() =>
+                  profileNavigation(
+                    post?.skill?.posted_by?._id,
+                    post?.skill?.posted_by
+                  )
+                }
               >
-                {post?.skill?.posted_by?.name}
-              </Text>
+                <Image
+                  source={{ uri: post?.skill?.posted_by?.image }}
+                  style={{ width: 40, height: 40, borderRadius: 50 }}
+                />
+                <Text
+                  style={{
+                    ...Fonts.SemiBold16black,
+                  }}
+                >
+                  {post?.skill?.posted_by?.name}
+                </Text>
+              </TouchableOpacity>
 
               <View
                 style={{
                   flexDirection: isRtl ? "row-reverse" : "row",
                   alignItems: "center",
                   marginTop: Default.fixPadding * 0.5,
+                  marginLeft: 45,
                 }}
               >
                 <SimpleLineIcons
@@ -227,6 +268,7 @@ const Losted = ({ navigation, route }) => {
                   marginVertical: Default.fixPadding * 0.5,
                   alignItems: "center",
                   flexDirection: isRtl ? "row-reverse" : "row",
+                  marginLeft: 45,
                 }}
               >
                 <Text
@@ -310,13 +352,9 @@ const Losted = ({ navigation, route }) => {
                 ...Default.shadow,
                 backgroundColor: Colors.white,
                 borderRadius: 10,
-                //   justifyContent: "center",
-                // alignItems: "center",
-                //  paddingVertical: Default.fixPadding * 3.5,
                 paddingTop: 28,
                 paddingBottom: 38,
                 paddingLeft: 8,
-
                 width: width / 1.1,
                 flexDirection: "row",
               }}
@@ -336,8 +374,17 @@ const Losted = ({ navigation, route }) => {
                   />
                   {tr("description")}
                 </Text>
+                <Text
+                  style={{
+                    ...Fonts.Medium14grey,
+                    marginBottom: 20,
+                    marginLeft: 18,
+                  }}
+                >
+                  {post.skill.description}
+                </Text>
 
-                {readMore ? (
+                {/* {readMore ? (
                   <Text style={{ ...Fonts.Medium14grey }}>
                     {post.skill.description}
                     <Text
@@ -359,7 +406,7 @@ const Losted = ({ navigation, route }) => {
                       {tr("readMore")}
                     </Text>
                   </Text>
-                )}
+                )} */}
                 <Text
                   style={{
                     ...Fonts.SemiBold16primary,
@@ -370,8 +417,14 @@ const Losted = ({ navigation, route }) => {
 
                   {"Price"}
                 </Text>
-                <Text style={{ ...Fonts.Medium14grey, paddingBottom: 20 }}>
-                  RS:{post?.skill?.price_per_hour}/hr
+                <Text
+                  style={{
+                    ...Fonts.Medium14grey,
+                    paddingBottom: 20,
+                    marginLeft: 18,
+                  }}
+                >
+                  RS:{post?.skill?.price}/{post?.skill?.price_unit}
                 </Text>
                 <Text
                   style={{
@@ -383,11 +436,15 @@ const Losted = ({ navigation, route }) => {
 
                   {"Availability"}
                 </Text>
-                <Text style={{ ...Fonts.Medium14grey }}>
-                  {post?.skill?.time}
-                </Text>
-
-                <Text style={{ ...Fonts.Medium14grey }}>{formattedDays}</Text>
+                {post?.skill?.days?.map((day) => (
+                  <Text
+                    key={day.name}
+                    style={{ ...Fonts.Medium14grey, marginLeft: 18 }}
+                  >
+                    {day.name} - From {moment(day.startHours).format("LT")} To{" "}
+                    {moment(day.endHours).format("LT")}
+                  </Text>
+                ))}
               </View>
             </TouchableOpacity>
           </View>

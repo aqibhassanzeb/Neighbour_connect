@@ -31,17 +31,15 @@ const skillSchema = new mongoose.Schema(
     images: {
       type: [],
     },
-    time: {
+    days: {
+      type: [],
+    },
+    price: {
       type: String,
     },
-    price_per_hour: {
+    price_unit: {
       type: String,
     },
-    selected_day: [
-      {
-        type: String,
-      },
-    ],
     selected_visibility: {
       type: String,
       required: true,
