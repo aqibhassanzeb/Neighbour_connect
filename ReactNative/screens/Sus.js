@@ -28,6 +28,11 @@ import { useFocusEffect } from "@react-navigation/native";
 const { width, height } = Dimensions.get("window");
 import { DotIndicator } from "react-native-indicators";
 import useGetUser from "../components/useGetUser";
+import BreadCrumbs from "../components/BreadCrumbs";
+import { AntDesign } from "@expo/vector-icons";
+import Placeholder from "../components/Placeholders/PlaceholderThree";
+import EmptySearch from "../components/EmptySearch";
+import Empty from "../components/Empty";
 
 const ServicesScreen = ({ navigation }) => {
   const user = useGetUser();
@@ -156,47 +161,40 @@ const ServicesScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
-    const filteredPosts = posts.filter((post) =>
-      post.category.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredPosts = posts.filter(
+      (post) =>
+        post.category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilter(filteredPosts);
   }, [searchTerm, posts]);
 
-  const handleProfilePress = (post) => {
-    if (post.posted_by.connections.includes(user._id)) {
-      navigation.navigate("Profile3", {
-        user: post.posted_by,
-      });
-    } else if (post.posted_by._id == userId) {
+  function profileNavigation(userId, userInfo) {
+    if (userId === user._id) {
       navigation.navigate("profileScreen");
-    } else if (user.requests) {
-      user.requests.map((req) => {
-        if (req.sender === post.posted_by._id) {
-          navigation.navigate("Profile4", {
-            user: {
-              sender: {
-                _id: post.posted_by._id,
-                name: post.posted_by.name,
-                image: post.posted_by.image,
-              },
-            },
-          });
-        } else {
-          return;
-        }
+    } else if (user.connections.includes(userId)) {
+      navigation.navigate("Profile3", { user: userInfo });
+    } else if (
+      user.requests &&
+      user.requests.some((req) => req.sender === userId)
+    ) {
+      navigation.navigate("Profile4", {
+        user: {
+          sender: {
+            _id: userId,
+            name: userInfo.name,
+            image: userInfo.image,
+          },
+        },
       });
     } else {
-      navigation.navigate("Profile1", {
-        user: post.posted_by,
-      });
+      navigation.navigate("Profile1", { user: userInfo });
     }
-  };
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       <ScrollView>
-        {isLoading && !isFetching && <Loader />}
-
         <View
           style={{
             backgroundColor: Colors.primary,
@@ -252,7 +250,19 @@ const ServicesScreen = ({ navigation }) => {
             />
           </View>
         </View>
-
+        <BreadCrumbs>
+          <AntDesign name="right" size={18} color="#9ca3af" />
+          <Text
+            style={{
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              color: Colors.primary,
+              fontWeight: "bold",
+            }}
+          >
+            Neighbour Watch
+          </Text>
+        </BreadCrumbs>
         <View style={styles.conta}>
           <View style={styles.buttonConta}>
             <View flexDirection="row">
@@ -301,31 +311,16 @@ const ServicesScreen = ({ navigation }) => {
             )}
           </Text>
         </View>
+        {isLoading && !isFetching && <Placeholder />}
+
+        {filter.length === 0 && searchTerm.length > 0 && !isLoading && (
+          <EmptySearch
+            text={`No Search Result Found for ${searchTerm}`}
+            marginTop={80}
+          />
+        )}
         {filter.length === 0 && !isLoading && (
-          <TouchableOpacity
-            style={{
-              ...Default.shadow,
-              backgroundColor: Colors.white,
-              marginTop: 30,
-              marginHorizontal: 13,
-              //    marginBottom: 27,
-              borderRadius: 10,
-              // overflow: "hidden",
-              flexDirection: isRtl ? "row-reverse" : "row",
-              paddingVertical: Default.fixPadding,
-            }}
-          >
-            <View
-              style={{
-                flex: 2,
-                //  paddingHorizontal: Default.fixPadding * 1.5,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Text>No Result Found</Text>
-            </View>
-          </TouchableOpacity>
+          <Empty text="No Activites Posted Yet" marginTop={80} />
         )}
         <ScrollView showsVerticalScrollIndicator={false}>
           {filter.length > 0 &&
@@ -350,9 +345,10 @@ const ServicesScreen = ({ navigation }) => {
                   }}
                 >
                   <TouchableOpacity
-                    onPress={() => handleProfilePress(post)}
+                    onPress={() =>
+                      profileNavigation(post.posted_by._id, post.posted_by)
+                    }
                     style={{
-                      // flex: 7,
                       flexDirection: isRtl ? "row-reverse" : "row",
                       marginLeft: 12,
                     }}
@@ -509,7 +505,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     // paddingHorizontal: 10,
-    marginTop: 30,
+    marginTop: 10,
 
     marginHorizontal: Default.fixPadding * 1.2,
   },

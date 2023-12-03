@@ -15,7 +15,6 @@ import { Colors, Default, Fonts } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import Founded from "../components/Founded";
-
 import llost from "../components/llost";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { lostItemGetbyLoc, lostandfoundCategGet } from "../apis/apis";
@@ -27,6 +26,9 @@ import {
   updataData,
 } from "../redux/loanandfoundSlice";
 import { FlatList } from "react-native-gesture-handler";
+import { AntDesign } from "@expo/vector-icons";
+import BreadCrumbs from "../components/BreadCrumbs";
+
 // import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 const Tab = createMaterialTopTabNavigator();
@@ -36,6 +38,7 @@ const CustomTabBar = ({ state, descriptors, navigation, position }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [categories, setCategories] = useState([]);
   const [selectedCat, setSelectedCat] = useState({ name: "All", id: "123" });
+  const [catLoading, setCatLoading] = useState(false);
   const [userId, setUserId] = useState("");
 
   const dispatch = useDispatch();
@@ -75,13 +78,16 @@ const CustomTabBar = ({ state, descriptors, navigation, position }) => {
 
   const handleGetCateg = async () => {
     try {
+      setCatLoading(true);
       // setFetchingCategLoader(true);
       let result = await lostandfoundCategGet();
-
+      setCatLoading(false);
       if (result.status == 200) {
         setCategories(result.data?.data);
       }
     } catch (error) {
+      setCatLoading(false);
+      console.log(error.message);
     } finally {
       // setFetchingCategLoader(false);
     }
@@ -152,6 +158,19 @@ const CustomTabBar = ({ state, descriptors, navigation, position }) => {
             />
           </TouchableOpacity>
         </View>
+        <BreadCrumbs>
+          <AntDesign name="right" size={18} color="#9ca3af" />
+          <Text
+            style={{
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              color: Colors.primary,
+              fontWeight: "bold",
+            }}
+          >
+            Lost & Found
+          </Text>
+        </BreadCrumbs>
 
         <View style={styles.container}>
           <View style={styles.buttonContainer}>
@@ -161,7 +180,7 @@ const CustomTabBar = ({ state, descriptors, navigation, position }) => {
               <Button
                 color="#005D7A"
                 title="Add Items"
-                onPress={() => navigation.navigate("ListItem")}
+                onPress={() => navigation.navigate("ChooseLF")}
               />
             </View>
           </View>
@@ -348,8 +367,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     // paddingHorizontal: 10,
-    marginTop: 20,
+    marginTop: 10,
 
+    marginHorizontal: Default.fixPadding * 2,
+  },
+  breadCrumb: {
+    marginTop: 10,
     marginHorizontal: Default.fixPadding * 2,
   },
   buttonContainer: {

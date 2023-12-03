@@ -76,7 +76,7 @@ const PickAddressScreen = ({ navigation, route }) => {
     const selectedLocation = e.nativeEvent;
     setPoi(selectedLocation);
   };
-  console.log(poi);
+
   const handleButtonPress = async () => {
     if (poi === null && location === null) {
       alert("Please tap on any location");
@@ -96,15 +96,29 @@ const PickAddressScreen = ({ navigation, route }) => {
         },
       });
     } else {
-      console.log("HERE");
-      navigation.navigate("Radius", {
-        user,
-        address: {
-          latitude: poi.coordinate.latitude,
-          longitude: poi.coordinate.longitude,
-          name: poi.name,
-        },
-      });
+      if (!poi.name) {
+        const placeName = await getPlaceName(
+          poi.coordinate.latitude,
+          poi.coordinate.longitude
+        );
+        navigation.navigate("Radius", {
+          user,
+          address: {
+            latitude: poi.coordinate.latitude,
+            longitude: poi.coordinate.longitude,
+            name: placeName,
+          },
+        });
+      } else {
+        navigation.navigate("Radius", {
+          user,
+          address: {
+            latitude: poi.coordinate.latitude,
+            longitude: poi.coordinate.longitude,
+            name: poi.name,
+          },
+        });
+      }
     }
   };
 

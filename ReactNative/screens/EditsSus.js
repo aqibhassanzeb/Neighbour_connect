@@ -34,6 +34,8 @@ import { useDispatch, useSelector } from "react-redux";
 import Loader from "../components/loader";
 import { clearLocation } from "../redux/loanandfoundSlice";
 import { extractDate, extractTime } from "../utils";
+import { AntDesign } from "@expo/vector-icons";
+import BreadCrumbs from "../components/BreadCrumbs";
 
 const { width, height } = Dimensions.get("window");
 const PayPalScreen = ({ navigation, route }) => {
@@ -243,6 +245,40 @@ const PayPalScreen = ({ navigation, route }) => {
         </Text>
       </View>
 
+      <BreadCrumbs>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Sus")}
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+          }}
+        >
+          <Text> Neighbour Watch</Text>
+        </TouchableOpacity>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Mysus")}
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+          }}
+        >
+          <Text>My Activities</Text>
+        </TouchableOpacity>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <Text
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            color: Colors.primary,
+            fontWeight: "bold",
+          }}
+        >
+          Edit
+        </Text>
+      </BreadCrumbs>
+
       <ScrollView showsVerticalScrollIndicator={false}>
         <View
           style={{
@@ -266,6 +302,7 @@ const PayPalScreen = ({ navigation, route }) => {
               style={{
                 color: Colors.grey,
                 marginLeft: 105,
+                marginBottom: 10,
               }}
             >
               Upload New Pictures/Videos

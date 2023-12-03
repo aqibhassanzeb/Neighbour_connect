@@ -39,11 +39,13 @@ import Loader from "../components/loader";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { clearLocation } from "../redux/loanandfoundSlice";
+import { AntDesign } from "@expo/vector-icons";
+import BreadCrumbs from "../components/BreadCrumbs";
 
 const { width, height } = Dimensions.get("window");
 const PayPalScreen = ({ navigation, route }) => {
   const { selectedLocation } = useSelector((state) => state.loanandfound);
-
+  const { type } = route.params;
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState({
     name: "Category",
@@ -68,10 +70,7 @@ const PayPalScreen = ({ navigation, route }) => {
     setSelectedOption(option);
     setDropdownOpen(false);
   };
-  const handleOptionSelects = (option) => {
-    setSelectedOptions(option);
-    setDropdownOpens(false);
-  };
+
   const handleOptionSelectsd = (option) => {
     setSelectedOptionsd(option);
     setDropdownOpensd(false);
@@ -100,6 +99,7 @@ const PayPalScreen = ({ navigation, route }) => {
   const [calendarModal, setCalendarModel] = useState(false);
   const today = moment().format("YYYY-MM-DD");
   const [finalDate, setFinalDate] = useState();
+  console.log(finalDate);
 
   const handleConfirmCalendar = (date) => {
     setFinalDate(date);
@@ -135,8 +135,9 @@ const PayPalScreen = ({ navigation, route }) => {
     }
 
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      // allowsEditing: true,
+      allowsMultipleSelection: true,
     });
 
     if (!result.canceled) {
@@ -172,10 +173,6 @@ const PayPalScreen = ({ navigation, route }) => {
       alert("Please enter a description.");
       return false;
     }
-    if (selectedOptions == "Type") {
-      alert("Please select a type.");
-      return false;
-    }
     if (selectedOptionsd == "Visibility") {
       alert("Please select a visibility.");
       return false;
@@ -199,13 +196,13 @@ const PayPalScreen = ({ navigation, route }) => {
       formData.append("title", title);
       formData.append("category", selectedOption._id);
       formData.append("description", description);
-      formData.append("date", String(finalDate));
+      formData.append("date", finalDate.toString());
       const mapLocation = {
         ...selectedLocation.coordinate,
         name: selectedLocation.name,
       };
       formData.append("location", JSON.stringify(mapLocation));
-      formData.append("type", selectedOptions);
+      formData.append("type", type);
       formData.append("visibility", selectedOptionsd);
       formData.append("notify", checked);
 
@@ -289,6 +286,29 @@ const PayPalScreen = ({ navigation, route }) => {
           {updateHandle ? "Update Item" : "Add Item"}
         </Text>
       </View>
+      <BreadCrumbs>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <TouchableOpacity
+          onPress={() => navigation.navigate("lostTabt")}
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+          }}
+        >
+          <Text> Lost & Found</Text>
+        </TouchableOpacity>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <Text
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            color: Colors.primary,
+            fontWeight: "bold",
+          }}
+        >
+          Add Activity
+        </Text>
+      </BreadCrumbs>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View
@@ -469,6 +489,11 @@ const PayPalScreen = ({ navigation, route }) => {
                   <TouchableOpacity
                     key={elm._id}
                     onPress={() => handleOptionSelect(elm)}
+                    style={{
+                      borderBottomWidth: 1,
+                      borderBottomColor: "#e2e8f0",
+                      paddingVertical: 2,
+                    }}
                   >
                     <Text style={{ padding: 10 }}>{elm.name} </Text>
                   </TouchableOpacity>
@@ -614,81 +639,6 @@ const PayPalScreen = ({ navigation, route }) => {
               </View>
             </TouchableOpacity>
           </View>
-          <View
-            style={{
-              ...Default.shadow,
-              borderRadius: 10,
-              backgroundColor: Colors.white,
-              padding: Default.fixPadding * 1.5,
-              flexDirection: isRtl ? "row-reverse" : "row",
-
-              //  alignItems: "center",
-              marginTop: Default.fixPadding * 3,
-            }}
-          >
-            <View>
-              <Ionicons
-                name="options-outline"
-                color={Colors.grey}
-                size={20}
-                style={{
-                  flex: 0.7,
-                }}
-              />
-            </View>
-            <View>
-              <TouchableOpacity
-                onPress={() => setDropdownOpens(!dropdownOpens)}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  paddingRight: 1,
-                  color: "grey",
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    marginLeft: 15,
-                  }}
-                >
-                  <Text
-                    style={{
-                      marginTop: 3,
-                      color: "grey",
-                      textTransform: "capitalize",
-                    }}
-                  >
-                    {selectedOptions}
-                  </Text>
-                  <View
-                    style={{
-                      color: "grey",
-
-                      position: "absolute",
-                      marginLeft: 290,
-                    }}
-                  >
-                    <Ionicons
-                      name={dropdownOpens ? "chevron-up" : "chevron-down"}
-                      size={24}
-                      color="grey"
-                    />
-                  </View>
-                </View>
-              </TouchableOpacity>
-            </View>
-          </View>
-          {dropdownOpens && (
-            <View style={styles.dropdownsd}>
-              <TouchableOpacity onPress={() => handleOptionSelects("lost")}>
-                <Text style={{ padding: 10 }}>Lost </Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleOptionSelects("found")}>
-                <Text style={{ padding: 10 }}>Found</Text>
-              </TouchableOpacity>
-            </View>
-          )}
 
           <View
             style={{
@@ -793,11 +743,21 @@ const PayPalScreen = ({ navigation, route }) => {
             <View style={styles.dropdown}>
               <TouchableOpacity
                 onPress={() => handleOptionSelectsd("neighborhood")}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#e2e8f0",
+                  paddingVertical: 2,
+                }}
               >
                 <Text style={{ padding: 10 }}>Neighborhood </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => handleOptionSelectsd("connection")}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#e2e8f0",
+                  paddingVertical: 2,
+                }}
               >
                 <Text style={{ padding: 10 }}>Connection</Text>
               </TouchableOpacity>
@@ -849,6 +809,7 @@ const PayPalScreen = ({ navigation, route }) => {
             marginTop: Default.fixPadding * 2,
             padding: Default.fixPadding * 1.2,
             marginHorizontal: Default.fixPadding * 2,
+            marginBottom: 20,
           }}
         >
           <Text style={{ ...Fonts.SemiBold18white }}>
@@ -900,7 +861,7 @@ const PayPalScreen = ({ navigation, route }) => {
                     }}
                   >
                     <Text style={{ ...Fonts.SemiBold18black }}>
-                      {tr("selectDate")}
+                      Select Date
                     </Text>
                   </View>
                   <TouchableOpacity
@@ -1022,14 +983,11 @@ const styles = StyleSheet.create({
     flexDirection: "column",
   },
   dropdowns: {
-    width: 390,
-    height: 240,
     backgroundColor: "#fafafa",
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#ddd",
     paddingHorizontal: 10,
-    paddingRight: 100,
     zIndex: 21,
   },
   dropdownsd: {
@@ -1045,14 +1003,11 @@ const styles = StyleSheet.create({
   },
 
   dropdown: {
-    width: 390,
-    height: 90,
     backgroundColor: "#fafafa",
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#ddd",
     paddingHorizontal: 10,
-    paddingRight: 100,
     zIndex: 21,
   },
 });

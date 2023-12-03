@@ -132,8 +132,14 @@ import Photo from "./screens/Photo";
 import Tutoring from "./screens/Tutoring";
 import Appearance from "./screens/Appearance";
 import Myaccount from "./screens/Myaccount";
+import RegSucc from "./screens/RegistrationSuccess";
+import ChooseLF from "./screens/ChooseLF";
+
 import { store } from "./redux/store";
 import { Provider as ReduxProvider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+import { persistStore } from "redux-persist";
+let persistor = persistStore(store);
 
 const Stack = createStackNavigator();
 
@@ -192,6 +198,11 @@ const MainNavigation = (props) => {
         <Stack.Screen
           name="LostPosted"
           component={LostPosted}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ChooseLF"
+          component={ChooseLF}
           options={{ headerShown: false }}
         />
         <Stack.Screen
@@ -534,6 +545,11 @@ const MainNavigation = (props) => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name="RegSucc"
+          component={RegSucc}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
           name="Notify"
           component={Notify}
           options={{ headerShown: false }}
@@ -827,7 +843,9 @@ function App() {
 export default () => {
   return (
     <ReduxProvider store={store}>
-      <App />
+      <PersistGate persistor={persistor}>
+        <App />
+      </PersistGate>
     </ReduxProvider>
   );
 };

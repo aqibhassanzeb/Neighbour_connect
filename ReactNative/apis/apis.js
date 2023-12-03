@@ -795,7 +795,13 @@ export const addPostReport = async (data) => {
 
 // ALL SEARCH
 export const AllSearch = async (query) => {
-  let result = await apiRequest("GET", `search?query=${query}`, null, null);
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "GET",
+    `search?query=${query}`,
+    null,
+    headersWithToken
+  );
   return result;
 };
 

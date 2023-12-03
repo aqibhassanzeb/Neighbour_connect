@@ -15,8 +15,8 @@ import {
 } from "react-native";
 
 import React, { useState, useEffect } from "react";
-import { Colors, Default, Fonts } from "../constants/styles";
-
+import { Colors, Default, Fonts, screenHeight } from "../constants/styles";
+import { AntDesign } from "@expo/vector-icons";
 import Feather from "react-native-vector-icons/Feather";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
@@ -24,6 +24,8 @@ import { lostItemGet, lostandfoundUpdate } from "../apis/apis";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Loader from "../components/loader";
 import { hasPassed15Minutes } from "../utils";
+import BreadCrumbs from "../components/BreadCrumbs";
+import Empty from "../components/Empty";
 
 const { width, height } = Dimensions.get("window");
 
@@ -170,53 +172,61 @@ const Lostss = ({ navigation }) => {
             marginHorizontal: Default.fixPadding * 1.2,
           }}
         >
-          {"My Items"}
+          {"My Activites"}
         </Text>
       </View>
+      <BreadCrumbs>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <TouchableOpacity
+          onPress={() => navigation.navigate("lostTabt")}
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+          }}
+        >
+          <Text> Lost & Found</Text>
+        </TouchableOpacity>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <Text
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            color: Colors.primary,
+            fontWeight: "bold",
+          }}
+        >
+          My Activities
+        </Text>
+      </BreadCrumbs>
       <ScrollView showsVerticalScrollIndicator={false}>
         {allClear ? null : <></>}
 
-        {!loader && data.length === 0 && <Text>Not Found</Text>}
+        {!loader && data.length === 0 && (
+          <Empty text="No Activities yet. Start posting!" marginTop={250} />
+        )}
 
         {data.length > 0 &&
           data.map((elm) => (
             <View
               style={{
-                //margin: Default.fixPadding * 2,
                 marginLeft: 20,
               }}
               key={elm._id}
             >
-              <View
-                style={
-                  {
-                    // flexDirection: isRtl ? "row-reverse" : "row",
-                    //   justifyContent: "space-between",
-                    // marginHorizontal: Default.fixPadding * 2,
-                    //  marginBottom: Default.fixPadding * 2,
-                    //    marginTop: Default.fixPadding,
-                  }
-                }
-              >
+              <View>
                 <TouchableOpacity
                   onPress={() =>
                     navigation.navigate("Losted", {
-                      _id: elm._id,
-                      userId,
+                      data: elm,
                     })
                   }
                   style={{
                     ...Default.shadow,
-                    //  backgroundColor: Colors.white,
-                    //    borderRadius: 10,
-                    //   justifyContent: "center",
-                    // alignItems: "center",
-                    //  paddingVertical: Default.fixPadding * 3.5,
+
                     paddingTop: 48,
                     paddingBottom: 28,
                     paddingLeft: 5,
 
-                    //  width: width / 1.1,
                     flexDirection: "row",
                   }}
                 >
@@ -254,7 +264,6 @@ const Lostss = ({ navigation }) => {
                     </Text>
                     <Text
                       style={{
-                        //  ...Fonts.SemiBold15primary,
                         overflow: "hidden",
                         paddingLeft: 20,
                       }}
@@ -278,14 +287,7 @@ const Lostss = ({ navigation }) => {
                                   setCancelModal(true);
                                   setSetselectedEditId(elm._id);
                                 }
-                                //  setSelectedId(item.key);
                               }}
-                              // style={{
-                              //   backgroundColor: Colors.primary,
-                              //   paddingVertical: Default.fixPadding * 0.5,
-                              //   paddingHorizontal: Default.fixPadding,
-                              //   borderRadius: 5,
-                              // }}
                             >
                               <Text
                                 numberOfLines={1}
@@ -304,15 +306,8 @@ const Lostss = ({ navigation }) => {
                         </View>
                       </View>
                     )}
-                    {/* <Button title="Mark As Found" onPress={() => alert('Button pressed')}  style={{
-              //  ...Fonts.SemiBold15primary,
-              paddingRight:55,
-                overflow: "hidden",
-                
-              }}/> */}
                   </View>
 
-                  {/* <Ionicons name="ellipsis-vertical" size={24} color="black" /> */}
                   <View style={styles.contain}>
                     {!hasPassed15Minutes(elm.createdAt) && (
                       <TouchableOpacity
@@ -363,12 +358,7 @@ const Lostss = ({ navigation }) => {
             </View>
           ))}
 
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={cancelModal}
-          // onRequestClose={() => setCancelModal(false)}
-        >
+        <Modal animationType="fade" transparent={true} visible={cancelModal}>
           <TouchableOpacity
             activeOpacity={1}
             onPressOut={() => setCancelModal(false)}

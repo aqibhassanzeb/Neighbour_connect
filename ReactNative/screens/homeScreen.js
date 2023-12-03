@@ -18,7 +18,7 @@ import {
 } from "react-native";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ScrollView } from "react-native-virtualized-view";
-import { Colors, Default, Fonts } from "../constants/styles";
+import { Colors, Default, Fonts, WindowWidth } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
@@ -31,11 +31,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Loader from "../components/loader";
 import { AllSearch, getSettings, userGet, userGetbyId } from "../apis/apis";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  handleClearUserInfo,
-  handleSetUserinfo,
-} from "../redux/loanandfoundSlice";
+import { handleClearUserInfo } from "../redux/loanandfoundSlice";
 import { setSettings } from "../redux/notificationSlice";
+import { logout } from "../redux/authSlice";
 
 const { width, height } = Dimensions.get("window");
 
@@ -93,11 +91,12 @@ const HomeScreen = ({ navigation, route }) => {
   const handleLogout = async () => {
     try {
       dispatch(handleClearUserInfo());
+      dispatch(logout());
       await AsyncStorage.removeItem("userDatainfo");
       await AsyncStorage.removeItem("userData");
       setCancelModal(false);
       navigation.navigate("Logins1");
-      DevSettings.reload();
+      // DevSettings.reload();
     } catch (error) {
       console.error("Error clearing AsyncStorage:", error);
     }
@@ -138,7 +137,6 @@ const HomeScreen = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    // Load user data from AsyncStorage when the component mounts
     loadUserData();
   }, [navigation]);
 
@@ -174,6 +172,10 @@ const HomeScreen = ({ navigation, route }) => {
   useEffect(() => {
     handleGetSettings();
   }, []);
+
+  function formatLocation(text) {
+    return text?.replace(/\n/g, " ");
+  }
 
   return (
     <SafeAreaView
@@ -219,16 +221,17 @@ const HomeScreen = ({ navigation, route }) => {
                 name="location-pin"
                 size={22}
                 color={Colors.white}
-                style={{ marginTop: 10 }}
               />
               <Text
                 style={{
                   ...Fonts.Medium14white,
                   paddingTop: 3,
                   paddingLeft: 2,
+
+                  // width: 300,
                 }}
               >
-                {userData?.address?.name}
+                {formatLocation(userData?.address?.name)}
               </Text>
             </View>
           </View>
@@ -289,6 +292,7 @@ const HomeScreen = ({ navigation, route }) => {
                 left: 40,
                 borderRadius: 5,
                 padding: 10,
+                borderWidth: 1,
                 zIndex: 998,
               }}
             >
@@ -312,6 +316,7 @@ const HomeScreen = ({ navigation, route }) => {
             <View
               style={{
                 width: 320,
+                marginTop: 5,
                 // height: 50,
                 backgroundColor: "white",
                 position: "absolute",
@@ -319,29 +324,44 @@ const HomeScreen = ({ navigation, route }) => {
                 left: 40,
                 borderRadius: 5,
                 padding: 10,
+                borderWidth: 1,
                 zIndex: 998,
               }}
             >
               {searchResults.length < 1 && !searchLoading ? (
-                <Text
+                <View
                   style={{
-                    fontWeight: 700,
-                    fontSize: 15,
-                    textAlign: "center",
-                    height: 50,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
                   }}
                 >
-                  No result found for{" "}
+                  <Image
+                    source={require("../assets/icons/not-found.png")}
+                    style={{ height: 50, width: 50, marginTop: 10 }}
+                    resizeMode="contain"
+                  />
                   <Text
                     style={{
                       fontWeight: 700,
                       fontSize: 15,
-                      color: Colors.primary,
+                      textAlign: "center",
+                      height: 50,
                     }}
                   >
-                    {query}
+                    No result found for{" "}
+                    <Text
+                      style={{
+                        fontWeight: 700,
+                        fontSize: 15,
+                        color: Colors.primary,
+                      }}
+                    >
+                      {query}
+                    </Text>
                   </Text>
-                </Text>
+                </View>
               ) : (
                 !searchLoading && (
                   <ScrollView>
@@ -410,7 +430,7 @@ const HomeScreen = ({ navigation, route }) => {
           <TouchableOpacity
             onPress={() =>
               navigation.navigate("lostTabt", {
-                userId: userData._id,
+                userId: userData?._id,
               })
             }
             style={{

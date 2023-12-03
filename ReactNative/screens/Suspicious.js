@@ -5,29 +5,18 @@ import {
   ScrollView,
   TouchableOpacity,
   BackHandler,
-  Image,
-  TextInput,
   StyleSheet,
-  Dimensions,
   StatusBar,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Colors, Fonts, Default } from "../constants/styles";
+import { AntDesign } from "@expo/vector-icons";
 
 import Ionicons from "react-native-vector-icons/Ionicons";
-import Feather from "react-native-vector-icons/Feather";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import Loader from "../components/loader";
-
-const { width, height } = Dimensions.get("window");
+import BreadCrumbs from "../components/BreadCrumbs";
 
 const RegisterScreen = ({ navigation }) => {
-  const [radius, setRadius] = useState(1);
-
-  const handleRadiusChange = (value) => {
-    setRadius(value);
-  };
   const [checked, setChecked] = useState(false);
 
   const { t, i18n } = useTranslation();
@@ -47,12 +36,6 @@ const RegisterScreen = ({ navigation }) => {
     return () =>
       BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
-
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [number, setNumber] = useState("");
-
-  const [password, setPassword] = useState("");
 
   return (
     <SafeAreaView
@@ -87,7 +70,29 @@ const RegisterScreen = ({ navigation }) => {
           {"Post Activity"}
         </Text>
       </View>
-
+      <BreadCrumbs>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Sus")}
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+          }}
+        >
+          <Text> Neighbor Watch</Text>
+        </TouchableOpacity>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <Text
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            color: Colors.primary,
+            fontWeight: "bold",
+          }}
+        >
+          Guidelines
+        </Text>
+      </BreadCrumbs>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View
           style={{
@@ -225,10 +230,6 @@ const RegisterScreen = ({ navigation }) => {
 
           <View
             style={{
-              //  ...Default.shadow,
-              //  borderRadius: 10,
-              //  backgroundColor: Colors.white,
-              //  padding: Default.fixPadding * 1.5,
               flexDirection: isRtl ? "row-reverse" : "row",
               alignItems: "center",
               marginTop: Default.fixPadding * 3,

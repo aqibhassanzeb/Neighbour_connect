@@ -1,4 +1,4 @@
-import { BackHandler, Platform } from "react-native";
+import { BackHandler, Platform, Image } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -11,12 +11,13 @@ import Notify from "../screens/Notify";
 import ProfileScreen from "../screens/profileScreen";
 import SnackbarToast from "./snackbarToast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSelector } from "react-redux";
 
 const Tab = createBottomTabNavigator();
 
 const BottomTab = (props) => {
   const { t, i18n } = useTranslation();
-
+  const user = useSelector((state) => state?.authReducer?.activeUser?.user);
   const isRtl = i18n.dir() == "rtl";
 
   function tr(key) {
@@ -24,7 +25,7 @@ const BottomTab = (props) => {
   }
 
   const [exit, setExit] = useState(false);
-  const [userData, setUserData] = useState("")
+  const [userData, setUserData] = useState("");
 
   const onToggleSnackBarExit = () => setExit(!exit);
 
@@ -66,15 +67,15 @@ const BottomTab = (props) => {
 
   const loadUserData = async () => {
     try {
-      const userDataString = await AsyncStorage.getItem('userData');
+      const userDataString = await AsyncStorage.getItem("userData");
       if (userDataString) {
         const userData = JSON.parse(userDataString);
-        setUserData(userData?.user)
+        setUserData(userData?.user);
       } else {
-        console.log('No user data found in AsyncStorage.');
+        console.log("No user data found in AsyncStorage.");
       }
     } catch (error) {
-      console.error('Error loading user data:', error);
+      console.error("Error loading user data:", error);
     }
   };
   return (
@@ -84,8 +85,7 @@ const BottomTab = (props) => {
         screenOptions={{
           tabBarStyle: {
             backgroundColor: Colors.white,
-            padding: Default.fixPadding * 0.5,
-            height: Platform.OS === "android" ? 60 : 90,
+            height: Platform.OS === "android" ? 65 : 90,
             justifyContent: "center",
             alignItems: "center",
           },
@@ -149,14 +149,17 @@ const BottomTab = (props) => {
           name={isRtl ? "homeScreen" : "profileScreen"}
           component={isRtl ? HomeScreen : ProfileScreen}
           options={{
-            title: title2,
+            title: user?.name?.split(" ")[0],
             tabBarActiveTintColor: Colors.primary,
             headerShown: false,
-            tabBarIcon: ({ focused, size }) => (
-              <Feather
-                name={isRtl ? "home" : "user"}
-                color={focused ? Colors.primary : Colors.grey}
-                size={22}
+            tabBarIcon: () => (
+              <Image
+                width={30}
+                height={30}
+                style={{ borderRadius: 15 }}
+                source={{
+                  uri: user?.image,
+                }}
               />
             ),
           }}

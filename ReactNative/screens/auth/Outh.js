@@ -39,7 +39,7 @@ const RegisterScreen = ({ navigation }) => {
     return t(`registerScreen:${key}`);
   }
   const backAction = () => {
-    navigation.navigate("loginScreen");
+    navigation.goBack();
     return true;
   };
   useEffect(() => {
@@ -49,20 +49,8 @@ const RegisterScreen = ({ navigation }) => {
       BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [number, setNumber] = useState("");
-
-  const [password, setPassword] = useState("");
-
-  const [registerLoader, setRegisterLoader] = useState(false);
-
   const handleRegister = () => {
-    setRegisterLoader(true);
-    setTimeout(() => {
-      setRegisterLoader(false);
-      navigation.navigate("bottomTab");
-    }, 800);
+    navigation.navigate("RegSucc");
   };
 
   return (
@@ -286,7 +274,6 @@ const RegisterScreen = ({ navigation }) => {
               I agree to uphold the responsible Neighbor Pledge
             </Text>
           </View>
-          <Loader visible={registerLoader} />
           <TouchableOpacity
             disabled={checked === false}
             onPress={handleRegister}

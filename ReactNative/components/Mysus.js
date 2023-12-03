@@ -21,6 +21,9 @@ import { Video } from "expo-av";
 import { deleteWatch, getWatchesByUser } from "../apis/apis";
 import Loader from "./loader";
 import { extractDate, extractTime, hasPassed15Minutes } from "../utils";
+import BreadCrumbs from "./BreadCrumbs";
+import { AntDesign } from "@expo/vector-icons";
+import Empty from "./Empty";
 
 const CategoryScreen = ({ navigation, route }) => {
   const { t, i18n } = useTranslation();
@@ -134,32 +137,32 @@ const CategoryScreen = ({ navigation, route }) => {
           </Text>
         </View>
       </View>
-      {isLoading && <Loader />}
-      {!isLoading && myWatches.length === 0 && (
+      <BreadCrumbs>
+        <AntDesign name="right" size={18} color="#9ca3af" />
         <TouchableOpacity
+          onPress={() => navigation.navigate("Sus")}
           style={{
-            ...Default.shadow,
-            backgroundColor: Colors.white,
-            marginTop: 30,
-            marginHorizontal: 13,
-            //    marginBottom: 27,
-            borderRadius: 10,
-            // overflow: "hidden",
-            flexDirection: isRtl ? "row-reverse" : "row",
-            paddingVertical: Default.fixPadding,
+            paddingHorizontal: 10,
+            paddingVertical: 5,
           }}
         >
-          <View
-            style={{
-              flex: 2,
-              //  paddingHorizontal: Default.fixPadding * 1.5,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Text>{!isLoading && "No Activity"}</Text>
-          </View>
+          <Text> Neighbour Watch</Text>
         </TouchableOpacity>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <Text
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            color: Colors.primary,
+            fontWeight: "bold",
+          }}
+        >
+          My Activities
+        </Text>
+      </BreadCrumbs>
+      {isLoading && <Loader />}
+      {!isLoading && myWatches.length === 0 && (
+        <Empty text="No Activities yet. Start posting!" marginTop={230} />
       )}
 
       <ScrollView showsVerticalScrollIndicator={false}>

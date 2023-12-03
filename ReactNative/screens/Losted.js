@@ -24,10 +24,13 @@ import { getId, lostItemGet } from "../apis/apis";
 import { handleLoaderforOne } from "../redux/loanandfoundSlice";
 import Loader from "../components/loader";
 import { extractDate } from "../utils";
+import { useSelector } from "react-redux";
 const { width, height } = Dimensions.get("window");
 
 const Losted = ({ navigation, route }) => {
   const { t, i18n } = useTranslation();
+  const user = useSelector((state) => state.authReducer.activeUser.user);
+  const { data } = route.params;
 
   const isRtl = i18n.dir() == "rtl";
 
@@ -45,57 +48,30 @@ const Losted = ({ navigation, route }) => {
       BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
 
-  const shareMessage = () => {
-    Share.share({
-      message: "Helping Hand",
-    });
-  };
-  const [like, setLike] = useState(false);
-
-  const [likeRemove, setLikeRemove] = useState(false);
-  const onToggleSnackBarRemove = () => setLikeRemove(false);
-
-  const [likeAdd, setLikeAdd] = useState(false);
-  const onToggleSnackBarAdd = () => setLikeAdd(false);
-
-  const [readMore, setReadMore] = useState(false);
-
-  const [data, setData] = useState("");
-  const [loader, setLoader] = useState(false);
-  const [loggedInUserId, setLoggedInUserId] = useState("");
-
-  const handleGetitem = async () => {
-    try {
-      setLoader(true);
-      let paylaod = {};
-      paylaod._id = route.params._id;
-      let result = await lostItemGet(paylaod);
-
-      if (result.status == 200) {
-        setData(result.data.data[0]);
-      }
-    } catch (error) {
-      alert("something went wrong!");
-    } finally {
-      setLoader(false);
+  function profileNavigation(userId, userInfo) {
+    if (userId === user._id) {
+      navigation.navigate("profileScreen");
+    } else if (user.connections.includes(userId)) {
+      navigation.navigate("Profile3", { user: userInfo });
+    } else if (
+      user.requests &&
+      user.requests.some((req) => req.sender === userId)
+    ) {
+      navigation.navigate("Profile4", {
+        user: {
+          sender: {
+            _id: userId,
+            name: userInfo.name,
+            image: userInfo.image,
+          },
+        },
+      });
+    } else {
+      navigation.navigate("Profile1", { user: userInfo });
     }
-  };
+  }
 
-  useEffect(() => {
-    handleGetitem();
-  }, [route.params._id]);
-
-  useEffect(() => {
-    async function getAsyncId() {
-      const id = await getId();
-      setLoggedInUserId(id);
-    }
-    getAsyncId();
-  }, []);
-
-  return loader ? (
-    <Loader />
-  ) : (
+  return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       <View
         style={{
@@ -161,20 +137,6 @@ const Losted = ({ navigation, route }) => {
                 />
               </View>
             ))}
-          {/* <View>
-              <Image
-                source={require("../assets/images/bag1.jpeg")}
-                style={{ height: height / 2.8, width: width }}
-                resizeMode="cover"
-              />
-            </View>
-            <View>
-              <Image
-                source={require("../assets/images/bag2.jpeg")}
-                style={{ height: height / 2.8, width: width }}
-                resizeMode="cover"
-              />
-            </View> */}
         </Swiper>
       </View>
       <View
@@ -185,38 +147,6 @@ const Losted = ({ navigation, route }) => {
           position: "absolute",
         }}
       >
-        {/* <View
-          style={{
-            flex: 8,
-            flexDirection: isRtl ? "row-reverse" : "row",
-            marginHorizontal: Default.fixPadding * 2,
-          }}
-        >
-          <TouchableOpacity
-            style={{
-              alignSelf: isRtl ? "flex-end" : "flex-start",
-            }}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons
-              name={isRtl ? "arrow-forward" : "arrow-back"}
-              size={25}
-              color={Colors.white}
-            />
-          </TouchableOpacity>
-
-          <Text
-            style={{
-              ...Fonts.SemiBold18white,
-              justifyContent: "center",
-              alignItems: "center",
-              marginHorizontal: Default.fixPadding * 1.2,
-            }}
-          >
-            {data.type}
-          </Text>
-        </View> */}
-
         <View
           style={{
             flex: 2,
@@ -238,20 +168,37 @@ const Losted = ({ navigation, route }) => {
             <View
               style={{ flex: 7, alignItems: isRtl ? "flex-end" : "flex-start" }}
             >
-              <Text
+              <TouchableOpacity
                 style={{
-                  ...Fonts.SemiBold16black,
-                  marginTop: Default.fixPadding * 1.5,
+                  flexDirection: "row",
+                  marginTop: 20,
+                  alignItems: "center",
+                  gap: 10,
                 }}
+                onPress={() =>
+                  profileNavigation(data?.posted_by._id, data?.posted_by)
+                }
               >
-                {data?.posted_by?.name}
-              </Text>
+                <Image
+                  source={{ uri: data?.posted_by?.image }}
+                  style={{ width: 40, height: 40, borderRadius: 50 }}
+                />
+                <Text
+                  style={{
+                    ...Fonts.SemiBold16black,
+                  }}
+                >
+                  {data?.posted_by?.name}
+                </Text>
+              </TouchableOpacity>
 
               <View
                 style={{
                   flexDirection: isRtl ? "row-reverse" : "row",
                   alignItems: "center",
                   marginTop: Default.fixPadding * 0.5,
+                  marginLeft: 10,
+                  marginTop: 10,
                 }}
               >
                 <SimpleLineIcons
@@ -262,7 +209,7 @@ const Losted = ({ navigation, route }) => {
                 <Text
                   style={{
                     ...Fonts.SemiBold12grey,
-                    marginLeft: Default.fixPadding * 0.3,
+                    marginLeft: Default.fixPadding * 0.5,
                   }}
                 >
                   {data && data?.location?.name}
@@ -270,7 +217,7 @@ const Losted = ({ navigation, route }) => {
               </View>
             </View>
 
-            {route.params.userId !== data?.posted_by?._id && (
+            {user._id !== data?.posted_by?._id && (
               <View
                 style={{
                   // flex: 3,
@@ -415,7 +362,7 @@ const Losted = ({ navigation, route }) => {
                     style={styles.image}
                     size={20}
                     color="black"
-                  />
+                  />{" "}
                   Date
                 </Text>
                 <Text
@@ -450,13 +397,13 @@ const Losted = ({ navigation, route }) => {
                     paddingLeft: 20,
                   }}
                 >
-                  {data.title}
+                  {data?.title}
                 </Text>
               </View>
             </TouchableOpacity>
           </View>
         </View>
-        {route.params.userId !== data?.posted_by?._id && (
+        {user._id !== data?.posted_by?._id && (
           <View
             style={{
               marginLeft: 20,
@@ -478,7 +425,7 @@ const Losted = ({ navigation, route }) => {
                     recepientId: data.posted_by._id,
                     recepientName: data.posted_by.name,
                     recepientImage: data.posted_by.image,
-                    senderId: loggedInUserId,
+                    senderId: user._id,
                   },
                 })
               }
@@ -490,6 +437,7 @@ const Losted = ({ navigation, route }) => {
                 marginLeft: 2,
                 marginRight: 18,
                 paddingVertical: Default.fixPadding * 1.2,
+                marginBottom: 10,
               }}
             >
               <Text style={{ ...Fonts.SemiBold18white }}>{"Message"}</Text>

@@ -23,3 +23,12 @@ export const replacements = {
   suspicious: "suspicious activity",
   forum: "neighbor forum",
 };
+
+export function checkIfUserInConnections(userId, postUserConnections = []) {
+  for (const connection of postUserConnections) {
+    if (connection === userId) {
+      return true;
+    }
+  }
+  return false;
+}

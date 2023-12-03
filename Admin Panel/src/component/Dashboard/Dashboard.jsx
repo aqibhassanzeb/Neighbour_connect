@@ -553,11 +553,11 @@ const Dashboard = () => {
                     }}
                   >
                     <ListItemAvatar>
-                      <Avatar alt="Pankaj" src={value.user.image} />
+                      <Avatar alt="Pankaj" src={value?.user?.image} />
                     </ListItemAvatar>
                     <ListItemText
-                      primary={value.user.name}
-                      secondary={moment(value.login_time).fromNow()}
+                      primary={value?.user?.name}
+                      secondary={moment(value?.login_time).fromNow()}
                     />
                   </ListItem>
                 ))}

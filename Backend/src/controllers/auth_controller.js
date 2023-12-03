@@ -512,17 +512,14 @@ export const deleteAccount = async (req, res) => {
 
 export const getUserStatistics = async (req, res) => {
   try {
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth() + 1; // Months are 0-based, so add 1.
+    const now = new Date();
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+    const endOfYear = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
 
-    const pipeline = [
+    const userRegistrations = await User.aggregate([
       {
         $match: {
-          createdAt: {
-            $gte: new Date(`${currentYear}-01-01`),
-            $lt: new Date(`${currentYear}-${currentMonth + 1}-01`),
-          },
+          createdAt: { $gte: startOfYear, $lte: endOfYear },
         },
       },
       {
@@ -534,20 +531,33 @@ export const getUserStatistics = async (req, res) => {
       {
         $sort: { _id: 1 },
       },
+    ]);
+
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ];
 
-    const result = await User.aggregate(pipeline);
-    const monthData = Array.from({ length: currentMonth }, (_, i) => {
-      const monthNumber = i + 1;
-      const monthName = new Date(
-        `${currentYear}-${monthNumber}-01`
-      ).toLocaleString("en-US", { month: "short" });
-      const monthCount =
-        result.find((item) => item._id === monthNumber)?.count || 0;
-      return { month: monthName, Accounts: monthCount };
+    const response = monthNames.map((name, index) => {
+      const count =
+        userRegistrations.find((data) => data._id === index + 1)?.count || 0;
+      return {
+        name,
+        Accounts: count,
+      };
     });
 
-    res.json(monthData);
+    res.json(response);
   } catch (error) {
     res.status(400).json({ message: "something went wrong!" });
   }

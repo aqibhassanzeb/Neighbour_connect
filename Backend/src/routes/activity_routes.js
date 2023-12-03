@@ -4,11 +4,12 @@ import {
   searchAll,
   userActivites,
 } from "../controllers/activites_controller.js";
+import { protect } from "../middleware/user_middleware.js";
 
 // Neighbour Forum
 routes.get("/user_activities/:id", userActivites);
 
 // Search APi
-routes.get("/search", searchAll);
+routes.get("/search", protect, searchAll);
 
 export default routes;

@@ -76,11 +76,7 @@ const RegisterScreen = ({ navigation }) => {
     setRegisterLoader(true);
     try {
       let user = await registerApi(payload);
-      console.log("Regiser Response", user);
       if (user.status == 200) {
-        const userData = JSON.stringify(user.data);
-
-        await AsyncStorage.setItem("userData", userData);
         setEmail("");
         setName("");
         setPassword("");
@@ -91,7 +87,6 @@ const RegisterScreen = ({ navigation }) => {
       }
     } catch (error) {
       alert("something went wrong!");
-      console.log("Registration Error:", error);
     } finally {
       setRegisterLoader(false);
     }

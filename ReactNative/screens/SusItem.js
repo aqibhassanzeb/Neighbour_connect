@@ -77,35 +77,28 @@ const SusItem = ({ navigation, route }) => {
     }
   };
 
-  const handleProfilePress = (post) => {
-    if (post.posted_by.connections.includes(user._id)) {
-      navigation.navigate("Profile3", {
-        user: post.posted_by,
-      });
-    } else if (post.posted_by._id == userId) {
+  function handleProfilePress(userId, userInfo) {
+    if (userId === user._id) {
       navigation.navigate("profileScreen");
-    } else if (user.requests) {
-      user.requests.map((req) => {
-        if (req.sender === post.posted_by._id) {
-          navigation.navigate("Profile4", {
-            user: {
-              sender: {
-                _id: post.posted_by._id,
-                name: post.posted_by.name,
-                image: post.posted_by.image,
-              },
-            },
-          });
-        } else {
-          return;
-        }
+    } else if (user.connections.includes(userId)) {
+      navigation.navigate("Profile3", { user: userInfo });
+    } else if (
+      user.requests &&
+      user.requests.some((req) => req.sender === userId)
+    ) {
+      navigation.navigate("Profile4", {
+        user: {
+          sender: {
+            _id: userId,
+            name: userInfo.name,
+            image: userInfo.image,
+          },
+        },
       });
     } else {
-      navigation.navigate("Profile1", {
-        user: post.posted_by,
-      });
+      navigation.navigate("Profile1", { user: userInfo });
     }
-  };
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
@@ -156,7 +149,9 @@ const SusItem = ({ navigation, route }) => {
           }}
         >
           <TouchableOpacity
-            onPress={() => handleProfilePress(post)}
+            onPress={() =>
+              handleProfilePress(post.posted_by._id, post.posted_by)
+            }
             style={{
               flexDirection: isRtl ? "row-reverse" : "row",
             }}

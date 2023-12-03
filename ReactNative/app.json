@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "RN-HomeService",
-    "slug": "RN-HomeService",
+    "name": "Neighbour-Connect",
+    "slug": "Neighbour-Connect",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -17,7 +17,7 @@
       "buildNumber": "1.0.0",
       "supportsTablet": true,
       "config": {
-        "googleMapsApiKey": "ENTER_YOUR_GOOGLE_MAP_API_KEY_HERE"
+        "googleMapsApiKey": ""
       }
     },
     "android": {
@@ -29,7 +29,7 @@
       },
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyDxeLoSv7tRgK2ulIAnW3dxU85tg_cLSjo"
+          "apiKey": ""
         }
       }
     },

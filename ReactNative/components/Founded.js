@@ -6,26 +6,27 @@ import {
   ScrollView,
   Dimensions,
   StyleSheet,
-  FlatList,
-  Modal,
   SafeAreaView,
+  FlatList,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Colors, Default, Fonts } from "../constants/styles";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import Feather from "react-native-vector-icons/Feather";
+
 import { useTranslation } from "react-i18next";
 
 import Ionicons from "react-native-vector-icons/Ionicons";
-import SnackbarToast from "./snackbarToast";
 import { useSelector } from "react-redux";
 import Loader from "./loader";
 import moment from "moment";
 import useGetUserId from "./useGetUserId";
-//import Founded from "../screens/Founded";
+import Empty from "./Empty";
+import { useNavigation } from "@react-navigation/native";
 const { width } = Dimensions.get("window");
+import Placeholder from "./Placeholders/PlacehoderOne";
 
 const OngoingTab = (props) => {
+  const user = useSelector((state) => state.authReducer.activeUser.user);
+  const navigation = useNavigation();
   const { t, i18n } = useTranslation();
   const userId = useGetUserId();
 
@@ -34,13 +35,6 @@ const OngoingTab = (props) => {
   function tr(key) {
     return t(`ongoingTab:${key}`);
   }
-  const [cancelModal, setCancelModal] = useState(false);
-
-  const [cancelToast, setCancelToast] = useState(false);
-  const onToggleSnackBarCancelToast = () => setCancelToast(false);
-
-  const [allClear, setAllClear] = useState(false);
-  const [foundDatalist, setFoundDatalist] = useState([]);
 
   const { data, loader, searchKeyword } = useSelector(
     (state) => state.loanandfound
@@ -48,549 +42,135 @@ const OngoingTab = (props) => {
 
   const regexPattern = new RegExp(searchKeyword, "i");
   let newData =
-    data.length > 0 &&
-    data.filter((elm) => regexPattern.test(elm.category.name));
+    data.length > 0 && data.filter((elm) => regexPattern.test(elm.title));
 
-  const truncateString = (str) => {
-    const words = str.split(" ");
-    const truncated = words.slice(0, 2).join(" ");
-    return words.length > 2 ? truncated + "..." : truncated;
-  };
+  function profileNavigation(userId, userInfo) {
+    if (userId === user._id) {
+      navigation.navigate("profileScreen");
+    } else if (user.connections.includes(userId)) {
+      navigation.navigate("Profile3", { user: userInfo });
+    } else {
+      navigation.navigate("Profile1", { user: userInfo });
+    }
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Loader visible={loader} />
-        {newData.length > 0 &&
-          newData.map((elm, index) => (
-            <View
-              style={{
-                //margin: Default.fixPadding * 2,
-                marginLeft: 20,
-              }}
-              key={elm._id}
-            >
-              <View
+        {/* <Loader visible={loader} /> */}
+        {loader && <Placeholder />}
+        {newData.length > 0 && (
+          <FlatList
+            data={newData}
+            renderItem={({ item }) => (
+              <TouchableOpacity
                 style={{
-                  // flexDirection: isRtl ? "row-reverse" : "row",
-                  //   justifyContent: "space-between",
-                  // marginHorizontal: Default.fixPadding * 2,
-                  marginBottom: Default.fixPadding * 2,
-                  marginTop: Default.fixPadding,
+                  backgroundColor: "white",
+                  padding: 5,
+                  margin: 5,
+                  flex: 1,
+                  borderRadius: 10,
+                  borderWidth: 1,
+                  borderColor: "#e2e8f0",
                 }}
+                onPress={() =>
+                  props.navigation.navigate("Losted", {
+                    data: item,
+                  })
+                }
               >
                 <TouchableOpacity
                   onPress={() =>
-                    props.navigation.navigate("Losted", {
-                      _id: elm._id,
-                      name: "Found",
-                      userId,
-                    })
+                    profileNavigation(item?.posted_by._id, item?.posted_by)
                   }
                   style={{
-                    ...Default.shadow,
-                    backgroundColor: Colors.white,
-                    borderRadius: 10,
-                    //   justifyContent: "center",
-                    // alignItems: "center",
-                    //  paddingVertical: Default.fixPadding * 3.5,
-                    paddingTop: 38,
-                    paddingBottom: 38,
-                    paddingLeft: 30,
-
-                    width: width / 1.1,
                     flexDirection: "row",
+                    alignItems: "center",
+                    padding: 3,
+                    gap: 10,
+                    paddingBottom: 10,
                   }}
                 >
                   <Image
-                    source={{ uri: elm.gallary_images[0] }}
-                    style={{ height: 75, width: 75, ...Default.shadow }}
+                    source={{ uri: item?.posted_by.image }}
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderTopLeftRadius: 10,
+                      borderTopRightRadius: 10,
+                    }}
                   />
-                  <View>
-                    <Text
-                      style={{
-                        ...Fonts.SemiBold15primary,
-                        overflow: "hidden",
-                        paddingLeft: 20,
-                        fontWeight: "bold",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        fontWeight: "900",
-                        height: 32,
-                        fontSize: 22,
-                        color: "black",
-                      }}
-                    >
-                      {elm.title}
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 18,
-                        color: "darkred",
-                        overflow: "hidden",
-                        paddingLeft: 16,
-                        fontWeight: "600",
-                      }}
-                    >
-                      {" "}
-                      {elm.type}
-                    </Text>
-                    <Text
-                      style={{
-                        ...Fonts.SemiBold15primary,
-                        overflow: "hidden",
-                        paddingLeft: 20,
-                      }}
-                    >
-                      {truncateString(elm.description)}
-                    </Text>
-
-                    <Text
-                      style={{
-                        //  ...Fonts.SemiBold15primary,
-                        overflow: "hidden",
-                        paddingLeft: 20,
-                      }}
-                    >
-                      Street#04 Harley
-                    </Text>
-
-                    <Text
-                      style={{
-                        // ...Fonts.SemiBold15primary,
-                        overflow: "hidden",
-                        paddingLeft: 20,
-                      }}
-                    >
-                      {`Posted by ${elm?.posted_by?.name}`}
-                    </Text>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        paddingLeft: 20,
-                      }}
-                    >
-                      <Text style={{ marginRight: 2 }}>
-                        <Ionicons name="time-outline" size={15} />
-                      </Text>
-                      <Text style={{ fontSize: 13 }}>
-                        {" "}
-                        {moment(elm.createdAt).fromNow()}
-                      </Text>
-                    </View>
-                  </View>
+                  <Text>{item?.posted_by.name}</Text>
                 </TouchableOpacity>
-              </View>
-            </View>
-          ))}
-
-        {/* <View
-            style={{
-              marginLeft:20
+                <Image
+                  source={{ uri: item?.gallary_images[0] }}
+                  height={180}
+                  style={{
+                    width: "100%",
+                    borderTopLeftRadius: 10,
+                    borderTopRightRadius: 10,
+                  }}
+                />
+                <Text
+                  style={{
+                    paddingHorizontal: 4,
+                    paddingTop: 4,
+                    color: Colors.primary,
+                    fontWeight: "bold",
+                    fontSize: 15,
+                    letterSpacing: 0.5,
+                  }}
+                >
+                  {item?.title}
+                </Text>
+                <Text
+                  style={{
+                    paddingHorizontal: 4,
+                    fontSize: 12,
+                    letterSpacing: 0.5,
+                    fontWeight: "bold",
+                  }}
+                >
+                  Lost Location:{" "}
+                  <Text
+                    style={{
+                      fontWeight: "600",
+                    }}
+                  >
+                    {item?.location?.name}
+                  </Text>
+                </Text>
+                <Text
+                  style={{
+                    paddingHorizontal: 4,
+                    fontSize: 12,
+                    letterSpacing: 0.5,
+                    fontWeight: "bold",
+                  }}
+                >
+                  Lost Date:{" "}
+                  <Text
+                    style={{
+                      fontWeight: "600",
+                    }}
+                  >
+                    {moment(item?.date).format("ddd MMM DD YYYY")}
+                  </Text>
+                </Text>
+              </TouchableOpacity>
+            )}
+            keyExtractor={(item) => item._id}
+            numColumns={2}
+            contentContainerStyle={{
+              justifyContent: "space-between",
+              paddingHorizontal: 16,
+              paddingTop: 16,
             }}
-          >
-             <View
-          style={{
-           // flexDirection: isRtl ? "row-reverse" : "row",
-         //   justifyContent: "space-between",
-           // marginHorizontal: Default.fixPadding * 2,
-            marginBottom: Default.fixPadding * 2,
-            marginTop: Default.fixPadding,
-          }}
-        >
-          <TouchableOpacity
-          onPress={() =>
-            props.navigation.navigate("Losted", {
-              title: "Founded",
-            })
-          }
-            style={{
-              ...Default.shadow,
-              backgroundColor: Colors.white,
-              borderRadius: 10,
-           //   justifyContent: "center",
-             // alignItems: "center",
-            //  paddingVertical: Default.fixPadding * 3.5,
-              paddingTop:38,
-              paddingBottom:38,
-              paddingLeft:30,
-
-              width: width / 1.1,
-              flexDirection: 'row',
-            }}
-          >
-            <Image
-
-              source={require("../assets/images/wallets.jpg")}
-              style={{ height: 75, width: 75 , ...Default.shadow}}
-            />
-            <View>
-            <Text
-              style={{
-               ...Fonts.SemiBold15primary,
-                overflow: "hidden",
-                paddingLeft:20,
-                fontWeight:'bold',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                fontWeight:'900',
-                height:32,
-                fontSize: 22,
-                color:'black'
-              }}
-            >
-             WALLET
-            </Text>
-            <Text   style={{
-                fontSize:18,
-                color:"darkred",
-                overflow: "hidden",
-                paddingLeft:16,
-                fontWeight:'600',
-                
-              }}> Found</Text>
-            <Text
-              style={{
-                ...Fonts.SemiBold15primary,
-                overflow: "hidden",
-                paddingLeft:20,
-                
-              }}
-            >
-              Brown Wallet
-            </Text>
-            <Text
-              style={{
-              //  ...Fonts.SemiBold15primary,
-                overflow: "hidden",
-                paddingLeft:20,
-                
-              }}
-            >
-             Street#04 Harley
-            </Text>
-            <Text
-              style={{
-               // ...Fonts.SemiBold15primary,
-                overflow: "hidden",
-                paddingLeft:20,
-                
-              }}
-            >
-            Posted by Laiba
-            </Text>
-            </View>
-          </TouchableOpacity>
-          </View>
-          
-  </View>
-  <View
-            style={{
-              marginLeft:20
-            }}
-          >
-             <View
-          style={{
-           // flexDirection: isRtl ? "row-reverse" : "row",
-         //   justifyContent: "space-between",
-           // marginHorizontal: Default.fixPadding * 2,
-            marginBottom: Default.fixPadding * 2,
-            marginTop: Default.fixPadding,
-          }}
-        >
-          <TouchableOpacity
-           onPress={() =>
-            props.navigation.navigate("Losted", {
-              title: "Founded",
-            })
-          }
-            style={{
-              ...Default.shadow,
-              backgroundColor: Colors.white,
-              borderRadius: 10,
-           //   justifyContent: "center",
-             // alignItems: "center",
-            //  paddingVertical: Default.fixPadding * 3.5,
-              paddingTop:38,
-              paddingBottom:38,
-              paddingLeft:30,
-
-              width: width / 1.1,
-              flexDirection: 'row',
-            }}
-          >
-            <Image
-
-              source={require("../assets/images/key.jpg")}
-              style={{ height: 75, width: 75 , ...Default.shadow}}
-            />
-            <View>
-            <Text
-              style={{
-               ...Fonts.SemiBold15primary,
-                overflow: "hidden",
-                paddingLeft:20,
-                fontWeight:'bold',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                fontWeight:'900',
-                height:32,
-                fontSize: 22,
-                color:'black'
-              }}
-            >
-             KEYS
-            </Text>
-            <Text   style={{
-                fontSize:18,
-                color:"darkred",
-                overflow: "hidden",
-                paddingLeft:16,
-                fontWeight:'600',
-                
-              }}> Found</Text>
-            <Text
-              style={{
-                ...Fonts.SemiBold15primary,
-                overflow: "hidden",
-                paddingLeft:20,
-                
-              }}
-            >
-              3 keys
-            </Text>
-            <Text
-              style={{
-              //  ...Fonts.SemiBold15primary,
-                overflow: "hidden",
-                paddingLeft:20,
-                
-              }}
-            >
-             Street#04 Harley
-            </Text>
-            <Text
-              style={{
-               // ...Fonts.SemiBold15primary,
-                overflow: "hidden",
-                paddingLeft:20,
-                
-              }}
-            >
-            Posted by Laiba
-            </Text>
-            </View>
-          
-          </TouchableOpacity>
-          </View>
-          
-  </View>
-  <View
-            style={{
-              marginLeft:20
-            }}
-          >
-             <View
-          style={{
-           // flexDirection: isRtl ? "row-reverse" : "row",
-         //   justifyContent: "space-between",
-           // marginHorizontal: Default.fixPadding * 2,
-            marginBottom: Default.fixPadding * 2,
-            marginTop: Default.fixPadding,
-          }}
-        >
-          <TouchableOpacity
-           onPress={() =>
-            props.navigation.navigate("Losted", {
-              title: "Founded",
-            })
-          }
-            style={{
-              ...Default.shadow,
-              backgroundColor: Colors.white,
-              borderRadius: 10,
-           //   justifyContent: "center",
-             // alignItems: "center",
-            //  paddingVertical: Default.fixPadding * 3.5,
-              paddingTop:38,
-              paddingBottom:38,
-              paddingLeft:30,
-
-              width: width / 1.1,
-              flexDirection: 'row',
-            }}
-          >
-        <Ionicons name="image-outline" size={75} color="black" 
- 
- style={{ height: 75, width: 75 , ...Default.shadow}}
-/>
-            <View>
-            <Text
-              style={{
-                ...Fonts.SemiBold15primary,
-                overflow: "hidden",
-                paddingLeft:20,
-                fontWeight:'bold',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                fontWeight:'900',
-                height:32,
-                fontSize: 22,
-                color:'black'
-              }}
-            >
-             RING
-            </Text>
-            <Text   style={{
-                fontSize:18,
-                color:"darkred",
-                overflow: "hidden",
-                paddingLeft:16,
-                fontWeight:'600',
-                
-              }}> Found</Text>
-            <Text
-              style={{
-                ...Fonts.SemiBold15primary,
-                overflow: "hidden",
-                paddingLeft:20,
-                
-              }}
-            >
-              Silver Ring
-            </Text>
-            <Text
-              style={{
-              //  ...Fonts.SemiBold15primary,
-                overflow: "hidden",
-                paddingLeft:20,
-                
-              }}
-            >
-             Street#04 Harley
-            </Text>
-            <Text
-              style={{
-               // ...Fonts.SemiBold15primary,
-                overflow: "hidden",
-                paddingLeft:20,
-                
-              }}
-            >
-            Posted by Laiba
-            </Text>
-            </View>
-          </TouchableOpacity>
-          </View>
-          
-  </View>
-  <View
-            style={{
-              marginLeft:20
-            }}
-          >
-             <View
-          style={{
-           // flexDirection: isRtl ? "row-reverse" : "row",
-         //   justifyContent: "space-between",
-           // marginHorizontal: Default.fixPadding * 2,
-            marginBottom: Default.fixPadding * 2,
-            marginTop: Default.fixPadding,
-          }}
-        >
-          <TouchableOpacity
-            onPress={() =>
-              props.navigation.navigate("Losted", {
-                title: "Founded",
-              })
-            }
-            style={{
-              ...Default.shadow,
-              backgroundColor: Colors.white,
-              borderRadius: 10,
-           //   justifyContent: "center",
-             // alignItems: "center",
-            //  paddingVertical: Default.fixPadding * 3.5,
-              paddingTop:38,
-              paddingBottom:38,
-              paddingLeft:30,
-
-              width: width / 1.1,
-              flexDirection: 'row',
-            }}
-          >
-            <Image
-
-              source={require("../assets/images/hat.jpg")}
-              style={{ height: 75, width: 75 , ...Default.shadow}}
-            />
-            <View>
-            <Text
-              style={{
-                ...Fonts.SemiBold15primary,
-                overflow: "hidden",
-                paddingLeft:20,
-                fontWeight:'bold',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                fontWeight:'900',
-                height:32,
-                fontSize: 22,
-                color:'black'
-              }}
-            >
-             CAP
-            </Text>
-            <Text   style={{
-                fontSize:18,
-                color:"darkred",
-                overflow: "hidden",
-                paddingLeft:16,
-                fontWeight:'600',
-                
-              }}> Found</Text>
-            <Text
-              style={{
-                ...Fonts.SemiBold15primary,
-                overflow: "hidden",
-                paddingLeft:20,
-                
-              }}
-            >
-              Red
-            </Text>
-            <Text
-              style={{
-              //  ...Fonts.SemiBold15primary,
-                overflow: "hidden",
-                paddingLeft:20,
-                
-              }}
-            >
-             Street#04 Harley
-            </Text>
-            <Text
-              style={{
-               // ...Fonts.SemiBold15primary,
-                overflow: "hidden",
-                paddingLeft:20,
-                
-              }}
-            >
-          Posted by Laiba
-            </Text>
-            </View>
-         
-          </TouchableOpacity>
-          </View>
-         
-  </View>  */}
+          />
+        )}
+        {!loader && newData.length === 0 && (
+          <Empty text="No Item Listed" marginTop={100} />
+        )}
       </ScrollView>
     </SafeAreaView>
   );
