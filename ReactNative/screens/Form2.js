@@ -5,22 +5,19 @@ import {
   ScrollView,
   TouchableOpacity,
   BackHandler,
-  Image,
   TextInput,
   StyleSheet,
-  Animated,
   Dimensions,
   StatusBar,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Colors, Fonts, Default } from "../constants/styles";
-
 import Ionicons from "react-native-vector-icons/Ionicons";
-import Feather from "react-native-vector-icons/Feather";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Loader from "../components/loader";
 import { addTopic } from "../apis/apis";
+import BreadCrumbs from "../components/BreadCrumbs";
+import { AntDesign } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -95,6 +92,29 @@ const RegisterScreen = ({ navigation }) => {
           />
         </TouchableOpacity>
       </View>
+      <BreadCrumbs>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Form")}
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+          }}
+        >
+          <Text> Neighbour Forum</Text>
+        </TouchableOpacity>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <Text
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            color: Colors.primary,
+            fontWeight: "bold",
+          }}
+        >
+          Add Topic
+        </Text>
+      </BreadCrumbs>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View
           style={{
@@ -136,25 +156,28 @@ const RegisterScreen = ({ navigation }) => {
             <Text
               style={{
                 fontWeight: "bold",
-                color: Colors.grey,
+                // color: Colors.grey,
                 fontSize: 18,
                 fontWeight: "bold",
                 paddingLeft: 6,
               }}
             >
-              Add topic
+              Topic Title
             </Text>
 
             <TextInput
               marginTop={12}
               marginBottom={12}
-              placeholder={"short but descriptive "}
+              placeholder={"Short but descriptive "}
               placeholderTextColor={Colors.grey}
               style={{
                 color: Colors.black,
                 fontSize: 14,
-
-                paddingLeft: 6,
+                paddingLeft: 10,
+                height: 50,
+                borderWidth: 1,
+                borderColor: "lightgrey",
+                borderRadius: 10,
               }}
               value={topic}
               onChangeText={(text) => setTopic(text)}
@@ -172,20 +195,20 @@ const RegisterScreen = ({ navigation }) => {
             <Text
               style={{
                 fontWeight: "bold",
-                color: Colors.grey,
+                // color: Colors.grey,
                 fontSize: 18,
 
                 fontWeight: "bold",
                 paddingLeft: 6,
               }}
             >
-              Add Description
+              Topic Description
             </Text>
 
             <TextInput
               marginTop={12}
               marginBottom={12}
-              paddingBottom={40}
+              // paddingBottom={40}
               placeholder={
                 "Provide details to make it easier for others to reply "
               }
@@ -193,8 +216,11 @@ const RegisterScreen = ({ navigation }) => {
               style={{
                 color: Colors.black,
                 fontSize: 14,
-
-                paddingLeft: 6,
+                paddingLeft: 10,
+                height: 50,
+                borderWidth: 1,
+                borderColor: "lightgrey",
+                borderRadius: 10,
               }}
               value={description}
               onChangeText={(text) => setDescription(text)}

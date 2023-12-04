@@ -14,7 +14,13 @@ import {
 } from "react-native";
 import React, { useState, useCallback, useEffect } from "react";
 
-import { Colors, Default, Fonts } from "../constants/styles";
+import {
+  Colors,
+  Default,
+  Fonts,
+  WindowHeight,
+  screenHeight,
+} from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -23,6 +29,7 @@ import { addReply, deleteReply } from "../apis/apis";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
 import { addReplyState, deleteReplyState } from "../redux/globalSlice";
+import { useNavigation } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -127,36 +134,29 @@ const ChatScreen = (props) => {
     } finally {
     }
   }
-
-  const handleProfilePress = (post) => {
-    if (post.reply_by.connections.includes(user._id)) {
-      props.navigation.navigate("Profile3", {
-        user: post.reply_by,
-      });
-    } else if (post.reply_by._id == user._id) {
-      props.navigation.navigate("profileScreen");
-    } else if (user.requests) {
-      user.requests.map((req) => {
-        if (req.sender === post.reply_by._id) {
-          props.navigation.navigate("Profile4", {
-            user: {
-              sender: {
-                _id: post.reply_by._id,
-                name: post.reply_by.name,
-                image: post.reply_by.image,
-              },
-            },
-          });
-        } else {
-          return;
-        }
+  const navigation = useNavigation();
+  function handleProfilePress(userId, userInfo) {
+    if (userId === user._id) {
+      navigation.navigate("profileScreen");
+    } else if (user.connections.includes(userId)) {
+      navigation.navigate("Profile3", { user: userInfo });
+    } else if (
+      user.requests &&
+      user.requests.some((req) => req.sender === userId)
+    ) {
+      navigation.navigate("Profile4", {
+        user: {
+          sender: {
+            _id: userId,
+            name: userInfo.name,
+            image: userInfo.image,
+          },
+        },
       });
     } else {
-      props.navigation.navigate("Profile1", {
-        user: post.reply_by,
-      });
+      navigation.navigate("Profile1", { user: userInfo });
     }
-  };
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.white }}>
@@ -192,193 +192,202 @@ const ChatScreen = (props) => {
           </Text>
         </View>
       </View>
-      <ScrollView>
-        <View>
-          {rep &&
-            rep.map((reply) => (
-              <View
-                key={reply._id}
-                style={{
-                  borderRadius: 10,
-
-                  marginRight: 12,
-                  marginTop: 25,
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => handleProfilePress(reply)}
+      <ScrollView style={{}}>
+        <View style={{ height: WindowHeight - 80 }}>
+          <View style={{ flex: 1 }}>
+            {rep &&
+              rep.map((reply) => (
+                <View
+                  key={reply._id}
                   style={{
-                    flexDirection: isRtl ? "row-reverse" : "row",
+                    borderRadius: 10,
+
+                    marginRight: 12,
+                    marginTop: 25,
                   }}
                 >
-                  <View
+                  <TouchableOpacity
+                    onPress={() =>
+                      handleProfilePress(reply.reply_by._id, reply.reply_by)
+                    }
                     style={{
                       flexDirection: isRtl ? "row-reverse" : "row",
-                      marginLeft: 6,
                     }}
                   >
-                    <Image
-                      source={{ uri: reply.reply_by.image }}
-                      style={{
-                        height: 46,
-                        width: 46,
-                        borderRadius: 75,
-                        marginTop: 9,
-                        marginHorizontal: 14,
-                      }}
-                      resizeMode="contain"
-                    />
                     <View
                       style={{
-                        justifyContent: "center",
-                        marginLeft: 2,
-                        alignItems: isRtl ? "flex-end" : "flex-start",
-                        flexDirection: "row",
-                        alignItems: "center",
+                        flexDirection: isRtl ? "row-reverse" : "row",
+                        marginLeft: 6,
                       }}
                     >
-                      <Text
-                        numberOfLines={1}
+                      <Image
+                        source={{ uri: reply.reply_by.image }}
                         style={{
-                          ...Fonts.SemiBold16black,
-                          overflow: "hidden",
+                          height: 46,
+                          width: 46,
+                          borderRadius: 75,
+                          marginTop: 9,
+                          marginHorizontal: 14,
+                        }}
+                        resizeMode="contain"
+                      />
+                      <View
+                        style={{
+                          justifyContent: "space-between",
+                          marginLeft: 2,
+                          alignItems: isRtl ? "flex-end" : "flex-start",
+                          flexDirection: "row",
+                          alignItems: "center",
                         }}
                       >
-                        {reply.reply_by.name}
-                      </Text>
-                      {user._id === reply.reply_by._id && (
-                        <TouchableOpacity
-                          onPress={() => {
-                            setDropdownOpens(!dropdownOpens);
-                            setSelectedId(reply._id);
+                        <Text
+                          numberOfLines={1}
+                          style={{
+                            ...Fonts.SemiBold16black,
+                            overflow: "hidden",
+                            // width: 280,
                           }}
                         >
-                          <Ionicons
-                            name="ellipsis-vertical"
-                            size={24}
-                            color="black"
-                            // marginLeft={179}
-                            marginTop={10}
-                          />
-                        </TouchableOpacity>
-                      )}
-                      {dropdownOpens && selectedId === reply._id && (
-                        <View style={styles.dropdowns}>
+                          {reply.reply_by.name}
+                        </Text>
+                        <View>
+                          {user._id === reply.reply_by._id && (
+                            <TouchableOpacity
+                              onPress={() => {
+                                setDropdownOpens(!dropdownOpens);
+                                setSelectedId(reply._id);
+                              }}
+                              style={{ marginLeft: 145 }}
+                            >
+                              <Ionicons
+                                name="ellipsis-vertical"
+                                size={24}
+                                color="black"
+                                // marginLeft={179}
+                                marginTop={10}
+                              />
+                            </TouchableOpacity>
+                          )}
+                          {dropdownOpens && selectedId === reply._id && (
+                            <View style={styles.dropdowns}>
+                              <TouchableOpacity
+                                style={[
+                                  styles.dropdownButton,
+
+                                  selectedValue === "button1" &&
+                                    styles.dropdownButtonSelected,
+                                ]}
+                                onPress={() => {
+                                  handleDelete(reply._id);
+                                }}
+                              >
+                                <Ionicons
+                                  name="trash-outline"
+                                  size={20}
+                                  color="black"
+                                />
+                                <Text style={styles.dropdownButtonText}>
+                                  Delete
+                                </Text>
+                              </TouchableOpacity>
+                            </View>
+                          )}
+                        </View>
+                      </View>
+                    </View>
+                    <View>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setDropdownOpen(!dropdownOpen);
+                          setSelected(reply._id);
+                        }}
+                      >
+                        <Ionicons
+                          name="ellipsis-vertical"
+                          size={24}
+                          color="black"
+                          marginLeft={219}
+                        />
+                      </TouchableOpacity>
+                      {dropdownOpen && reply._id === selected && (
+                        <View style={styles.dropdownss}>
                           <TouchableOpacity
                             style={[
                               styles.dropdownButton,
-
                               selectedValue === "button1" &&
                                 styles.dropdownButtonSelected,
                             ]}
-                            onPress={() => {
-                              handleDelete(reply._id);
-                            }}
+                            onPress={() =>
+                              props.navigation.navigate("Report", {
+                                postId: topic._id,
+                                replyId: reply._id,
+                                module: "neighbour-forum",
+                              })
+                            }
                           >
                             <Ionicons
-                              name="trash-outline"
+                              name="flag-outline"
                               size={20}
                               color="black"
                             />
                             <Text style={styles.dropdownButtonText}>
-                              Delete
+                              Report
                             </Text>
                           </TouchableOpacity>
                         </View>
                       )}
                     </View>
-                  </View>
-                  <View>
-                    <TouchableOpacity
-                      onPress={() => {
-                        setDropdownOpen(!dropdownOpen);
-                        setSelected(reply._id);
-                      }}
-                    >
-                      <Ionicons
-                        name="ellipsis-vertical"
-                        size={24}
-                        color="black"
-                        marginLeft={219}
-                      />
-                    </TouchableOpacity>
-                    {dropdownOpen && reply._id === selected && (
-                      <View style={styles.dropdownss}>
-                        <TouchableOpacity
-                          style={[
-                            styles.dropdownButton,
-                            selectedValue === "button1" &&
-                              styles.dropdownButtonSelected,
-                          ]}
-                          onPress={() =>
-                            props.navigation.navigate("Report", {
-                              postId: topic._id,
-                              replyId: reply._id,
-                              module: "neighbour-forum",
-                            })
-                          }
-                        >
-                          <Ionicons
-                            name="flag-outline"
-                            size={20}
-                            color="black"
-                          />
-                          <Text style={styles.dropdownButtonText}>Report</Text>
-                        </TouchableOpacity>
-                      </View>
-                    )}
-                  </View>
-                </TouchableOpacity>
+                  </TouchableOpacity>
 
-                <Text
-                  style={{
-                    justifyContent: "center",
-                    alignItems: isRtl ? "flex-end" : "flex-start",
+                  <Text
+                    style={{
+                      justifyContent: "center",
+                      alignItems: isRtl ? "flex-end" : "flex-start",
 
-                    marginLeft: 85,
-                    marginBottom: 12,
-                  }}
-                >
-                  {reply.text}{" "}
-                </Text>
-              </View>
-            ))}
-        </View>
-
-        <View
-          style={{
-            ...Default.shadow,
-            backgroundColor: Colors.white,
-            flexDirection: isRtl ? "row-reverse" : "row",
-            borderRadius: 5,
-            padding: Default.fixPadding * 0.8,
-            marginHorizontal: Default.fixPadding * 2,
-            borderWidth: 1,
-            borderColor: "gray",
-            marginTop: 14,
-          }}
-        >
-          <TextInput
-            placeholder="Write Something ..."
+                      marginLeft: 85,
+                      marginBottom: 12,
+                    }}
+                  >
+                    {reply.text}{" "}
+                  </Text>
+                </View>
+              ))}
+          </View>
+          <View
             style={{
-              ...Fonts.SemiBold16grey,
-              marginHorizontal: Default.fixPadding * 0.8,
-              flex: 1,
+              ...Default.shadow,
+              backgroundColor: Colors.extraLightGrey,
+              flexDirection: isRtl ? "row-reverse" : "row",
+              borderRadius: 5,
+              padding: Default.fixPadding * 0.8,
+              marginHorizontal: Default.fixPadding * 2,
+              borderWidth: 1,
+              borderColor: "gray",
+              marginTop: 14,
             }}
-            value={text}
-            onChangeText={(text) => setText(text)}
-          />
-          <TouchableOpacity
-            style={{
-              backgroundColor: isLoading ? "white" : Colors.primary,
-              padding: Default.fixPadding * 1,
-              borderWidth: isLoading ? 1 : 0,
-              borderRadius: 10,
-            }}
-            onPress={() => handleReply()}
           >
-            <Text style={{ color: isLoading ? "gray" : "white" }}>Reply</Text>
-          </TouchableOpacity>
+            <TextInput
+              placeholder="Write Something ..."
+              style={{
+                ...Fonts.SemiBold16grey,
+                marginHorizontal: Default.fixPadding * 0.8,
+                flex: 1,
+              }}
+              value={text}
+              onChangeText={(text) => setText(text)}
+            />
+            <TouchableOpacity
+              style={{
+                backgroundColor: isLoading ? "white" : Colors.primary,
+                padding: Default.fixPadding * 1,
+                borderWidth: isLoading ? 1 : 0,
+                borderRadius: 10,
+              }}
+              onPress={() => handleReply()}
+            >
+              <Text style={{ color: isLoading ? "gray" : "white" }}>Reply</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
       <Modal animationType="fade" transparent={true} visible={cancelModal}>

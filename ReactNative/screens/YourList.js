@@ -7,17 +7,13 @@ import {
   Image,
   Dimensions,
   Modal,
-  FlatList,
   StyleSheet,
-  Button,
   BackHandler,
-  TextInput,
 } from "react-native";
 
 import React, { useState, useEffect } from "react";
-import { Colors, Default, Fonts, screenHeight } from "../constants/styles";
+import { Colors, Default, Fonts } from "../constants/styles";
 import { AntDesign } from "@expo/vector-icons";
-import Feather from "react-native-vector-icons/Feather";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import { lostItemGet, lostandfoundUpdate } from "../apis/apis";

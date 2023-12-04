@@ -22,10 +22,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { setFilterTopics, setTopics } from "../redux/globalSlice";
 import moment from "moment";
 import useGetUser from "../components/useGetUser";
+import { AntDesign } from "@expo/vector-icons";
+import BreadCrumbs from "../components/BreadCrumbs";
+import Placeholder from "../components/Placeholders/PlaceholderForm";
+import Empty from "../components/Empty";
+import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 const ChatScreen = (props) => {
-  const user = useGetUser();
+  const user = useSelector((state) => state.authReducer.activeUser.user);
   const [selectedId, setSelectedId] = useState("");
   const { filteredTopics } = useSelector((state) => state.global);
   const [selectedValue, setSelectedValue] = useState("");
@@ -34,9 +39,9 @@ const ChatScreen = (props) => {
   const [dropdownOpens, setDropdownOpens] = useState(false);
   const [dropdownOpend, setDropdownOpend] = useState(false);
   const [dropdownOpendd, setDropdownOpendd] = useState(false);
-  // const [topics, setTopics] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  const navigation = useNavigation();
   const dispatch = useDispatch();
 
   const handleButtonPress = (buttonValue) => {
@@ -93,39 +98,31 @@ const ChatScreen = (props) => {
     dispatch(setFilterTopics(query)); // Dispatch the search query to Redux
   };
 
-  const handleProfilePress = (post) => {
-    if (post.posted_by.connections.includes(user._id)) {
-      props.navigation.navigate("Profile3", {
-        user: post.posted_by,
-      });
-    } else if (post.posted_by._id == user._id) {
-      props.navigation.navigate("profileScreen");
-    } else if (user.requests) {
-      user.requests.map((req) => {
-        if (req.sender === post.posted_by._id) {
-          props.navigation.navigate("Profile4", {
-            user: {
-              sender: {
-                _id: post.posted_by._id,
-                name: post.posted_by.name,
-                image: post.posted_by.image,
-              },
-            },
-          });
-        } else {
-          return;
-        }
+  function handleProfilePress(userId, userInfo) {
+    if (userId === user._id) {
+      navigation.navigate("profileScreen");
+    } else if (user.connections.includes(userId)) {
+      navigation.navigate("Profile3", { user: userInfo });
+    } else if (
+      user.requests &&
+      user.requests.some((req) => req.sender === userId)
+    ) {
+      navigation.navigate("Profile4", {
+        user: {
+          sender: {
+            _id: userId,
+            name: userInfo.name,
+            image: userInfo.image,
+          },
+        },
       });
     } else {
-      props.navigation.navigate("Profile1", {
-        user: post.posted_by,
-      });
+      navigation.navigate("Profile1", { user: userInfo });
     }
-  };
-
+  }
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
-      {isLoading && <Loader />}
+      {/* {isLoading && <Loader />} */}
       <View
         style={{
           backgroundColor: Colors.primary,
@@ -182,11 +179,23 @@ const ChatScreen = (props) => {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
+        <BreadCrumbs>
+          <AntDesign name="right" size={18} color="#9ca3af" />
+          <Text
+            style={{
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              color: Colors.primary,
+              fontWeight: "bold",
+            }}
+          >
+            Neighbour Form
+          </Text>
+        </BreadCrumbs>
         <View style={styles.containr}>
           <View style={styles.buttonContainr}>
             <View flexDirection="row">
               <Ionicons name="add-circle-outline" size={32} color="white" />
-
               <Button
                 color="#005D7A"
                 title="Add Discussion"
@@ -222,31 +231,9 @@ const ChatScreen = (props) => {
           </Text>
         </View>
         {filteredTopics.length === 0 && !isLoading && (
-          <TouchableOpacity
-            style={{
-              ...Default.shadow,
-              backgroundColor: Colors.white,
-              marginTop: 30,
-              marginHorizontal: 13,
-              //    marginBottom: 27,
-              borderRadius: 10,
-              // overflow: "hidden",
-              flexDirection: isRtl ? "row-reverse" : "row",
-              paddingVertical: Default.fixPadding,
-            }}
-          >
-            <View
-              style={{
-                flex: 2,
-                //  paddingHorizontal: Default.fixPadding * 1.5,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Text>No Result Found</Text>
-            </View>
-          </TouchableOpacity>
+          <Empty text="No Topics Found" marginTop={160} />
         )}
+        {isLoading && filteredTopics.length === 0 && <Placeholder />}
         {filteredTopics.length > 0 &&
           filteredTopics.map((topic) => (
             <View
@@ -266,7 +253,9 @@ const ChatScreen = (props) => {
                 }}
               >
                 <TouchableOpacity
-                  onPress={() => handleProfilePress(topic)}
+                  onPress={() =>
+                    handleProfilePress(topic.posted_by._id, topic.posted_by)
+                  }
                   style={{
                     // flex: 7,
                     flexDirection: isRtl ? "row-reverse" : "row",
@@ -314,7 +303,7 @@ const ChatScreen = (props) => {
                   </View>
                 </TouchableOpacity>
                 <View>
-                  {props.route.params.userId !== topic.posted_by._id && (
+                  {user._id !== topic.posted_by._id && (
                     <TouchableOpacity
                       onPress={() => {
                         setSelectedId(topic._id);
@@ -413,6 +402,7 @@ const ChatScreen = (props) => {
               </TouchableOpacity>
             </View>
           ))}
+        <View style={{ height: 10 }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -601,7 +591,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     // paddingHorizontal: 10,
-    marginTop: 30,
+    marginTop: 10,
 
     marginHorizontal: Default.fixPadding * 2,
   },

@@ -19,6 +19,11 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { deleteTopic, getTopicsByUser } from "../apis/apis";
 import Loader from "../components/loader";
 import { hasPassed15Minutes } from "../utils";
+import Placeholder from "../components/Placeholders/PlaceholderForm";
+import Empty from "../components/Empty";
+import { AntDesign } from "@expo/vector-icons";
+import BreadCrumbs from "../components/BreadCrumbs";
+import { useNavigation } from "@react-navigation/native";
 
 const ChatScreen = (props) => {
   const [topics, setTopics] = useState([]);
@@ -26,6 +31,7 @@ const ChatScreen = (props) => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [first, setFirst] = useState(false);
   const [selectedId, setSelectedId] = useState("");
+  const navigation = useNavigation();
 
   const [selectedValue, setSelectedValue] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -139,8 +145,34 @@ const ChatScreen = (props) => {
           }}
         ></View>
       </View>
-      {isLoading && <Loader />}
+      <BreadCrumbs>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Form")}
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+          }}
+        >
+          <Text> Neighbour Forum</Text>
+        </TouchableOpacity>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <Text
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            color: Colors.primary,
+            fontWeight: "bold",
+          }}
+        >
+          My Topics
+        </Text>
+      </BreadCrumbs>
+      {isLoading && topics.length === 0 && <Placeholder />}
       {deleteLoading && <Loader />}
+      {!isLoading && topics.length === 0 && (
+        <Empty text="No Discussion Started Yet" marginTop={210} />
+      )}
       <ScrollView showsVerticalScrollIndicator={false}>
         {topics.length > 0 &&
           topics.map((topic) => (
