@@ -8,39 +8,29 @@ import {
   BackHandler,
   StyleSheet,
   Dimensions,
-  Button,
-  image,
   Modal,
   TextInput,
 } from "react-native";
 
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import Octicons from "react-native-vector-icons/Octicons";
-import { Slider } from "react-native-range-slider-expo";
 import CalendarPicker from "react-native-calendar-picker";
 import moment from "moment";
-
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import * as ImagePicker from "expo-image-picker";
 import React, { useState, useEffect } from "react";
-import { Colors, Default, Fonts } from "../constants/styles";
+import { Colors, Default, Fonts, screenHeight } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import {
-  lostItemGet,
-  lostandfoundCategGet,
-  lostandfoundCreate,
-  lostandfoundUpdate,
-} from "../apis/apis";
+import { lostandfoundCategGet, lostandfoundCreate } from "../apis/apis";
 import { FontAwesome5 } from "@expo/vector-icons";
 import Loader from "../components/loader";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { clearLocation } from "../redux/loanandfoundSlice";
 import { AntDesign } from "@expo/vector-icons";
 import BreadCrumbs from "../components/BreadCrumbs";
+import { ImagePicker } from "expo-image-multiple-picker";
+import ImagePickerHeader from "../components/ImagePickerHeader";
+import ImagePickerAlbum from "../components/ImagePickerAlbum";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 const PayPalScreen = ({ navigation, route }) => {
@@ -59,12 +49,11 @@ const PayPalScreen = ({ navigation, route }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [updateHandle, setUpdateHandle] = useState(false);
-
   const [dropdownOpens, setDropdownOpens] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState("Type");
-
   const [dropdownOpensd, setDropdownOpensd] = useState(false);
   const [selectedOptionsd, setSelectedOptionsd] = useState("Visibility");
+  const [open, setOpen] = useState(false);
 
   const handleOptionSelect = (option) => {
     setSelectedOption(option);
@@ -129,22 +118,7 @@ const PayPalScreen = ({ navigation, route }) => {
   }, []);
 
   const pickImageAsync = async () => {
-    if (selectedImages.length >= 3) {
-      alert("You can select a maximum of three images.");
-      return;
-    }
-
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      // allowsEditing: true,
-      allowsMultipleSelection: true,
-    });
-
-    if (!result.canceled) {
-      setSelectedImages([...selectedImages, result.assets[0]]);
-    } else {
-      alert("You did not select any image.");
-    }
+    setOpen(true);
   };
 
   const handleImageRemove = (index) => {
@@ -185,8 +159,10 @@ const PayPalScreen = ({ navigation, route }) => {
       const formData = new FormData();
       selectedImages.slice(0, 3).forEach((media) => {
         const extension = media.uri.split(".").pop();
-        const type = `${media.type}/${extension}`;
-        const name = media.uri.split("/").pop();
+        const type = `${
+          media.mediaType === "photo" ? "image" : "video"
+        }/${extension}`;
+        const name = media.filename;
         formData.append("photos", {
           uri: media.uri,
           type,
@@ -221,71 +197,79 @@ const PayPalScreen = ({ navigation, route }) => {
     }
   };
 
-  // const handleGetfoundandlostItem = async () => {
-  //   try {
-  //     setHandleLoading(true);
-  //     let paylaod = {};
-  //     paylaod._id = route.params.itemId;
-  //     let result = await lostItemGet(paylaod);
-
-  //     if (result.status == 200) {
-  //       let itemData = result.data.data[0];
-  //       console.log("item data :", itemData);
-  //       setUpdateHandle(true);
-  //       setFormData({
-  //         ...formData,
-  //         title: itemData.title,
-  //         description: itemData.description,
-  //       });
-  //       handleOptionSelect({
-  //         name: itemData.category?.name,
-  //         _id: itemData.category?._id,
-  //       });
-  //       handleOptionSelects(itemData.type);
-  //       handleOptionSelectsd(itemData.visibility);
-  //       setChecked(itemData.notify);
-  //       setDate(itemData.date);
-  //       // setData(result.data.data[0])
-  //     }
-  //   } catch (error) {
-  //     alert("something went wrong!");
-  //   } finally {
-  //     setHandleLoading(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   !!route.params?.itemId && handleGetfoundandlostItem();
-  // }, [route.params]);
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       {handleLoading && <Loader />}
-      <View
-        style={{
-          paddingVertical: Default.fixPadding * 1.2,
-          flexDirection: isRtl ? "row-reverse" : "row",
-          alignItems: "center",
-          backgroundColor: Colors.primary,
-          paddingHorizontal: Default.fixPadding * 2,
-        }}
-      >
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons
-            name={isRtl ? "arrow-forward" : "arrow-back"}
-            size={25}
-            color={Colors.white}
-          />
-        </TouchableOpacity>
-        <Text
+      {!open && (
+        <View
           style={{
-            ...Fonts.SemiBold18white,
-            marginHorizontal: Default.fixPadding * 1.2,
+            paddingVertical: Default.fixPadding * 1.2,
+            flexDirection: isRtl ? "row-reverse" : "row",
+            alignItems: "center",
+            backgroundColor: Colors.primary,
+            paddingHorizontal: Default.fixPadding * 2,
           }}
         >
-          {updateHandle ? "Update Item" : "Add Item"}
-        </Text>
-      </View>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons
+              name={isRtl ? "arrow-forward" : "arrow-back"}
+              size={25}
+              color={Colors.white}
+            />
+          </TouchableOpacity>
+          <Text
+            style={{
+              ...Fonts.SemiBold18white,
+              marginHorizontal: Default.fixPadding * 1.2,
+            }}
+          >
+            {updateHandle ? "Update Item" : "Add Item"}
+          </Text>
+        </View>
+      )}
+      {open && (
+        <View
+          style={{
+            backgroundColor: Colors.extraLightGrey,
+            height: screenHeight,
+            position: "relative",
+          }}
+        >
+          <ImagePicker
+            theme={{
+              header: ImagePickerHeader,
+              album: ImagePickerAlbum,
+            }}
+            onSave={(assets) => {
+              setSelectedImages([...selectedImages, ...assets]);
+              setOpen(false);
+            }}
+            onCancel={() => {
+              setOpen(false);
+            }}
+            multiple
+            limit={3 - selectedImages.length}
+          />
+          <TouchableOpacity onPress={() => setOpen(false)}>
+            <Text
+              style={{
+                color: "white",
+                borderColor: "white",
+                borderWidth: 1,
+                borderRadius: 3,
+                paddingVertical: 4,
+                paddingHorizontal: 20,
+                position: "absolute",
+                top: 40,
+                right: 20,
+              }}
+            >
+              Cancel
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       <BreadCrumbs>
         <AntDesign name="right" size={18} color="#9ca3af" />
         <TouchableOpacity
@@ -315,45 +299,40 @@ const PayPalScreen = ({ navigation, route }) => {
           style={{
             alignItems: "center",
             justifyContent: "center",
-            flexDirection: "row",
             marginTop: 20,
           }}
         >
-          <TouchableOpacity onPress={pickImageAsync}>
-            <Ionicons name="ios-camera" size={80} color="grey" />
-          </TouchableOpacity>
-          {/* <ScrollView horizontal style={{ marginBottom: 10 }}>
-        {selectedImages.map((uri, index) => (
-          <TouchableOpacity
-            key={index}
-            onPress={() => {
-              // Implement any action you want when an image is tapped here
-              console.log('Image tapped:', uri);
-            }}
-          >
-            <Image
-              source={{ uri: uri }}
-              style={{ width: 200, height: 200, marginRight: 10, borderRadius: 10 }}
-            />
-          </TouchableOpacity>
-        ))}
-      </ScrollView> */}
-          {/* {setselectedImages && <Image source={{ uri: setselectedImages }} style={{ width: 200, height: 200 }} />} */}
+          {selectedImages.length === 0 || selectedImages.length < 3 ? (
+            <TouchableOpacity onPress={pickImageAsync}>
+              <MaterialCommunityIcons
+                name="camera-plus"
+                size={60}
+                color="grey"
+              />
+            </TouchableOpacity>
+          ) : (
+            <MaterialCommunityIcons name="camera" size={60} color="grey" />
+          )}
+          <Text style={{ fontSize: 16, letterSpacing: 2, marginLeft: 10 }}>
+            {selectedImages.length} / 3
+          </Text>
         </View>
+
         <View
           style={{
             marginHorizontal: Default.fixPadding * 2,
-            //  marginVertical: Default.fixPadding * 2,
           }}
         >
-          <Text
-            style={{
-              color: Colors.grey,
-              marginLeft: 135,
-            }}
-          >
-            Upload Pictures
-          </Text>
+          {selectedImages.length === 0 && (
+            <Text
+              style={{
+                color: Colors.grey,
+                marginLeft: 135,
+              }}
+            >
+              Upload Pictures
+            </Text>
+          )}
           <ScrollView horizontal style={{ marginBottom: 10, marginTop: 10 }}>
             {selectedImages.map((uri, index) => (
               <View

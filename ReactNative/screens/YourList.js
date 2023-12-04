@@ -26,13 +26,6 @@ import Empty from "../components/Empty";
 const { width, height } = Dimensions.get("window");
 
 const Lostss = ({ navigation }) => {
-  const [selectListItemem, setSelectListItemem] = useState(null);
-  const items = [
-    { id: 1, label: "Option 1" },
-    { id: 2, label: "Option 2" },
-    { id: 3, label: "Option 3" },
-  ];
-
   const [cancelModal, setCancelModal] = useState(false);
 
   const [cancelToast, setCancelToast] = useState(false);
@@ -56,19 +49,14 @@ const Lostss = ({ navigation }) => {
   }, []);
 
   const [allClear, setAllClear] = useState(false);
-
   const [search, setSearch] = useState();
-
   const [selectedId, setSelectedId] = useState("");
   const [selectedValue, setSelectedValue] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
   const [dropdownOpens, setDropdownOpens] = useState(false);
   const [dropdownOpend, setDropdownOpend] = useState(false);
   const [setselectedEditId, setSetselectedEditId] = useState("");
-
   const [dropdownOpendd, setDropdownOpendd] = useState(false);
-
   const [data, setData] = useState([]);
   const [loader, setLoader] = useState(false);
   const [userId, setUserId] = useState("");

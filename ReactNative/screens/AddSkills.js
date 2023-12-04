@@ -17,9 +17,9 @@ import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import CalendarPicker from "react-native-calendar-picker";
 import moment from "moment";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import * as ImagePicker from "expo-image-picker";
+import { ImagePicker } from "expo-image-multiple-picker";
 import React, { useState, useEffect } from "react";
-import { Colors, Default, Fonts } from "../constants/styles";
+import { Colors, Default, Fonts, screenHeight } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -30,6 +30,9 @@ import { clearLocation } from "../redux/loanandfoundSlice";
 import { AntDesign } from "@expo/vector-icons";
 import BreadCrumbs from "../components/BreadCrumbs";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import ImagePickerHeader from "../components/ImagePickerHeader";
+import ImagePickerAlbum from "../components/ImagePickerAlbum";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 const Checkbox = ({ label, onChange, checked }) => {
@@ -83,6 +86,7 @@ const PayPalScreen = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [timeDetails, setTimeDetails] = useState({});
   const [days, setDays] = useState([]);
+  const [open, setOpen] = useState(false);
 
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
@@ -141,23 +145,9 @@ const PayPalScreen = ({ navigation }) => {
   }, []);
 
   const pickImageAsync = async () => {
-    if (selectedImages.length >= 3) {
-      alert("You can select a maximum of three images.");
-      return;
-    }
-
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setSelectedImages([...selectedImages, result.assets[0]]);
-    } else {
-      alert("You did not select any image.");
-    }
+    setOpen(true);
   };
+
   const handlePost = async () => {
     if (selectedImages.length === 0) {
       Alert.alert("Error", "Image Is Required", [
@@ -179,8 +169,10 @@ const PayPalScreen = ({ navigation }) => {
         const formData = new FormData();
         selectedImages.slice(0, 3).forEach((image) => {
           const extension = image.uri.split(".").pop();
-          const type = `${image.type}/${extension}`;
-          const name = image.uri.split("/").pop();
+          const type = `${
+            image.mediaType === "photo" ? "image" : "video"
+          }/${extension}`;
+          const name = image.filename;
           formData.append("photos", {
             uri: image.uri,
             type,
@@ -333,32 +325,75 @@ const PayPalScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       {isLoading && <Loader />}
-      {/* Title Bar  */}
-      <View
-        style={{
-          paddingVertical: Default.fixPadding * 1.2,
-          flexDirection: isRtl ? "row-reverse" : "row",
-          alignItems: "center",
-          backgroundColor: Colors.primary,
-          paddingHorizontal: Default.fixPadding * 2,
-        }}
-      >
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons
-            name={isRtl ? "arrow-forward" : "arrow-back"}
-            size={25}
-            color={Colors.white}
-          />
-        </TouchableOpacity>
-        <Text
+      {!open && (
+        <View
           style={{
-            ...Fonts.SemiBold18white,
-            marginHorizontal: Default.fixPadding * 1.2,
+            paddingVertical: Default.fixPadding * 1.2,
+            flexDirection: isRtl ? "row-reverse" : "row",
+            alignItems: "center",
+            backgroundColor: Colors.primary,
+            paddingHorizontal: Default.fixPadding * 2,
           }}
         >
-          {"Add Skill"}
-        </Text>
-      </View>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons
+              name={isRtl ? "arrow-forward" : "arrow-back"}
+              size={25}
+              color={Colors.white}
+            />
+          </TouchableOpacity>
+          <Text
+            style={{
+              ...Fonts.SemiBold18white,
+              marginHorizontal: Default.fixPadding * 1.2,
+            }}
+          >
+            {"Add Skill"}
+          </Text>
+        </View>
+      )}
+      {open && (
+        <View
+          style={{
+            backgroundColor: Colors.extraLightGrey,
+            height: screenHeight,
+            position: "relative",
+          }}
+        >
+          <ImagePicker
+            theme={{
+              header: ImagePickerHeader,
+              album: ImagePickerAlbum,
+            }}
+            onSave={(assets) => {
+              setSelectedImages([...selectedImages, ...assets]);
+              setOpen(false);
+            }}
+            onCancel={() => {
+              setOpen(false);
+            }}
+            multiple
+            limit={3 - selectedImages.length}
+          />
+          <TouchableOpacity onPress={() => setOpen(false)}>
+            <Text
+              style={{
+                color: "white",
+                borderColor: "white",
+                borderWidth: 1,
+                borderRadius: 3,
+                paddingVertical: 4,
+                paddingHorizontal: 20,
+                position: "absolute",
+                top: 40,
+                right: 20,
+              }}
+            >
+              Cancel
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
       <BreadCrumbs>
         <AntDesign name="right" size={18} color="#9ca3af" />
         <TouchableOpacity
@@ -382,19 +417,31 @@ const PayPalScreen = ({ navigation }) => {
           Add Skill
         </Text>
       </BreadCrumbs>
+
       <ScrollView showsVerticalScrollIndicator={false}>
         <View
           style={{
             alignItems: "center",
             justifyContent: "center",
-            flexDirection: "row",
             marginTop: 20,
           }}
         >
-          <TouchableOpacity onPress={pickImageAsync}>
-            <Ionicons name="ios-camera" size={80} color="grey" />
-          </TouchableOpacity>
+          {selectedImages.length === 0 || selectedImages.length < 3 ? (
+            <TouchableOpacity onPress={pickImageAsync}>
+              <MaterialCommunityIcons
+                name="camera-plus"
+                size={60}
+                color="grey"
+              />
+            </TouchableOpacity>
+          ) : (
+            <MaterialCommunityIcons name="camera" size={60} color="grey" />
+          )}
+          <Text style={{ fontSize: 16, letterSpacing: 2, marginLeft: 10 }}>
+            {selectedImages.length} / 3
+          </Text>
         </View>
+
         <View>
           <ScrollView horizontal style={{ margin: 10 }}>
             {selectedImages.map((uri, index) => (
@@ -432,14 +479,17 @@ const PayPalScreen = ({ navigation }) => {
             //  marginVertical: Default.fixPadding * 2,
           }}
         >
-          <Text
-            style={{
-              color: Colors.grey,
-              marginLeft: 135,
-            }}
-          >
-            Upload Pictures
-          </Text>
+          {!selectedImages.length > 0 && (
+            <Text
+              style={{
+                color: Colors.grey,
+                marginLeft: 135,
+                letterSpacing: 1,
+              }}
+            >
+              Upload Pictures
+            </Text>
+          )}
           <View
             style={{
               ...Default.shadow,

@@ -8,21 +8,15 @@ import {
   BackHandler,
   StyleSheet,
   Dimensions,
-  Button,
-  image,
   Modal,
   TextInput,
 } from "react-native";
 
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
-import Octicons from "react-native-vector-icons/Octicons";
-import { Slider } from "react-native-range-slider-expo";
 import CalendarPicker from "react-native-calendar-picker";
 import moment from "moment";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import * as ImagePicker from "expo-image-picker";
 import React, { useState, useEffect } from "react";
-import { Colors, Default, Fonts } from "../constants/styles";
+import { Colors, Default, Fonts, screenHeight } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import { addSell, getSellCategories } from "../apis/apis";
@@ -32,6 +26,10 @@ import { clearLocation } from "../redux/loanandfoundSlice";
 import Loader from "../components/loader";
 import { AntDesign } from "@expo/vector-icons";
 import BreadCrumbs from "../components/BreadCrumbs";
+import { ImagePicker } from "expo-image-multiple-picker";
+import ImagePickerHeader from "../components/ImagePickerHeader";
+import ImagePickerAlbum from "../components/ImagePickerAlbum";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 const PayPalScreen = ({ navigation }) => {
@@ -54,6 +52,8 @@ const PayPalScreen = ({ navigation }) => {
   const [selectedImages, setSelectedImages] = useState([]);
   const [price, setPrice] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [open, setOpen] = useState(false);
+
   const { t, i18n } = useTranslation();
 
   const handleOptionSelect = (option) => {
@@ -104,22 +104,7 @@ const PayPalScreen = ({ navigation }) => {
   };
 
   const pickImageAsync = async () => {
-    if (selectedImages.length >= 6) {
-      alert("You can select a maximum of 6 images.");
-      return;
-    }
-
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setSelectedImages([...selectedImages, result.assets[0]]);
-    } else {
-      alert("You did not select any image.");
-    }
+    setOpen(true);
   };
 
   const dispatch = useDispatch();
@@ -137,8 +122,10 @@ const PayPalScreen = ({ navigation }) => {
       const formData = new FormData();
       selectedImages.slice(0, 3).forEach((image) => {
         const extension = image.uri.split(".").pop();
-        const type = `${image.type}/${extension}`;
-        const name = image.uri.split("/").pop();
+        const type = `${
+          image.mediaType === "photo" ? "image" : "video"
+        }/${extension}`;
+        const name = image.filename;
         formData.append("photos", {
           uri: image.uri,
           type,
@@ -207,31 +194,75 @@ const PayPalScreen = ({ navigation }) => {
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       {isLoading && <Loader />}
 
-      <View
-        style={{
-          paddingVertical: Default.fixPadding * 1.2,
-          flexDirection: isRtl ? "row-reverse" : "row",
-          alignItems: "center",
-          backgroundColor: Colors.primary,
-          paddingHorizontal: Default.fixPadding * 2,
-        }}
-      >
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons
-            name={isRtl ? "arrow-forward" : "arrow-back"}
-            size={25}
-            color={Colors.white}
-          />
-        </TouchableOpacity>
-        <Text
+      {!open && (
+        <View
           style={{
-            ...Fonts.SemiBold18white,
-            marginHorizontal: Default.fixPadding * 1.2,
+            paddingVertical: Default.fixPadding * 1.2,
+            flexDirection: isRtl ? "row-reverse" : "row",
+            alignItems: "center",
+            backgroundColor: Colors.primary,
+            paddingHorizontal: Default.fixPadding * 2,
           }}
         >
-          {"Sell Item"}
-        </Text>
-      </View>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons
+              name={isRtl ? "arrow-forward" : "arrow-back"}
+              size={25}
+              color={Colors.white}
+            />
+          </TouchableOpacity>
+          <Text
+            style={{
+              ...Fonts.SemiBold18white,
+              marginHorizontal: Default.fixPadding * 1.2,
+            }}
+          >
+            {"Sell Item"}
+          </Text>
+        </View>
+      )}
+      {open && (
+        <View
+          style={{
+            backgroundColor: Colors.extraLightGrey,
+            height: screenHeight,
+            position: "relative",
+          }}
+        >
+          <ImagePicker
+            theme={{
+              header: ImagePickerHeader,
+              album: ImagePickerAlbum,
+            }}
+            onSave={(assets) => {
+              setSelectedImages([...selectedImages, ...assets]);
+              setOpen(false);
+            }}
+            onCancel={() => {
+              setOpen(false);
+            }}
+            multiple
+            limit={3 - selectedImages.length}
+          />
+          <TouchableOpacity onPress={() => setOpen(false)}>
+            <Text
+              style={{
+                color: "white",
+                borderColor: "white",
+                borderWidth: 1,
+                borderRadius: 3,
+                paddingVertical: 4,
+                paddingHorizontal: 20,
+                position: "absolute",
+                top: 40,
+                right: 20,
+              }}
+            >
+              Cancel
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
       <BreadCrumbs>
         <AntDesign name="right" size={18} color="#9ca3af" />
         <TouchableOpacity
@@ -260,13 +291,23 @@ const PayPalScreen = ({ navigation }) => {
           style={{
             alignItems: "center",
             justifyContent: "center",
-            flexDirection: "row",
             marginTop: 20,
           }}
         >
-          <TouchableOpacity onPress={pickImageAsync}>
-            <Ionicons name="ios-camera" size={80} color="grey" />
-          </TouchableOpacity>
+          {selectedImages.length === 0 || selectedImages.length < 3 ? (
+            <TouchableOpacity onPress={pickImageAsync}>
+              <MaterialCommunityIcons
+                name="camera-plus"
+                size={60}
+                color="grey"
+              />
+            </TouchableOpacity>
+          ) : (
+            <MaterialCommunityIcons name="camera" size={60} color="grey" />
+          )}
+          <Text style={{ fontSize: 16, letterSpacing: 2, marginLeft: 10 }}>
+            {selectedImages.length} / 3
+          </Text>
         </View>
 
         <ScrollView horizontal style={{ margin: 10 }}>
@@ -304,14 +345,16 @@ const PayPalScreen = ({ navigation }) => {
             //  marginVertical: Default.fixPadding * 2,
           }}
         >
-          <Text
-            style={{
-              color: Colors.grey,
-              marginLeft: 135,
-            }}
-          >
-            Upload Pictures
-          </Text>
+          {selectedImages.length === 0 && (
+            <Text
+              style={{
+                color: Colors.grey,
+                marginLeft: 145,
+              }}
+            >
+              Upload Pictures
+            </Text>
+          )}
 
           <View
             style={{

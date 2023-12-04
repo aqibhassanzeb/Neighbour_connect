@@ -8,34 +8,32 @@ import {
   BackHandler,
   StyleSheet,
   Dimensions,
-  Button,
-  image,
   Modal,
   TextInput,
 } from "react-native";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import Octicons from "react-native-vector-icons/Octicons";
-import { Slider } from "react-native-range-slider-expo";
 import CalendarPicker from "react-native-calendar-picker";
 import moment from "moment";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import * as ImagePicker from "expo-image-picker";
 import React, { useState, useEffect } from "react";
-import { Colors, Default, Fonts } from "../constants/styles";
+import { Colors, Default, Fonts, screenHeight } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Video } from "expo-av";
 import { addWatch, getWatchCategories } from "../apis/apis";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
 import Loader from "../components/loader";
 import { clearLocation } from "../redux/loanandfoundSlice";
 import BreadCrumbs from "../components/BreadCrumbs";
 import { AntDesign } from "@expo/vector-icons";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import ImagePickerHeader from "../components/ImagePickerHeader";
+import ImagePickerAlbum from "../components/ImagePickerAlbum";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { ImagePicker } from "expo-image-multiple-picker";
 
 const { width, height } = Dimensions.get("window");
 const PayPalScreen = ({ navigation }) => {
@@ -58,6 +56,7 @@ const PayPalScreen = ({ navigation }) => {
   const [categories, setCategories] = useState([]);
   const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const { t, i18n } = useTranslation();
   const isRtl = i18n.dir() == "rtl";
@@ -107,22 +106,7 @@ const PayPalScreen = ({ navigation }) => {
   };
 
   const pickMedia = async () => {
-    if (selectedMedia.length >= 3) {
-      alert("You can select a maximum of three images.");
-      return;
-    }
-
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setSelectedMedia([...selectedMedia, result.assets[0]]);
-    } else {
-      alert("You did not select any image.");
-    }
+    setOpen(true);
   };
 
   const handleMediaRemove = (index) => {
@@ -162,8 +146,10 @@ const PayPalScreen = ({ navigation }) => {
       const formData = new FormData();
       selectedMedia.slice(0, 3).forEach((media) => {
         const extension = media.uri.split(".").pop();
-        const type = `${media.type}/${extension}`;
-        const name = media.uri.split("/").pop();
+        const type = `${
+          media.mediaType === "photo" ? "image" : "video"
+        }/${extension}`;
+        const name = media.filename;
         formData.append("media", {
           uri: media.uri,
           type,
@@ -201,31 +187,78 @@ const PayPalScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       {isLoading && <Loader />}
-      <View
-        style={{
-          paddingVertical: Default.fixPadding * 1.2,
-          flexDirection: isRtl ? "row-reverse" : "row",
-          alignItems: "center",
-          backgroundColor: Colors.primary,
-          paddingHorizontal: Default.fixPadding * 2,
-        }}
-      >
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons
-            name={isRtl ? "arrow-forward" : "arrow-back"}
-            size={25}
-            color={Colors.white}
-          />
-        </TouchableOpacity>
-        <Text
+      {!open && (
+        <View
           style={{
-            ...Fonts.SemiBold18white,
-            marginHorizontal: Default.fixPadding * 1.2,
+            paddingVertical: Default.fixPadding * 1.2,
+            flexDirection: isRtl ? "row-reverse" : "row",
+            alignItems: "center",
+            backgroundColor: Colors.primary,
+            paddingHorizontal: Default.fixPadding * 2,
           }}
         >
-          {"Post Activity"}
-        </Text>
-      </View>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons
+              name={isRtl ? "arrow-forward" : "arrow-back"}
+              size={25}
+              color={Colors.white}
+            />
+          </TouchableOpacity>
+          <Text
+            style={{
+              ...Fonts.SemiBold18white,
+              marginHorizontal: Default.fixPadding * 1.2,
+            }}
+          >
+            {"Post Activity"}
+          </Text>
+        </View>
+      )}
+
+      {open && (
+        <View
+          style={{
+            backgroundColor: Colors.extraLightGrey,
+            height: screenHeight,
+            position: "relative",
+          }}
+        >
+          <ImagePicker
+            theme={{
+              header: ImagePickerHeader,
+              album: ImagePickerAlbum,
+            }}
+            onSave={(assets) => {
+              selectedMedia([...selectedMedia, ...assets]);
+              setOpen(false);
+            }}
+            onCancel={() => {
+              setOpen(false);
+            }}
+            multiple
+            limit={3 - selectedMedia.length}
+            video
+          />
+          <TouchableOpacity onPress={() => setOpen(false)}>
+            <Text
+              style={{
+                color: "white",
+                borderColor: "white",
+                borderWidth: 1,
+                borderRadius: 3,
+                paddingVertical: 4,
+                paddingHorizontal: 20,
+                position: "absolute",
+                top: 40,
+                right: 20,
+              }}
+            >
+              Cancel
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       <BreadCrumbs>
         <AntDesign name="right" size={18} color="#9ca3af" />
         <TouchableOpacity
@@ -264,13 +297,23 @@ const PayPalScreen = ({ navigation }) => {
           style={{
             alignItems: "center",
             justifyContent: "center",
-            flexDirection: "row",
             marginTop: 20,
           }}
         >
-          <TouchableOpacity onPress={pickMedia}>
-            <Ionicons name="ios-camera" size={80} color="grey" />
-          </TouchableOpacity>
+          {selectedMedia.length === 0 || selectedMedia.length < 3 ? (
+            <TouchableOpacity onPress={pickMedia}>
+              <MaterialCommunityIcons
+                name="camera-plus"
+                size={60}
+                color="grey"
+              />
+            </TouchableOpacity>
+          ) : (
+            <MaterialCommunityIcons name="camera" size={60} color="grey" />
+          )}
+          <Text style={{ fontSize: 16, letterSpacing: 2, marginLeft: 10 }}>
+            {selectedMedia.length} / 3
+          </Text>
         </View>
         <View>
           <ScrollView horizontal style={{ margin: 10 }}>
@@ -316,14 +359,16 @@ const PayPalScreen = ({ navigation }) => {
             marginHorizontal: Default.fixPadding * 2,
           }}
         >
-          <Text
-            style={{
-              color: Colors.grey,
-              marginLeft: 105,
-            }}
-          >
-            Upload Pictures/Videos
-          </Text>
+          {selectedMedia.length === 0 && (
+            <Text
+              style={{
+                color: Colors.grey,
+                marginLeft: 105,
+              }}
+            >
+              Upload Pictures/Videos
+            </Text>
+          )}
 
           <View
             style={{
