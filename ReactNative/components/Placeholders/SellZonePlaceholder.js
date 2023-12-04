@@ -50,13 +50,19 @@ const ShimmerBox = ({ width, height }) => {
   );
 };
 
-const Placeholder = ({ height = 90 }) => {
+const Placeholder = () => {
   return (
     <View style={styles.container}>
-      <View>
-        <ShimmerBox width={380} height={height} />
-        <ShimmerBox width={380} height={height} />
-        <ShimmerBox width={380} height={height} />
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          paddingHorizontal: 16,
+          paddingTop: 16,
+        }}
+      >
+        <ShimmerBox width={180} height={180} />
+        <ShimmerBox width={180} height={180} />
       </View>
     </View>
   );
@@ -64,8 +70,8 @@ const Placeholder = ({ height = 90 }) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingLeft: 25,
-    paddingTop: 20,
+    padding: 16,
+    paddingLeft: 5,
   },
   shimmer: {
     borderRadius: 10,

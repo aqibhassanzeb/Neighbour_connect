@@ -19,6 +19,8 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import { useDispatch, useSelector } from "react-redux";
 import { debounce } from "../utils";
 import { setSearchResults } from "../redux/globalSlice";
+import BreadCrumbs from "../components/BreadCrumbs";
+import { AntDesign } from "@expo/vector-icons";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -105,7 +107,19 @@ const CustomTabBar = ({ state, descriptors, navigation, position }) => {
             />
           </TouchableOpacity>
         </View>
-
+        <BreadCrumbs>
+          <AntDesign name="right" size={18} color="#9ca3af" />
+          <Text
+            style={{
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              color: Colors.primary,
+              fontWeight: "bold",
+            }}
+          >
+            Sell Zone
+          </Text>
+        </BreadCrumbs>
         <View style={styles.container}>
           <View style={styles.buttonContainer}>
             <View flexDirection="row">
@@ -261,7 +275,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     // paddingHorizontal: 10,
-    marginTop: 20,
+    marginTop: 10,
 
     marginHorizontal: Default.fixPadding * 2,
   },

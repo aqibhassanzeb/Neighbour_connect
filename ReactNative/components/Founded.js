@@ -154,7 +154,7 @@ const OngoingTab = (props) => {
                       fontWeight: "600",
                     }}
                   >
-                    {moment(item?.date).format("ddd MMM DD YYYY")}
+                    {moment(JSON.parse(item?.date)).format("ddd MMM DD YYYY")}
                   </Text>
                 </Text>
               </TouchableOpacity>

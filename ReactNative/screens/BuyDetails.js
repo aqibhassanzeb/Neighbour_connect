@@ -21,11 +21,15 @@ import SnackbarToast from "../components/snackbarToast";
 import Swiper from "react-native-swiper";
 import ChatScreen from "../screens/chatScreen";
 import { getId } from "../apis/apis";
+import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
 const { width, height } = Dimensions.get("window");
 
-const Losted = ({ navigation, route }) => {
+const Losted = ({ route }) => {
   const { item, userId } = route.params;
+  const user = useSelector((state) => state.authReducer.activeUser.user);
   const [loggedInUserId, setLoggedInUserId] = useState("");
+  const navigation = useNavigation();
 
   const { t, i18n } = useTranslation();
 
@@ -67,6 +71,30 @@ const Losted = ({ navigation, route }) => {
     }
     getAsyncId();
   }, []);
+
+  function profileNavigation(userId, userInfo) {
+    if (userId === user._id) {
+      navigation.navigate("profileScreen");
+    } else if (user.connections.includes(userId)) {
+      navigation.navigate("Profile3", { user: userInfo });
+    } else if (
+      user.requests &&
+      user.requests.some((req) => req.sender === userId)
+    ) {
+      navigation.navigate("Profile4", {
+        user: {
+          sender: {
+            _id: userId,
+            name: userInfo.name,
+            image: userInfo.image,
+          },
+        },
+      });
+    } else {
+      navigation.navigate("Profile1", { user: userInfo });
+    }
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       <View
@@ -189,14 +217,41 @@ const Losted = ({ navigation, route }) => {
         <View style={{ backgroundColor: Colors.extraLightGrey }}>
           <View
             style={{
-              flexDirection: isRtl ? "row-reverse" : "row",
+              // flexDirection: isRtl ? "row-reverse" : "row",
               marginHorizontal: Default.fixPadding * 2,
               paddingBottom: Default.fixPadding * 2,
               paddingBottom: 30,
             }}
           >
+            <TouchableOpacity
+              style={{
+                flexDirection: "row",
+                marginTop: 20,
+                alignItems: "center",
+                gap: 10,
+              }}
+              onPress={() =>
+                profileNavigation(item?.posted_by._id, item?.posted_by)
+              }
+            >
+              <Image
+                source={{ uri: item?.posted_by?.image }}
+                style={{ width: 40, height: 40, borderRadius: 50 }}
+              />
+              <Text
+                style={{
+                  ...Fonts.SemiBold16black,
+                }}
+              >
+                {item?.posted_by?.name}
+              </Text>
+            </TouchableOpacity>
             <View
-              style={{ flex: 7, alignItems: isRtl ? "flex-end" : "flex-start" }}
+              style={{
+                flex: 7,
+                alignItems: isRtl ? "flex-end" : "flex-start",
+                marginLeft: 50,
+              }}
             >
               <Text
                 style={{

@@ -14,6 +14,7 @@ import { Colors, Default, Fonts } from "../constants/styles";
 import { useTranslation } from "react-i18next";
 import { getSellCategories } from "../apis/apis";
 import Loader from "./loader";
+import Placeholder from "../components/Placeholders/PlaceholderFour";
 
 const { width } = Dimensions.get("window");
 
@@ -51,7 +52,8 @@ const OngoingTab = ({ navigation }) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
-      {isLoading && <Loader />}
+      {/* {isLoading && <Loader />} */}
+      {isLoading && Categories.length === 0 && <Placeholder />}
       <View>
         <FlatList
           data={Categories && Categories}

@@ -373,7 +373,7 @@ const Losted = ({ navigation, route }) => {
                     paddingBottom: 30,
                   }}
                 >
-                  {extractDate(data?.date)}
+                  {extractDate(JSON.parse(data?.date))}
                 </Text>
                 <Text
                   style={{

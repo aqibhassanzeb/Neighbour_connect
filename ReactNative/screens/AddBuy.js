@@ -30,6 +30,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { clearLocation } from "../redux/loanandfoundSlice";
 import Loader from "../components/loader";
+import { AntDesign } from "@expo/vector-icons";
+import BreadCrumbs from "../components/BreadCrumbs";
 
 const { width, height } = Dimensions.get("window");
 const PayPalScreen = ({ navigation }) => {
@@ -230,7 +232,29 @@ const PayPalScreen = ({ navigation }) => {
           {"Sell Item"}
         </Text>
       </View>
-
+      <BreadCrumbs>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <TouchableOpacity
+          onPress={() => navigation.navigate("BuySell")}
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+          }}
+        >
+          <Text> Sell Zone</Text>
+        </TouchableOpacity>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <Text
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            color: Colors.primary,
+            fontWeight: "bold",
+          }}
+        >
+          Add Item
+        </Text>
+      </BreadCrumbs>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View
           style={{
@@ -244,6 +268,7 @@ const PayPalScreen = ({ navigation }) => {
             <Ionicons name="ios-camera" size={80} color="grey" />
           </TouchableOpacity>
         </View>
+
         <ScrollView horizontal style={{ margin: 10 }}>
           {selectedImages.map((uri, index) => (
             <View
@@ -364,7 +389,8 @@ const PayPalScreen = ({ navigation }) => {
                       <Text
                         style={{
                           marginTop: 3,
-                          color: "grey",
+                          fontSize: 16,
+                          color: selectedOption.name ? "black" : "grey",
                         }}
                       >
                         {selectedOption.name ? selectedOption.name : "Category"}
@@ -372,7 +398,6 @@ const PayPalScreen = ({ navigation }) => {
                       <View
                         style={{
                           color: "grey",
-
                           position: "absolute",
                           marginLeft: 290,
                         }}
@@ -395,6 +420,11 @@ const PayPalScreen = ({ navigation }) => {
                     <TouchableOpacity
                       key={cat._id}
                       onPress={() => handleOptionSelect(cat)}
+                      style={{
+                        borderBottomWidth: 1,
+                        borderBottomColor: "#e2e8f0",
+                        paddingVertical: 2,
+                      }}
                     >
                       <Text style={{ padding: 10 }}>{cat.name}</Text>
                     </TouchableOpacity>
@@ -440,10 +470,11 @@ const PayPalScreen = ({ navigation }) => {
                 <Text
                   numberOfLines={2}
                   style={{
-                    ...Fonts.SemiBold14grey,
+                    // ...Fonts.SemiBold14grey,
                     overflow: "hidden",
                     textAlign: isRtl ? "right" : "left",
                     // paddingLeft: 21,
+                    color: selectedLocation?.name ? "black" : "grey",
                   }}
                 >
                   {selectedLocation?.name ? selectedLocation.name : "Location"}
@@ -560,7 +591,9 @@ const PayPalScreen = ({ navigation }) => {
                   <Text
                     style={{
                       marginTop: 3,
-                      color: "grey",
+                      color:
+                        selectedOptionsd === "Visibility" ? "grey" : "black",
+                      fontSize: 16,
                     }}
                   >
                     {selectedOptionsd}
@@ -568,7 +601,6 @@ const PayPalScreen = ({ navigation }) => {
                   <View
                     style={{
                       color: "grey",
-
                       position: "absolute",
                       marginLeft: 290,
                     }}
@@ -587,11 +619,21 @@ const PayPalScreen = ({ navigation }) => {
             <View style={styles.dropdowns}>
               <TouchableOpacity
                 onPress={() => handleOptionSelectsd("Neighborhood ")}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#e2e8f0",
+                  paddingVertical: 2,
+                }}
               >
                 <Text style={{ padding: 10 }}>Neighborhood </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => handleOptionSelectsd("Connection ")}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#e2e8f0",
+                  paddingVertical: 2,
+                }}
               >
                 <Text style={{ padding: 10 }}>Connection</Text>
               </TouchableOpacity>
@@ -609,6 +651,7 @@ const PayPalScreen = ({ navigation }) => {
             marginTop: Default.fixPadding * 2,
             padding: Default.fixPadding * 1.2,
             marginHorizontal: Default.fixPadding * 2,
+            marginBottom: 20,
           }}
         >
           <Text style={{ ...Fonts.SemiBold18white }}>{tr("Post")}</Text>
@@ -741,7 +784,7 @@ export default PayPalScreen;
 const styles = StyleSheet.create({
   checkbox: {
     //  borderWidth: 1,
-    //borderColor: 'gray',
+    //borderColor: 'grey',
     // borderRadius: 4,
     padding: 4,
   },
@@ -781,25 +824,19 @@ const styles = StyleSheet.create({
   },
 
   dropdown: {
-    width: 390,
-    height: 390,
     backgroundColor: "#fafafa",
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#ddd",
     paddingHorizontal: 10,
-    paddingRight: 100,
     zIndex: 21,
   },
   dropdowns: {
-    width: 390,
-    height: 90,
     backgroundColor: "#fafafa",
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#ddd",
     paddingHorizontal: 10,
-    paddingRight: 100,
     zIndex: 21,
   },
 });

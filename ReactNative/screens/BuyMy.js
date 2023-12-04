@@ -28,7 +28,10 @@ import {
 } from "../apis/apis";
 import SellItemsList from "../components/SellItemsList";
 import Loader from "../components/loader";
-
+import BreadCrumbs from "../components/BreadCrumbs";
+import { AntDesign } from "@expo/vector-icons";
+import Placeholder from "../components/Placeholders/PlaceholderList";
+import Empty from "../components/Empty";
 const { width, height } = Dimensions.get("window");
 
 const Lostss = ({ navigation }) => {
@@ -189,32 +192,32 @@ const Lostss = ({ navigation }) => {
           {"My Items"}
         </Text>
       </View>
-      {isLoading && <Loader />}
-      {!isLoading && userSells.length === 0 && (
+      <BreadCrumbs>
+        <AntDesign name="right" size={18} color="#9ca3af" />
         <TouchableOpacity
+          onPress={() => navigation.navigate("BuySell")}
           style={{
-            ...Default.shadow,
-            backgroundColor: Colors.white,
-            marginTop: 30,
-            marginHorizontal: 13,
-            //    marginBottom: 27,
-            borderRadius: 10,
-            // overflow: "hidden",
-            flexDirection: isRtl ? "row-reverse" : "row",
-            paddingVertical: Default.fixPadding,
+            paddingHorizontal: 10,
+            paddingVertical: 5,
           }}
         >
-          <View
-            style={{
-              flex: 2,
-              //  paddingHorizontal: Default.fixPadding * 1.5,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Text>{!isLoading && "No Items"}</Text>
-          </View>
+          <Text> Sell Zone</Text>
         </TouchableOpacity>
+        <AntDesign name="right" size={18} color="#9ca3af" />
+        <Text
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            color: Colors.primary,
+            fontWeight: "bold",
+          }}
+        >
+          My Items
+        </Text>
+      </BreadCrumbs>
+      {isLoading && userSells.length === 0 && <Placeholder height={120} />}
+      {!isLoading && userSells.length === 0 && (
+        <Empty text='"No listings Found' marginTop={190} />
       )}
       <ScrollView showsVerticalScrollIndicator={false}>
         {userSells.length > 0 &&

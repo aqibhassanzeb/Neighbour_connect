@@ -21,7 +21,9 @@ import { debounce } from "../utils";
 import moment from "moment";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import useGetUserId from "./useGetUserId";
+import Placeholder from "./Placeholders/SellZonePlaceholder";
 const { width } = Dimensions.get("window");
+import Empty from "../components/Empty";
 
 const OngoingTab = (props) => {
   const { filteredSellZoneItems } = useSelector((state) => state.global);
@@ -63,32 +65,10 @@ const OngoingTab = (props) => {
   );
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
-      {filteredSellZoneItems.length === 0 && (
-        <TouchableOpacity
-          style={{
-            ...Default.shadow,
-            backgroundColor: Colors.white,
-            marginTop: 30,
-            marginHorizontal: 13,
-            //    marginBottom: 27,
-            borderRadius: 10,
-            // overflow: "hidden",
-            flexDirection: isRtl ? "row-reverse" : "row",
-            paddingVertical: Default.fixPadding,
-          }}
-        >
-          <View
-            style={{
-              flex: 2,
-              //  paddingHorizontal: Default.fixPadding * 1.5,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Text>No Result Found</Text>
-          </View>
-        </TouchableOpacity>
+      {filteredSellZoneItems.length === 0 && !isLoading && (
+        <Empty text="Not Items" marginTop={100} />
       )}
+      {isLoading && filteredSellZoneItems.length === 0 && <Placeholder />}
       <FlatList
         data={filteredSellZoneItems || []}
         numColumns={2}
@@ -98,12 +78,13 @@ const OngoingTab = (props) => {
             style={{
               marginLeft: 20,
               flexDirection: "row",
+              backgroundColor: "white",
+              borderRadius: 10,
             }}
           >
             <View
               style={{
                 marginBottom: Default.fixPadding * 2,
-                marginTop: Default.fixPadding,
               }}
             >
               <TouchableOpacity
@@ -124,7 +105,7 @@ const OngoingTab = (props) => {
                       height: 165,
                       width: 175,
                       ...Default.shadow,
-                      borderRadius: 20,
+                      borderRadius: 10,
                     }}
                   />
                   {item.is_sold && (
@@ -134,28 +115,29 @@ const OngoingTab = (props) => {
                   )}
                 </View>
 
-                <View></View>
-                <Text
-                  style={{ fontSize: 16, paddingLeft: 3, fontWeight: "bold" }}
-                >
-                  {item.title}
-                </Text>
-                <Text style={{ fontSize: 16, paddingLeft: 4 }}>
-                  RS {item.price}
-                </Text>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text>
-                    <Ionicons name="time-outline" size={15} />
+                <View style={{ paddingLeft: 10, paddingTop: 5 }}>
+                  <Text
+                    style={{ fontSize: 16, paddingLeft: 3, fontWeight: "bold" }}
+                  >
+                    {item.title}
                   </Text>
-                  <Text style={{ fontSize: 13 }}>
-                    {" "}
-                    {moment(item.createdAt).fromNow()}
+                  <Text style={{ fontSize: 16, paddingLeft: 4 }}>
+                    RS {item.price}
                   </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text>
+                      <Ionicons name="time-outline" size={15} />
+                    </Text>
+                    <Text style={{ fontSize: 13 }}>
+                      {" "}
+                      {moment(item.createdAt).fromNow()}
+                    </Text>
+                  </View>
                 </View>
               </TouchableOpacity>
             </View>
@@ -172,6 +154,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    padding: 1,
   },
   tagContainer: {
     position: "absolute",

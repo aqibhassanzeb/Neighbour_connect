@@ -196,7 +196,7 @@ const PayPalScreen = ({ navigation, route }) => {
       formData.append("title", title);
       formData.append("category", selectedOption._id);
       formData.append("description", description);
-      formData.append("date", finalDate.toString());
+      formData.append("date", JSON.stringify(finalDate));
       const mapLocation = {
         ...selectedLocation.coordinate,
         name: selectedLocation.name,
