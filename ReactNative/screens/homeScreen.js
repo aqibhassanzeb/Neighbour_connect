@@ -44,9 +44,9 @@ const HomeScreen = ({ navigation, route }) => {
   const [cachedResults, setCachedResults] = useState({});
   const [searchLoading, setSearchLoading] = useState(false);
   const [showDropDown, setshowDropDown] = useState(false);
-  const [userData, setUserData] = useState("");
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const [loader, setLoader] = useState(false);
+  const userData = useSelector((state) => state.authReducer.activeUser?.user);
 
   const toggleSidePanel = () => {
     setIsSidePanelOpen(!isSidePanelOpen);
@@ -77,9 +77,6 @@ const HomeScreen = ({ navigation, route }) => {
     }
   }, [query]);
 
-  const { userInfo } = useSelector((state) => state.loanandfound);
-  const user = useSelector((state) => state.authReducer.activeUser);
-
   const { t, i18n } = useTranslation();
 
   const isRtl = i18n.dir() == "rtl";
@@ -101,44 +98,42 @@ const HomeScreen = ({ navigation, route }) => {
       console.error("Error clearing AsyncStorage:", error);
     }
   };
+  // const handleGetuser = async () => {
+  //   try {
+  //     setLoader(true);
+  //     let paylaod = {};
+  //     if (userInfo?.user) {
+  //       paylaod._id = userInfo.user?._id;
+  //     } else {
+  //       let userData = await AsyncStorage.getItem("userData");
+  //       let userInformation = JSON.parse(userData);
+  //       paylaod._id = userInformation.user?._id;
+  //     }
+  //     let result = await userGetbyId(paylaod);
+  //     if (result.status == 200) {
+  //       return result.data.data;
+  //     }
+  //   } catch (error) {
+  //     console.log("error ;", error);
+  //     alert("something went wrong!");
+  //   } finally {
+  //     setLoader(false);
+  //   }
+  // };
+  // const loadUserData = async () => {
+  //   try {
+  //     let newUserData = await handleGetuser();
+  //     setUserData(newUserData);
+  //     const userDataJson = JSON.stringify(newUserData);
+  //     await AsyncStorage.setItem("userDatainfo", userDataJson);
+  //   } catch (error) {
+  //     console.error("Error loading user data:", error);
+  //   }
+  // };
 
-  const handleGetuser = async () => {
-    try {
-      setLoader(true);
-      let paylaod = {};
-      if (userInfo?.user) {
-        paylaod._id = userInfo.user?._id;
-      } else {
-        let userData = await AsyncStorage.getItem("userData");
-        let userInformation = JSON.parse(userData);
-        paylaod._id = userInformation.user?._id;
-      }
-      let result = await userGetbyId(paylaod);
-      if (result.status == 200) {
-        return result.data.data;
-      }
-    } catch (error) {
-      console.log("error ;", error);
-      alert("something went wrong!");
-    } finally {
-      setLoader(false);
-    }
-  };
-
-  const loadUserData = async () => {
-    try {
-      let newUserData = await handleGetuser();
-      setUserData(newUserData);
-      const userDataJson = JSON.stringify(newUserData);
-      await AsyncStorage.setItem("userDatainfo", userDataJson);
-    } catch (error) {
-      console.error("Error loading user data:", error);
-    }
-  };
-
-  useEffect(() => {
-    loadUserData();
-  }, [navigation]);
+  // useEffect(() => {
+  //   loadUserData();
+  // }, [navigation]);
 
   const handleNavigation = (value) => {
     switch (value) {

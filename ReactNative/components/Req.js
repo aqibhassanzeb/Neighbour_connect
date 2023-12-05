@@ -32,8 +32,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const { width } = Dimensions.get("window");
 import useGetUser from "./useGetUser";
 import Empty from "./EmpyMayKnow";
+import { setActiveUser } from "../redux/authSlice";
 
 const OngoingTab = (props) => {
+  const activeUser = useSelector((state) => state.authReducer.activeUser);
   const user = useSelector((state) => state.authReducer.activeUser?.user);
   const id = user?._id;
   const { t, i18n } = useTranslation();
@@ -62,12 +64,17 @@ const OngoingTab = (props) => {
   }
   const [isVisible, setIsVisible] = useState(false);
 
+  const dispatch = useDispatch();
+
   const toggleModal = async (sender_id) => {
     try {
       let accepted = await acceptRequest({ sender_id });
       if (accepted.status == 200) {
         setIsVisible(true);
         handleGetRequests();
+        dispatch(
+          setActiveUser({ message: "", user: accepted.data.user, token: "" })
+        );
       } else {
         alert(accepted.data.error);
       }

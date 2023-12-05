@@ -38,7 +38,7 @@ const RegisterScreen = ({ navigation, route }) => {
     return t(`registerScreen:${key}`);
   }
   const backAction = () => {
-    navigation.navigate("loginScreen");
+    navigation.goBack();
     return true;
   };
   useEffect(() => {

@@ -8,33 +8,32 @@ import {
   Image,
   Dimensions,
   BackHandler,
-  TextInput,
   Modal,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Colors, Default, Fonts } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
-
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import * as ImagePicker from "expo-image-picker";
 import { BottomSheet } from "react-native-btr";
 import { Camera } from "expo-camera";
-import SnackbarToast from "../components/snackbarToast";
-import CameraModule from "../components/cameraModule";
 import { Disconnect, getId, getUserActivities } from "../apis/apis";
 import moment from "moment";
-import { handleNavigation } from "./profileScreen";
 import useGetUser from "../components/useGetUser";
 import { UIActivityIndicator } from "react-native-indicators";
 import Empty from "../components/EmptyActivity";
-
+import { useDispatch, useSelector } from "react-redux";
+import { setActiveUser } from "../redux/authSlice";
 const { width, height } = Dimensions.get("window");
 
 const EditProfileScreen = (props) => {
-  const user = useGetUser();
-  const [isConnected, setConnected] = useState(true);
+  const activeUser = useSelector((state) => state.authReducer.activeUser);
+  const user = useSelector((state) => state.authReducer.activeUser.user);
+  console.log(user.connections);
   const connectionDetails = props.route.params?.user || {};
+  const [isConnected, setConnected] = useState(
+    user.connections.includes(connectionDetails._id)
+  );
   const [activites, setActivites] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -125,7 +124,7 @@ const EditProfileScreen = (props) => {
       setCameraNotGranted(true);
     }
   };
-
+  const dispatch = useDispatch();
   async function handleDisconnect() {
     try {
       let disconnect = await Disconnect({
@@ -134,6 +133,9 @@ const EditProfileScreen = (props) => {
       if (disconnect.status == 200) {
         setConnected(false);
         setCancelModal(false);
+        dispatch(
+          setActiveUser({ message: "", user: disconnect.data.user, token: "" })
+        );
       } else {
         alert(disconnect.data.error);
       }
@@ -199,168 +201,160 @@ const EditProfileScreen = (props) => {
           }}
         ></Text>
       </View>
-
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <View
+        style={{
+          flexDirection: isRtl ? "row-reverse" : "row",
+          marginVertical: Default.fixPadding * 2,
+        }}
+      >
         <View
           style={{
+            flex: 9,
             flexDirection: isRtl ? "row-reverse" : "row",
-            marginVertical: Default.fixPadding * 2,
+            marginHorizontal: Default.fixPadding * 2,
+          }}
+        >
+          <Image
+            source={{ uri: connectionDetails.image }}
+            style={{ height: 66, width: 66, borderRadius: 33 }}
+            resizeMode="contain"
+          />
+          <View
+            style={{
+              justifyContent: "center",
+              marginHorizontal: Default.fixPadding * 1.5,
+              alignItems: isRtl ? "flex-end" : "flex-start",
+            }}
+          >
+            <Text
+              numberOfLines={1}
+              style={{
+                ...Fonts.SemiBold16black,
+                overflow: "hidden",
+                position: "absolute",
+                width: 140,
+                top: 20,
+              }}
+            >
+              {connectionDetails.name}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.contain}>
+          <TouchableOpacity
+            style={styles.selectedButton}
+            onPress={() => setDropdownOpens(!dropdownOpens)}
+          >
+            <Ionicons name="ellipsis-vertical" size={24} color="black" />
+            <Text style={styles.selectedButtonText}>{selectedValue}</Text>
+          </TouchableOpacity>
+        </View>
+
+        {dropdownOpens && (
+          <View style={[styles.dropdown]}>
+            <TouchableOpacity
+              style={[
+                styles.dropdownButton,
+                selectedValue === "button1" && styles.dropdownButtonSelected,
+              ]}
+              onPress={() =>
+                props.navigation.navigate("Report", {
+                  postId: connectionDetails._id,
+                  module: "user",
+                })
+              }
+            >
+              <Ionicons name="flag-outline" size={23} color="black" />
+              <Text style={styles.dropdownButtonText}>Report</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+
+      <View
+        style={{
+          flexDirection: "row",
+          // position: "absolute",
+          marginTop: 25,
+          // marginBottom: 99,
+        }}
+      >
+        <TouchableOpacity
+          style={{
+            backgroundColor: Colors.primary,
+            borderRadius: 10,
+            justifyContent: "center",
+            alignItems: "center",
+
+            paddingLeft: 10,
+            paddingRight: 43,
+            paddingTop: 15,
+            paddingBottom: 15,
+            marginLeft: 23,
+            marginRight: 10,
+          }}
+          onPressOut={handleDisconnectTap}
+          disabled={!isConnected}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+            }}
+          >
+            <Ionicons
+              name={isConnected ? "checkmark-circle" : "close-circle"}
+              size={24}
+              color="white"
+              paddingRight={7}
+            />
+
+            <Text style={{ ...Fonts.SemiBold18white }}>
+              {isConnected ? "Connected" : "Disconnected"}
+            </Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            props.navigation.navigate("ChattingScreen", {
+              user: {
+                recepientId: connectionDetails._id,
+                recepientName: connectionDetails.name,
+                recepientImage: connectionDetails.image,
+                senderId: loggedInUserId,
+              },
+            })
+          }
+          style={{
+            backgroundColor: Colors.primary,
+            borderRadius: 10,
+            justifyContent: "center",
+            alignItems: "center",
+            paddingLeft: 33,
+            paddingRight: 33,
+            paddingTop: 15,
+            paddingBottom: 15,
+            marginRight: 23,
           }}
         >
           <View
             style={{
-              flex: 9,
-              flexDirection: isRtl ? "row-reverse" : "row",
-              marginHorizontal: Default.fixPadding * 2,
+              flexDirection: "row",
             }}
           >
-            <Image
-              source={{ uri: connectionDetails.image }}
-              style={{ height: 66, width: 66, borderRadius: 33 }}
-              resizeMode="contain"
+            <Ionicons
+              name="chatbubble-outline"
+              size={24}
+              color="white"
+              paddingRight={7}
             />
-            <View
-              style={{
-                justifyContent: "center",
-                marginHorizontal: Default.fixPadding * 1.5,
-                alignItems: isRtl ? "flex-end" : "flex-start",
-              }}
-            >
-              <Text
-                numberOfLines={1}
-                style={{
-                  ...Fonts.SemiBold16black,
-                  overflow: "hidden",
-                  position: "absolute",
-                  width: 140,
-                  top: 20,
-                }}
-              >
-                {connectionDetails.name}
-              </Text>
-            </View>
+            <Text style={{ ...Fonts.SemiBold18white }}>{tr("message")}</Text>
           </View>
+        </TouchableOpacity>
+      </View>
+      <View style={{ height: 1, backgroundColor: "grey", marginTop: 20 }} />
 
-          <View style={styles.contain}>
-            <TouchableOpacity
-              style={styles.selectedButton}
-              onPress={() => setDropdownOpens(!dropdownOpens)}
-            >
-              <Ionicons name="ellipsis-vertical" size={24} color="black" />
-              <Text style={styles.selectedButtonText}>{selectedValue}</Text>
-            </TouchableOpacity>
-          </View>
-
-          {dropdownOpens && (
-            <View style={[styles.dropdown]}>
-              <TouchableOpacity
-                style={[
-                  styles.dropdownButton,
-                  selectedValue === "button1" && styles.dropdownButtonSelected,
-                ]}
-                onPress={() =>
-                  props.navigation.navigate("Report", {
-                    postId: connectionDetails._id,
-                    module: "user",
-                  })
-                }
-              >
-                <Ionicons name="flag-outline" size={23} color="black" />
-                <Text style={styles.dropdownButtonText}>Report</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
-
-        <View
-          style={{
-            flexDirection: "row",
-            // position: "absolute",
-            marginTop: 25,
-            // marginBottom: 99,
-          }}
-        >
-          <TouchableOpacity
-            style={{
-              backgroundColor: Colors.primary,
-              borderRadius: 10,
-              justifyContent: "center",
-              alignItems: "center",
-
-              paddingLeft: 10,
-              paddingRight: 43,
-              paddingTop: 15,
-              paddingBottom: 15,
-              marginLeft: 23,
-              marginRight: 10,
-            }}
-            onPressOut={handleDisconnectTap}
-            disabled={!isConnected}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-              }}
-            >
-              <Ionicons
-                name={isConnected ? "checkmark-circle" : "close-circle"}
-                size={24}
-                color="white"
-                paddingRight={7}
-              />
-
-              <Text style={{ ...Fonts.SemiBold18white }}>
-                {isConnected ? "Connected" : "Disconnected"}
-              </Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() =>
-              props.navigation.navigate("ChattingScreen", {
-                user: {
-                  recepientId: connectionDetails._id,
-                  recepientName: connectionDetails.name,
-                  recepientImage: connectionDetails.image,
-                  senderId: loggedInUserId,
-                },
-              })
-            }
-            style={{
-              backgroundColor: Colors.primary,
-              borderRadius: 10,
-              justifyContent: "center",
-              alignItems: "center",
-              paddingLeft: 33,
-              paddingRight: 33,
-              paddingTop: 15,
-              paddingBottom: 15,
-              marginRight: 23,
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-              }}
-            >
-              <Ionicons
-                name="chatbubble-outline"
-                size={24}
-                color="white"
-                paddingRight={7}
-              />
-              <Text style={{ ...Fonts.SemiBold18white }}>{tr("message")}</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-        {/* <TouchableOpacity
-          onPress={() =>
-            props.navigation.navigate("SeeAll", {
-              title: "Losted",
-            })
-          }
-        >
-          <Text style={{ top: 110, left: 360 }}>SeeAll</Text>
-        </TouchableOpacity> */}
+      <ScrollView showsVerticalScrollIndicator={false}>
         {isLoading && (
           <View
             style={{
@@ -391,7 +385,6 @@ const EditProfileScreen = (props) => {
         {activites.length === 0 && !isLoading && (
           <Empty text="No Activity Today" marginTop={150} />
         )}
-
         {activites.length > 0 &&
           !isLoading &&
           activites.map((activity) => (
@@ -718,8 +711,6 @@ const EditProfileScreen = (props) => {
           </View>
         </TouchableOpacity>
       </Modal>
-
-      <View style={{ height: 1, backgroundColor: "grey", bottom: 580 }} />
     </SafeAreaView>
   );
 };

@@ -37,7 +37,7 @@ const { width } = Dimensions.get("window");
 export const handleNavigation = (activity) => {
   switch (activity.post_type) {
     case "lost_found":
-      return 'props.navigation.navigate("Losted",{_id: data.item.post._id,userId: user._id})';
+      return 'props.navigation.navigate("Losted",{_id: data.item.post._id,userId: user?._id})';
     case "suspicious activity":
       return "Mysus";
     case "neighbor forum":
@@ -145,7 +145,7 @@ const EditProfileScreen = (props) => {
       setPickedImage(result.assets[0].uri);
       toggleCloseUploadImage();
       const response = await uploadImageToCloudinary(result.assets[0]);
-      await updateUser({ _id: user._id, image: response });
+      await updateUser({ _id: user?._id, image: response });
     }
   };
 
@@ -193,7 +193,7 @@ const EditProfileScreen = (props) => {
               <View style={{ flexDirection: "row" }}>
                 {removeImage ? (
                   <Image
-                    source={{ uri: DEFAULT_USER_PIC }}
+                    source={{ uri: DEFAULT_USER_PIC && DEFAULT_USER_PIC }}
                     style={{
                       height: 88,
                       width: 88,
@@ -203,7 +203,7 @@ const EditProfileScreen = (props) => {
                   />
                 ) : (
                   <Image
-                    source={{ uri: user.image }}
+                    source={{ uri: user?.image }}
                     style={{
                       height: 88,
                       width: 88,
@@ -220,7 +220,7 @@ const EditProfileScreen = (props) => {
                     fontWeight: "bold",
                   }}
                 >
-                  {user.name}
+                  {user?.name}
                 </Text>
               </View>
             ) : (
@@ -242,7 +242,7 @@ const EditProfileScreen = (props) => {
                     fontWeight: "bold",
                   }}
                 >
-                  {user.name}
+                  {user?.name}
                 </Text>
               </View>
             )}

@@ -342,13 +342,12 @@ export const acceptRequest = async (req, res) => {
 
     receiver.requests[requestIndex].status = "accepted";
     receiver.connections.push(req.body.sender_id);
-    await receiver.save();
+    const update_receiver = await receiver.save();
 
-    const sender = await User.findByIdAndUpdate(req.body.sender_id, {
+    await User.findByIdAndUpdate(req.body.sender_id, {
       $push: { connections: receiver._id },
     });
-
-    res.json({ message: "Friend request accepted" });
+    res.json({ message: "Friend request accepted", user: update_receiver });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "Error accepting friend request" });
@@ -403,7 +402,7 @@ export const Disconnect = async (req, res) => {
     }
 
     user.connections.splice(connectionIndex, 1);
-    await user.save();
+    const updateuser = await user.save();
 
     const connection_user = await User.findById(connection_id);
 
@@ -422,7 +421,7 @@ export const Disconnect = async (req, res) => {
     connection_user.connections.splice(connection2Index, 1);
     await connection_user.save();
 
-    res.json({ message: "User Disconnected" });
+    res.json({ message: "User Disconnected", user: updateuser });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "Error Disconnecting user" });
