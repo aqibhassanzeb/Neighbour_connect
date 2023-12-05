@@ -31,14 +31,18 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 //import Founded from "../screens/Founded";
 const { width } = Dimensions.get("window");
 import useGetUser from "./useGetUser";
+import Empty from "./EmpyMayKnow";
 
 const OngoingTab = (props) => {
+  const user = useSelector((state) => state.authReducer.activeUser?.user);
+  const id = user?._id;
   const { t, i18n } = useTranslation();
   const [reqLoader, setReqLoader] = useState(false);
   const [requests, setRequests] = useState([]);
   const [neighboursData, setNeighboursData] = useState([]);
-  const [id, setId] = useState("");
-  const user = useGetUser();
+  const [nLoading, setNLoading] = useState(false);
+  // const [id, setId] = useState("");
+  // const user = useGetUser();
 
   const isRtl = i18n.dir() == "rtl";
   const [selectedValue, setSelectedValue] = useState("");
@@ -133,64 +137,6 @@ const OngoingTab = (props) => {
 
   const [allClear, setAllClear] = useState(false);
 
-  const services = [
-    {
-      key: "1",
-      name: "Appliances",
-      image: require("../assets/images/ap1.png"),
-    },
-    {
-      key: "2",
-      name: "Automotive",
-      image: require("../assets/images/ap2.png"),
-    },
-    {
-      key: "3",
-      name: "Toys & Games",
-      image: require("../assets/images/ap3.jpg"),
-    },
-    {
-      key: "4",
-      name: "Bicycle",
-      image: require("../assets/images/ap4.png"),
-    },
-    {
-      key: "5",
-      name: "Clothing & Accessories",
-      image: require("../assets/images/ap5.jpg"),
-    },
-    {
-      key: "6",
-      name: "Tools",
-      image: require("../assets/images/ap6.jpg"),
-    },
-    {
-      key: "7",
-      name: "Furniture",
-      image: require("../assets/images/ap7.png"),
-    },
-    {
-      key: "8",
-      name: "Home Decor",
-      image: require("../assets/images/ap8.png"),
-    },
-    {
-      key: "9",
-      name: "Garden",
-      image: require("../assets/images/ap9.png"),
-    },
-    {
-      key: "10",
-      name: "Others",
-      image: require("../assets/images/ap10.jpg"),
-    },
-  ];
-
-  const renderItemServices = ({ item, index }) => {
-    const isFirst =
-      index === services.length - 1 || index === services.length - 2;
-  };
-
   const handleGetRequests = async () => {
     try {
       setReqLoader(true);
@@ -208,12 +154,14 @@ const OngoingTab = (props) => {
 
   const handleGetNeighbours = async () => {
     try {
+      setNLoading(true);
       let result = await NeighbourMayKnow();
+      setNLoading(false);
       if (result.status == 200) {
         let filteredYouKnow = [];
         for (const user of result.data) {
           if (requests.length > 0) {
-            if (!requests.some((request) => request.sender._id === user._id)) {
+            if (!requests.some((request) => request.sender?._id === user._id)) {
               filteredYouKnow.push(user);
             }
           } else {
@@ -223,9 +171,11 @@ const OngoingTab = (props) => {
         setNeighboursData(filteredYouKnow);
       }
     } catch (error) {
+      setNLoading(false);
       console.log(error);
       alert(error.message);
     } finally {
+      setNLoading(false);
     }
   };
 
@@ -249,18 +199,18 @@ const OngoingTab = (props) => {
     }, [requests])
   );
 
-  const getId = async () => {
-    try {
-      const userData = await AsyncStorage.getItem("userData");
-      if (userData) {
-        let parseUserdata = JSON.parse(userData);
-        setId(parseUserdata.user._id);
-      }
-    } catch (error) {
-      console.log("assyn storage error", error.message);
-    }
-  };
-  getId();
+  // const getId = async () => {
+  //   try {
+  //     const userData = await AsyncStorage.getItem("userData");
+  //     if (userData) {
+  //       let parseUserdata = JSON.parse(userData);
+  //       setId(parseUserdata.user._id);
+  //     }
+  //   } catch (error) {
+  //     console.log("assyn storage error", error.message);
+  //   }
+  // };
+  // getId();
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       {countPending === 0 && (
@@ -275,10 +225,17 @@ const OngoingTab = (props) => {
             // overflow: "hidden",
             flexDirection: isRtl ? "row-reverse" : "row",
             paddingVertical: Default.fixPadding,
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
-          <Text style={{ marginLeft: 23, fontSize: 19, color: Colors.grey }}>
-            No Requests
+          <Text
+            style={{
+              fontSize: 19,
+              color: Colors.grey,
+            }}
+          >
+            No Connection Requests
           </Text>
         </View>
       )}
@@ -664,9 +621,19 @@ const OngoingTab = (props) => {
         </View>
       </Modal>
       {/* Neighbors */}
-      <Text style={{ marginLeft: 23, fontSize: 19, color: Colors.grey }}>
+      <Text
+        style={{
+          marginLeft: 23,
+          fontSize: 19,
+          color: Colors.grey,
+          marginTop: 20,
+        }}
+      >
         Neighbors You May Know
       </Text>
+      {neighboursData.length === 0 && !nLoading && (
+        <Empty text="No Nearby Connections Found" marginTop={100} />
+      )}
       <ScrollView showsVerticalScrollIndicator={false}>
         {neighboursData &&
           neighboursData.map((n) => {

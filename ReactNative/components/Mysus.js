@@ -256,6 +256,8 @@ const CategoryScreen = ({ navigation, route }) => {
                         padding: 10,
                         borderWidth: 0.5,
                         borderColor: "gray",
+                        right: 25,
+                        top: -10,
                       }}
                     >
                       <TouchableOpacity

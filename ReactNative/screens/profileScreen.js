@@ -28,6 +28,9 @@ import { uploadImageToCloudinary } from "../utils";
 import { getId, getUserActivities, userUpdate } from "../apis/apis";
 import { DEFAULT_USER_PIC } from "../config";
 import { useFocusEffect } from "@react-navigation/native";
+import Empty from "../components/EmptyActivity";
+import { useSelector } from "react-redux";
+import Placeholder from "../components/Placeholders/PlaceholderActivity";
 
 const { width } = Dimensions.get("window");
 
@@ -49,6 +52,7 @@ export const handleNavigation = (activity) => {
 };
 
 const EditProfileScreen = (props) => {
+  const user = useSelector((state) => state.authReducer?.activeUser?.user);
   const [update, setUpdate] = useState(false);
   const [uploadImage, setUploadImage] = useState(false);
   const [removeImageToast, setRemoveImageToast] = useState(false);
@@ -57,7 +61,6 @@ const EditProfileScreen = (props) => {
   const [removeImage, setRemoveImage] = useState(false);
   const [camera, setShowCamera] = useState(false);
   const [cameraNotGranted, setCameraNotGranted] = useState(false);
-  const [user, setUser] = useState({});
   const [activites, setActivites] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -102,20 +105,20 @@ const EditProfileScreen = (props) => {
     }, [])
   );
 
-  useLayoutEffect(() => {
-    const getUser = async () => {
-      try {
-        const userData = await AsyncStorage.getItem("userData");
-        if (userData) {
-          let parseUserdata = JSON.parse(userData);
-          setUser(parseUserdata.user);
-        }
-      } catch (error) {
-        console.log("assyn storage error", error.message);
-      }
-    };
-    getUser();
-  }, []);
+  // useLayoutEffect(() => {
+  //   const getUser = async () => {
+  //     try {
+  //       const userData = await AsyncStorage.getItem("userData");
+  //       if (userData) {
+  //         let parseUserdata = JSON.parse(userData);
+  //         setUser(parseUserdata.user);
+  //       }
+  //     } catch (error) {
+  //       console.log("assyn storage error", error.message);
+  //     }
+  //   };
+  //   getUser();
+  // }, []);
 
   const toggleCloseUploadImage = () => {
     setUploadImage(!uploadImage);
@@ -274,32 +277,9 @@ const EditProfileScreen = (props) => {
         </View>
 
         {activites.length === 0 && !isLoading && (
-          <TouchableOpacity
-            style={{
-              ...Default.shadow,
-              backgroundColor: Colors.white,
-              marginTop: 30,
-              marginHorizontal: 13,
-              //    marginBottom: 27,
-              borderRadius: 10,
-              // overflow: "hidden",
-              flexDirection: isRtl ? "row-reverse" : "row",
-              paddingVertical: Default.fixPadding,
-            }}
-          >
-            <View
-              style={{
-                flex: 2,
-                //  paddingHorizontal: Default.fixPadding * 1.5,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Text>No Activity Today</Text>
-            </View>
-          </TouchableOpacity>
+          <Empty text="No Activity Today" marginTop={100} />
         )}
-
+        {isLoading && activites.length === 0 && <Placeholder />}
         {activites.length > 0 &&
           activites.map((activity) => (
             <View key={activity._id}>

@@ -229,7 +229,7 @@ const PayPalScreen = ({ navigation }) => {
               album: ImagePickerAlbum,
             }}
             onSave={(assets) => {
-              selectedMedia([...selectedMedia, ...assets]);
+              // selectedMedia([...selectedMedia, ...assets]);
               setOpen(false);
             }}
             onCancel={() => {
@@ -398,6 +398,7 @@ const PayPalScreen = ({ navigation }) => {
                 flex: 9.3,
                 marginHorizontal: Default.fixPadding,
                 textAlign: isRtl ? "right" : "left",
+                fontSize: 15,
               }}
               onChangeText={(text) => setTitle(text)}
             />
@@ -516,6 +517,7 @@ const PayPalScreen = ({ navigation }) => {
                 flex: 9.3,
                 marginHorizontal: Default.fixPadding,
                 textAlign: isRtl ? "right" : "left",
+                fontSize: 15,
               }}
               onChangeText={(text) => setDescription(text)}
             />

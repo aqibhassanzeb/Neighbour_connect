@@ -395,7 +395,7 @@ const ServicesScreen = ({ navigation }) => {
                           name="ellipsis-vertical"
                           size={24}
                           color="black"
-                          marginLeft={193}
+                          marginLeft={170}
                           marginTop={10}
                         />
                       </TouchableOpacity>
@@ -662,6 +662,7 @@ const styles = StyleSheet.create({
   dropdown: {
     //  position: 'absolute',
     top: 30,
+    right: -10,
     marginRight: 8,
     backgroundColor: "white",
     width: 80,

@@ -302,7 +302,7 @@ const ChatScreen = (props) => {
                     </View>
                   </View>
                 </TouchableOpacity>
-                <View>
+                <View style={{ position: "absolute", right: 20 }}>
                   {user._id !== topic.posted_by._id && (
                     <TouchableOpacity
                       onPress={() => {

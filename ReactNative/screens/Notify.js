@@ -21,6 +21,7 @@ import Loader from "../components/loader";
 import { useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import useGetUser from "../components/useGetUser";
+import EmptyList from "../components/Placeholders/PlaceholderList";
 
 const NotificationScreen = ({ navigation }) => {
   const { queryParams } = useSelector((state) => state.notifications);
@@ -294,8 +295,8 @@ const NotificationScreen = ({ navigation }) => {
           {tr("Notifications")}
         </Text>
       </View>
-      {isLoading && <Loader />}
-      {notificationList.length === 0 ? (
+      {isLoading && listData.length === 0 && <EmptyList height={100} />}
+      {notificationList.length === 0 && !isLoading ? (
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >

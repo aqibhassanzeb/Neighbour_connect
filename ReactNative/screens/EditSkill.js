@@ -8,15 +8,12 @@ import {
   BackHandler,
   StyleSheet,
   Dimensions,
-  Button,
-  image,
   Modal,
   TextInput,
+  Alert,
 } from "react-native";
 
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
-import Octicons from "react-native-vector-icons/Octicons";
-import { Slider } from "react-native-range-slider-expo";
 import CalendarPicker from "react-native-calendar-picker";
 import moment from "moment";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -27,13 +24,12 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { FontAwesome5 } from "@expo/vector-icons";
-import axios from "axios";
 import Loader from "../components/loader";
 import { getCategories, updateImages, updateSkill } from "../apis/apis";
-import { extractDays, extractTime } from "../utils";
-import Swiper from "react-native-swiper";
+import { DAYS } from "../utils";
 import { useDispatch, useSelector } from "react-redux";
 import { clearLocation } from "../redux/loanandfoundSlice";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const { width, height } = Dimensions.get("window");
 const Checkbox = ({ label, onChange, checked }) => {
@@ -53,7 +49,9 @@ const PayPalScreen = ({ navigation, route }) => {
   const { data } = route.params;
   const { selectedLocation } = useSelector((state) => state.loanandfound);
 
-  const [checkedValues, setCheckedValues] = useState([]);
+  const [checkedValues, setCheckedValues] = useState(
+    data?.days?.map((day) => day.name)
+  );
   const [oldImages, setOldImages] = useState(data.images);
   const [image, setImage] = useState(null);
   const [selectedImages, setSelectedImages] = useState([]);
@@ -64,14 +62,13 @@ const PayPalScreen = ({ navigation, route }) => {
   const [dropdownOpens, setDropdownOpens] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState(data.skill_level);
   const [dropdownOpensds, setDropdownOpensds] = useState(false);
-  const [selectedOptionsds, setSelectedOptionsds] = useState();
+  const [selectedOptionsds, setSelectedOptionsds] = useState(data.days);
   const [dropdownOpensd, setDropdownOpensd] = useState(false);
   const [selectedOptionsd, setSelectedOptionsd] = useState(
     data.selected_visibility
   );
   const [checked, setChecked] = useState(false);
   const [selectedValue, setSelectedValue] = useState("");
-  const [pricePerHour, setPricePerHour] = useState(data.price_per_hour);
   const [modalVisible, setModalVisible] = useState(false);
   const [email, setEmail] = useState();
   const [timeModal, setTimeModal] = useState(false);
@@ -84,12 +81,20 @@ const PayPalScreen = ({ navigation, route }) => {
   const [description, setDescription] = useState(data.description);
   const [Categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [price, setPrice] = useState(data.price);
+  const [priceUnit, setPriceUnit] = useState(data.price_unit);
+  const [days, setDays] = useState(data.days);
+  const [open, setOpen] = useState(false);
+  const [priceUnitDropdown, setPriceUnitDropdown] = useState(false);
+  const [timeDetails, setTimeDetails] = useState({});
 
   const { t, i18n } = useTranslation();
 
   const handleCheckboxChange = (value) => {
     if (checkedValues.includes(value)) {
       setCheckedValues(checkedValues.filter((item) => item !== value));
+      const removeDay = days.filter((day) => value !== day.name);
+      setDays(removeDay);
     } else {
       setCheckedValues([...checkedValues, value]);
     }
@@ -161,22 +166,29 @@ const PayPalScreen = ({ navigation, route }) => {
 
     if (!result.canceled) {
       setSelectedImages([...selectedImages, result.assets[0]]);
-    } else {
-      alert("You did not select any image.");
     }
   };
 
   const dispatch = useDispatch();
 
   const handleUpdate = async () => {
+    if (oldImages?.length === 0 && selectedImages.length === 0) {
+      alert("No Images");
+      return;
+    }
+    if (days.length < 0) {
+      alert("Please Select Days");
+      return;
+    }
     const newData = {
       _id: data._id,
       category: selectedOption._id,
       description: description,
       skill_level: selectedOptions,
       time: String(time),
-      price_per_hour: pricePerHour,
-      selected_day: checkedValues,
+      price: price,
+      price_unit: priceUnit,
+      days: days,
       selected_visibility: selectedOptionsd,
     };
     if (selectedLocation.name) {
@@ -277,6 +289,82 @@ const PayPalScreen = ({ navigation, route }) => {
     const updatedImages = oldImages.filter((uri, i) => i !== index);
     setOldImages(updatedImages);
   };
+
+  function setDayTime(value) {
+    const { nativeEvent, type } = value;
+
+    if (type === "dismissed") {
+      setTimeModal(false);
+    } else if (type === "set") {
+      setTimeModal(false);
+
+      const updatedDays = days.map((day) => {
+        if (day.name === timeDetails.day) {
+          if (timeDetails.type === "startHours") {
+            return { ...day, startHours: nativeEvent.timestamp };
+          } else if (timeDetails.type === "endHours") {
+            return { ...day, endHours: nativeEvent.timestamp };
+          }
+        } else {
+          return day;
+        }
+      });
+
+      const dayExists = updatedDays.some((day) => day.name === timeDetails.day);
+
+      if (!dayExists) {
+        const newDay = {
+          name: timeDetails.day,
+          startHours:
+            timeDetails.type === "startHours"
+              ? nativeEvent.timestamp
+              : undefined,
+          endHours:
+            timeDetails.type === "endHours" ? nativeEvent.timestamp : undefined,
+        };
+
+        updatedDays.push(newDay);
+      }
+
+      setDays(updatedDays);
+    }
+  }
+
+  function showStartValue(dayName) {
+    const foundDay = days.find((day) => day.name === dayName);
+    return foundDay && foundDay.startHours
+      ? moment(foundDay.startHours).format("LT")
+      : false;
+  }
+
+  function showEndValue(dayName) {
+    const foundDay = days.find((day) => day.name === dayName);
+    return foundDay && foundDay.endHours
+      ? moment(foundDay.endHours).format("LT")
+      : false;
+  }
+
+  function validateDays() {
+    let errorMessages = "";
+    for (const day of checkedValues) {
+      const dayEntry = days.find((entry) => entry.name === day);
+      if (!dayEntry) {
+        errorMessages += `Empty Start & End Hour for ${day}\n`;
+      } else {
+        if (dayEntry.startHours === undefined) {
+          errorMessages += `Empty Start Hour for ${day}\n `;
+        }
+        if (dayEntry.endHours === undefined) {
+          errorMessages += `Empty End Hour for ${day}\n`;
+        }
+      }
+    }
+    if (errorMessages !== "") {
+      Alert.alert("Error", errorMessages, [{ text: "OK", onPress: () => {} }]);
+      return false;
+    }
+    return true;
+  }
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       {isLoading && <Loader />}
@@ -312,13 +400,24 @@ const PayPalScreen = ({ navigation, route }) => {
           style={{
             alignItems: "center",
             justifyContent: "center",
-            flexDirection: "row",
             marginTop: 20,
           }}
         >
-          <TouchableOpacity onPress={pickImageAsync}>
-            <Ionicons name="ios-camera" size={80} color="black" />
-          </TouchableOpacity>
+          {selectedImages.length + oldImages.length === 0 ||
+          selectedImages.length + oldImages.length < 3 ? (
+            <TouchableOpacity onPress={pickImageAsync}>
+              <MaterialCommunityIcons
+                name="camera-plus"
+                size={60}
+                color="grey"
+              />
+            </TouchableOpacity>
+          ) : (
+            <MaterialCommunityIcons name="camera" size={60} color="grey" />
+          )}
+          <Text style={{ fontSize: 16, letterSpacing: 2, marginLeft: 10 }}>
+            {selectedImages.length + oldImages.length} / 3
+          </Text>
         </View>
 
         <View
@@ -332,6 +431,7 @@ const PayPalScreen = ({ navigation, route }) => {
               style={{
                 color: Colors.black,
                 marginLeft: 135,
+                marginBottom: 10,
               }}
             >
               Update Pictures
@@ -476,6 +576,11 @@ const PayPalScreen = ({ navigation, route }) => {
                   <TouchableOpacity
                     key={cat._id}
                     onPress={() => handleOptionSelect(cat)}
+                    style={{
+                      borderBottomWidth: 1,
+                      borderBottomColor: "#e2e8f0",
+                      paddingVertical: 2,
+                    }}
                   >
                     <Text style={{ padding: 10 }}>{cat.name}</Text>
                   </TouchableOpacity>
@@ -656,11 +761,23 @@ const PayPalScreen = ({ navigation, route }) => {
           </View>
           {dropdownOpens && (
             <View style={styles.dropdowns}>
-              <TouchableOpacity onPress={() => handleOptionSelects("Skilled ")}>
+              <TouchableOpacity
+                onPress={() => handleOptionSelects("Skilled ")}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#e2e8f0",
+                  paddingVertical: 2,
+                }}
+              >
                 <Text style={{ padding: 10 }}>Skilled </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => handleOptionSelects("Semi Skilled ")}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#e2e8f0",
+                  paddingVertical: 2,
+                }}
               >
                 <Text style={{ padding: 10 }}>Semi Skilled</Text>
               </TouchableOpacity>
@@ -699,7 +816,7 @@ const PayPalScreen = ({ navigation, route }) => {
               }}
             />
           </View>
-          <View style={{ flex: 1 }}>
+          {/* <View style={{ flex: 1 }}>
             <TouchableOpacity
               onPress={() => setTimeModal(true)}
               style={{
@@ -741,50 +858,151 @@ const PayPalScreen = ({ navigation, route }) => {
               is24Hour={true}
               onChange={onTimeSelected}
             />
-          )}
-          <View
-            style={{
-              ...Default.shadow,
-              borderRadius: 10,
-              backgroundColor: Colors.white,
-              padding: Default.fixPadding * 1.5,
-              flexDirection: isRtl ? "row-reverse" : "row",
-              alignItems: "center",
-              marginTop: Default.fixPadding * 3,
-            }}
-          >
-            <Ionicons
-              name="md-pricetag"
-              color={Colors.black}
-              size={20}
+          )} */}
+          <View style={{ flexDirection: "row", gap: 15 }}>
+            <View
               style={{
-                flex: 0.7,
-              }}
-            />
-            <TextInput
-              keyboardType="numeric"
-              onChangeText={handlePriceChange}
-              value={pricePerHour}
-              placeholder="Price per hour"
-              placeholderTextColor={Colors.black}
-              selectionColor={Colors.primary}
-              style={{
-                flex: 9.3,
-                marginHorizontal: Default.fixPadding,
-                textAlign: isRtl ? "right" : "left",
-              }}
-            />
-            <Text
-              style={{
-                color: "black",
-
-                marginHorizontal: Default.fixPadding,
-                textAlign: isRtl ? "right" : "left",
+                ...Default.shadow,
+                borderRadius: 10,
+                backgroundColor: Colors.white,
+                paddingTop: Default.fixPadding * 1.5,
+                paddingLeft: Default.fixPadding * 1.5,
+                flexDirection: isRtl ? "row-reverse" : "row",
+                marginTop: Default.fixPadding * 3,
+                width: 200,
+                height: 53,
               }}
             >
-              {" "}
-              Rs/hr
-            </Text>
+              <View>
+                <Ionicons
+                  name="md-pricetag"
+                  color={Colors.grey}
+                  size={20}
+                  style={{
+                    flex: 0.7,
+                    marginRight: 14,
+                  }}
+                />
+              </View>
+              <View>
+                <TextInput
+                  keyboardType="numeric"
+                  placeholder="Price (Rs)"
+                  placeholderTextColor={"gray"}
+                  value={price}
+                  onChangeText={(text) => setPrice(text)}
+                  style={{ width: 150 }}
+                />
+              </View>
+            </View>
+            <View>
+              <View
+                style={{
+                  ...Default.shadow,
+                  borderRadius: 10,
+                  backgroundColor: Colors.white,
+                  padding: Default.fixPadding * 1.5,
+                  flexDirection: isRtl ? "row-reverse" : "row",
+                  marginTop: Default.fixPadding * 3,
+                  width: 165,
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => setPriceUnitDropdown(!priceUnitDropdown)}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingRight: 1,
+                    color: "grey",
+                    width: 150,
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      marginLeft: 15,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        marginTop: 3,
+                        color: "grey",
+                      }}
+                    >
+                      {priceUnit}
+                    </Text>
+                    <View
+                      style={{
+                        color: "grey",
+
+                        position: "absolute",
+                        marginLeft: 290,
+                      }}
+                    >
+                      <Ionicons
+                        name={priceUnitDropdown ? "chevron-up" : "chevron-down"}
+                        size={24}
+                        color="grey"
+                      />
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </View>
+              {priceUnitDropdown && (
+                <View style={styles.dropdowns}>
+                  <TouchableOpacity
+                    onPress={() => handlePriceOption("Hour")}
+                    style={{
+                      borderBottomWidth: 1,
+                      borderBottomColor: "#e2e8f0",
+                      paddingVertical: 2,
+                    }}
+                  >
+                    <Text style={{ padding: 10 }}>Hour</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handlePriceOption("Day")}
+                    style={{
+                      borderBottomWidth: 1,
+                      borderBottomColor: "#e2e8f0",
+                      paddingVertical: 2,
+                    }}
+                  >
+                    <Text style={{ padding: 10 }}>Day</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handlePriceOption("Task")}
+                    style={{
+                      borderBottomWidth: 1,
+                      borderBottomColor: "#e2e8f0",
+                      paddingVertical: 2,
+                    }}
+                  >
+                    <Text style={{ padding: 10 }}>Task</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handlePriceOption("Item")}
+                    style={{
+                      borderBottomWidth: 1,
+                      borderBottomColor: "#e2e8f0",
+                      paddingVertical: 2,
+                    }}
+                  >
+                    <Text style={{ padding: 10 }}>Item</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handlePriceOption("Project")}
+                    style={{
+                      borderBottomWidth: 1,
+                      borderBottomColor: "#e2e8f0",
+                      paddingVertical: 2,
+                    }}
+                  >
+                    <Text style={{ padding: 10 }}>Project</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
           </View>
 
           <View
@@ -802,7 +1020,7 @@ const PayPalScreen = ({ navigation, route }) => {
             <View>
               <Ionicons
                 name="sunny"
-                color={Colors.black}
+                color={Colors.grey}
                 size={20}
                 style={{
                   flex: 0.7,
@@ -816,7 +1034,7 @@ const PayPalScreen = ({ navigation, route }) => {
                   flexDirection: "row",
                   alignItems: "center",
                   paddingRight: 1,
-                  color: "black",
+                  color: "grey",
                 }}
               >
                 <View
@@ -828,14 +1046,14 @@ const PayPalScreen = ({ navigation, route }) => {
                   <Text
                     style={{
                       marginTop: 3,
-                      color: "black",
+                      color: "grey",
                     }}
                   >
-                    {extractDays(data.selected_day)}
+                    Days
                   </Text>
                   <View
                     style={{
-                      color: "black",
+                      color: "grey",
 
                       position: "absolute",
                       marginLeft: 290,
@@ -844,7 +1062,7 @@ const PayPalScreen = ({ navigation, route }) => {
                     <Ionicons
                       name={dropdownOpensds ? "chevron-up" : "chevron-down"}
                       size={24}
-                      color="black"
+                      color="grey"
                     />
                   </View>
                 </View>
@@ -854,45 +1072,129 @@ const PayPalScreen = ({ navigation, route }) => {
           {dropdownOpensds && (
             <View style={styles.dropdownsds}>
               <View style={styles.container}>
-                <Text style={styles.label}>Select Days:</Text>
-                <Checkbox
-                  label="Monday"
-                  checked={checkedValues.includes("Monday")}
-                  onChange={() => handleCheckboxChange("Monday")}
-                />
-                <Checkbox
-                  label="Tuesday"
-                  checked={checkedValues.includes("Tuesday")}
-                  onChange={() => handleCheckboxChange("Tuesday")}
-                />
-                <Checkbox
-                  label="Wednesday"
-                  checked={checkedValues.includes("Wednesday")}
-                  onChange={() => handleCheckboxChange("Wednesday")}
-                />
-                <Checkbox
-                  label="Thursday"
-                  checked={checkedValues.includes("Thursday")}
-                  onChange={() => handleCheckboxChange("Thursday")}
-                />
-                <Checkbox
-                  label="Friday"
-                  checked={checkedValues.includes("Friday")}
-                  onChange={() => handleCheckboxChange("Friday")}
-                />
-                <Checkbox
-                  label="Saturday"
-                  checked={checkedValues.includes("Saturday")}
-                  onChange={() => handleCheckboxChange("Saturday")}
-                />
-                <Checkbox
-                  label="Sunday"
-                  checked={checkedValues.includes("Sunday")}
-                  onChange={() => handleCheckboxChange("Sunday")}
-                />
+                <View style={{ flexDirection: "row", paddingBottom: 10 }}>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      paddingBottom: 10,
+                    }}
+                  >
+                    Select Days:
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      paddingBottom: 10,
+                      marginLeft: 80,
+                    }}
+                  >
+                    Start Hour
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      paddingBottom: 10,
+                      marginLeft: 25,
+                    }}
+                  >
+                    End Hour
+                  </Text>
+                </View>
+                {DAYS.map((day) => (
+                  <View key={day}>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Checkbox
+                        label={day}
+                        checked={checkedValues.includes(day)}
+                        onChange={() => handleCheckboxChange(day)}
+                      />
+                      <View style={{ flexDirection: "row", gap: 20 }}>
+                        <TouchableOpacity
+                          onPress={() => {
+                            if (checkedValues.includes(day)) {
+                              setTimeModal(true);
+                              setTimeDetails({ day, type: "startHours" });
+                            } else {
+                              Alert.alert("Error", `${day} is not selected`, [
+                                { text: "OK", onPress: () => {} },
+                              ]);
+                            }
+                          }}
+                          style={{ flexDirection: "row", gap: 3 }}
+                        >
+                          <MaterialIcons
+                            name="access-time"
+                            size={20}
+                            color={Colors.grey}
+                          />
+                          <Text
+                            numberOfLines={1}
+                            style={{
+                              color: showStartValue(day) ? "black" : "gray",
+                              fontSize: 14,
+                            }}
+                          >
+                            {showStartValue(day)
+                              ? showStartValue(day)
+                              : "00:00"}
+                          </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => {
+                            if (checkedValues.includes(day)) {
+                              setTimeModal(true);
+                              setTimeDetails({ day, type: "endHours" });
+                            } else {
+                              Alert.alert("Error", `${day} is not selected`, [
+                                { text: "OK", onPress: () => {} },
+                              ]);
+                            }
+                          }}
+                          style={{ flexDirection: "row", gap: 3 }}
+                        >
+                          <MaterialIcons
+                            name="access-time"
+                            size={20}
+                            color={Colors.grey}
+                          />
+                          <Text
+                            numberOfLines={1}
+                            style={{
+                              color: showEndValue(day) ? "black" : "gray",
+                              fontSize: 14,
+                            }}
+                          >
+                            {showEndValue(day) ? showEndValue(day) : "00:00"}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                    <View
+                      style={{
+                        height: 2,
+                        backgroundColor: "lightgray",
+                        marginVertical: 10,
+                      }}
+                    />
+                  </View>
+                ))}
+                {timeModal && (
+                  <DateTimePicker
+                    value={new Date()}
+                    onChange={(value) => setDayTime(value)}
+                    mode="time"
+                  />
+                )}
               </View>
             </View>
           )}
+
           <View
             style={{
               ...Default.shadow,
@@ -961,11 +1263,21 @@ const PayPalScreen = ({ navigation, route }) => {
             <View style={styles.dropdowns}>
               <TouchableOpacity
                 onPress={() => handleOptionSelectsd("Neighborhood ")}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#e2e8f0",
+                  paddingVertical: 2,
+                }}
               >
                 <Text style={{ padding: 10 }}>Neighborhood </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => handleOptionSelectsd("Connection ")}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#e2e8f0",
+                  paddingVertical: 2,
+                }}
               >
                 <Text style={{ padding: 10 }}>Connection</Text>
               </TouchableOpacity>
@@ -984,6 +1296,7 @@ const PayPalScreen = ({ navigation, route }) => {
             marginTop: Default.fixPadding * 2,
             padding: Default.fixPadding * 1.2,
             marginHorizontal: Default.fixPadding * 2,
+            marginBottom: 20,
           }}
         >
           <Text style={{ ...Fonts.SemiBold18white }}>{tr("Update")}</Text>
@@ -1208,36 +1521,27 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   dropdownsd: {
-    width: 390,
-    height: 460,
     backgroundColor: "#fafafa",
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#ddd",
     paddingHorizontal: 10,
-    paddingRight: 100,
     zIndex: 21,
   },
   dropdowns: {
-    width: 390,
-    height: 90,
     backgroundColor: "#fafafa",
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#ddd",
     paddingHorizontal: 10,
-    paddingRight: 100,
     zIndex: 21,
   },
   dropdownsds: {
-    width: 390,
-    height: 300,
     backgroundColor: "#fafafa",
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#ddd",
     paddingHorizontal: 10,
-    paddingRight: 100,
     zIndex: 21,
   },
 });

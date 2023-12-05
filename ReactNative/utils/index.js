@@ -132,3 +132,17 @@ export function hasPassed15Minutes(dateTime) {
   const minutesDifference = currentDateTime.diff(targetDateTime, "minutes");
   return minutesDifference >= 15;
 }
+
+export function formatText(text) {
+  return text?.replace(/\n/g, " ");
+}
+
+export const DAYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];

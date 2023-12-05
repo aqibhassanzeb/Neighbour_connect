@@ -19,6 +19,7 @@ import { useEffect } from "react";
 import Loader from "../components/loader";
 import { extractTime } from "../utils";
 import { useFocusEffect } from "@react-navigation/native";
+import Empty from "../components/EmptyChat";
 
 const MessagesScreen = ({ navigation, route }) => {
   const { t, i18n } = useTranslation();
@@ -279,28 +280,32 @@ const MessagesScreen = ({ navigation, route }) => {
           </View>
         </TouchableOpacity>
       </View>
-
+      {!isLoading && messageList.length === 0 && (
+        <Empty text="No Chats Found" marginTop={250} />
+      )}
       {selectedMessages.length > 0 && renderSelectDeleteBar()}
 
-      <FlatList
-        ListHeaderComponent={
-          <Text
-            style={{
-              top: 23,
-              left: 20,
-              fontSize: 23,
-              fontWeight: 900,
-              marginBottom: 30,
-            }}
-          >
-            Chats
-          </Text>
-        }
-        data={messageList}
-        renderItem={renderItemMessage}
-        keyExtractor={(item) => item._id}
-        showsVerticalScrollIndicator={false}
-      />
+      {messageList.length > 0 && (
+        <FlatList
+          ListHeaderComponent={
+            <Text
+              style={{
+                top: 23,
+                left: 20,
+                fontSize: 23,
+                fontWeight: 900,
+                marginBottom: 30,
+              }}
+            >
+              Chats
+            </Text>
+          }
+          data={messageList}
+          renderItem={renderItemMessage}
+          keyExtractor={(item) => item._id}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </SafeAreaView>
   );
 };

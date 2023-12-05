@@ -8,44 +8,45 @@ import {
   Image,
   Dimensions,
   BackHandler,
-  TextInput,
   Modal,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Colors, Default, Fonts } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
-
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import * as ImagePicker from "expo-image-picker";
 import { BottomSheet } from "react-native-btr";
 import { Camera } from "expo-camera";
-import SnackbarToast from "../components/snackbarToast";
-import CameraModule from "../components/cameraModule";
-import { NeighbourMayKnow, sendRequest } from "../apis/apis";
+import { sendRequest, userGetbyId } from "../apis/apis";
+import { useSelector } from "react-redux";
+import { useFocusEffect } from "@react-navigation/native";
+import { DotIndicator } from "react-native-indicators";
 
 const { width } = Dimensions.get("window");
 
 const EditProfileScreen = (props) => {
+  const user = useSelector((state) => state.authReducer.activeUser?.user);
   const [showFirstIcon, setShowFirstIcon] = useState(true);
   const [already, setAlready] = useState(false);
   const connectionDetails = props.route.params?.user || {};
 
   const [isClicked, setIsClicked] = useState(false);
+  const [PLoading, setPLoading] = useState(false);
+  const [isRequested, setIsRequested] = useState(false);
 
   const handleButtonClick = async () => {
     try {
       let send = await sendRequest({ receiver_id: connectionDetails._id });
       if (send.status == 200) {
-        setAlready(true);
-        setIsClicked(true);
+        setIsRequested(true);
         setShowFirstIcon(false);
       } else {
         alert(send.data.error);
       }
     } catch (error) {
       console.log(error);
-      alert("something went wrong!");
+      alert("Something went wrong!");
     } finally {
     }
   };
@@ -128,6 +129,35 @@ const EditProfileScreen = (props) => {
       setCameraNotGranted(true);
     }
   };
+
+  async function getUserInfo() {
+    try {
+      setPLoading(true);
+      const response = await userGetbyId({ _id: connectionDetails._id });
+      setPLoading(false);
+      if (response.status == 200) {
+        const userInfo = response.data.data;
+        const isRequested = userInfo?.requests.some(
+          (req) => req.sender === user._id
+        );
+        if (isRequested) {
+          setIsRequested(isRequested);
+          setShowFirstIcon(false);
+        }
+      }
+    } catch (error) {
+      setPLoading(false);
+      console.log("File Profile1", error.message);
+    }
+  }
+
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log("CALLED");
+      getUserInfo();
+    }, [connectionDetails])
+  );
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       <View
@@ -207,7 +237,7 @@ const EditProfileScreen = (props) => {
 
           {dropdownOpens && (
             <View style={[styles.dropdown]}>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={() => {
                   setCancelModal(true);
                   //  setSelectedId(item.key);
@@ -219,7 +249,7 @@ const EditProfileScreen = (props) => {
               >
                 <Ionicons name="close-circle-outline" size={23} color="black" />
                 <Text style={styles.dropdownButtonText}>Block</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <TouchableOpacity
                 style={[
                   styles.dropdownButton,
@@ -239,7 +269,7 @@ const EditProfileScreen = (props) => {
           )}
         </View>
 
-        <View
+        {/* <View
           style={{
             flexDirection: "row",
             position: "absolute",
@@ -284,7 +314,13 @@ const EditProfileScreen = (props) => {
               )}
 
               <Text style={{ ...Fonts.SemiBold18white }}>
-                {isClicked ? "pending" : "connect"}
+                {PLoading ? (
+                  <DotIndicator color="white" size={10} />
+                ) : isRequested ? (
+                  "pending"
+                ) : (
+                  "connect"
+                )}
               </Text>
             </View>
           </TouchableOpacity>
@@ -316,7 +352,7 @@ const EditProfileScreen = (props) => {
               <Text style={{ ...Fonts.SemiBold18white }}>{tr("message")}</Text>
             </View>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </ScrollView>
 
       {/* <Modal
@@ -621,8 +657,22 @@ const EditProfileScreen = (props) => {
               />
             )}
 
-            <Text style={{ ...Fonts.SemiBold18white }}>
-              {isClicked ? "Pending" : "Connect"}
+            <Text
+              style={{
+                ...Fonts.SemiBold18white,
+                width: 75,
+              }}
+            >
+              {PLoading ? (
+                <Text>
+                  {" "}
+                  <DotIndicator style={{}} size={3} color="white" />
+                </Text>
+              ) : isRequested ? (
+                "Pending"
+              ) : (
+                "Connect"
+              )}
             </Text>
           </View>
         </TouchableOpacity>
@@ -699,7 +749,8 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     //  position: 'absolute',
-    top: 20,
+    top: 40,
+    paddingLeft: 10,
     marginRight: 15,
     backgroundColor: "white",
     width: 120,

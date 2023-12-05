@@ -75,7 +75,7 @@ const OngoingTab = (props) => {
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {loader && <Placeholder />}
-        {newData.length > 0 ? (
+        {!loader && newData.length > 0 ? (
           <FlatList
             data={newData}
             renderItem={({ item }) => (
@@ -112,8 +112,7 @@ const OngoingTab = (props) => {
                     style={{
                       width: 30,
                       height: 30,
-                      borderTopLeftRadius: 10,
-                      borderTopRightRadius: 10,
+                      borderRadius: 50,
                     }}
                   />
                   <Text>{item?.posted_by.name}</Text>

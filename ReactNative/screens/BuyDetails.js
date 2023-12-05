@@ -248,43 +248,11 @@ const Losted = ({ route }) => {
             </TouchableOpacity>
             <View
               style={{
-                flex: 7,
-                alignItems: isRtl ? "flex-end" : "flex-start",
-                marginLeft: 50,
-              }}
-            >
-              <Text
-                style={{
-                  ...Fonts.SemiBold16black,
-                  marginTop: Default.fixPadding * 1.5,
-                }}
-              >
-                {item.title}
-              </Text>
-
-              <View
-                style={{
-                  flexDirection: isRtl ? "row-reverse" : "row",
-                  alignItems: "center",
-                  marginTop: Default.fixPadding * 0.5,
-                }}
-              >
-                <Text
-                  style={{
-                    ...Fonts.SemiBold12grey,
-                    marginLeft: Default.fixPadding * 0.3,
-                  }}
-                >
-                  RS {item.price}
-                </Text>
-              </View>
-            </View>
-
-            <View
-              style={{
                 justifyContent: "center",
                 alignItems: "center",
-                marginRight: 20,
+                position: "absolute",
+                right: 10,
+                top: 65,
               }}
             >
               {userId !== item.posted_by._id && (
@@ -303,11 +271,53 @@ const Losted = ({ route }) => {
                     backgroundColor: Colors.white,
                     justifyContent: "center",
                     alignItems: "center",
+                    // position: "absolute",
+                    // left: 90,
                   }}
                 >
                   <Ionicons name="ios-flag-outline" size={24} color="black" />
                 </TouchableOpacity>
               )}
+            </View>
+            <View
+              style={{
+                flex: 7,
+                alignItems: isRtl ? "flex-end" : "flex-start",
+                marginLeft: 20,
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: 170,
+                }}
+              >
+                <Text
+                  style={{
+                    ...Fonts.SemiBold16black,
+                    marginTop: Default.fixPadding * 1.5,
+                  }}
+                >
+                  {item.title}
+                </Text>
+              </View>
+
+              <View
+                style={{
+                  flexDirection: isRtl ? "row-reverse" : "row",
+                  alignItems: "center",
+                  marginTop: Default.fixPadding * 0.5,
+                }}
+              >
+                <Text
+                  style={{
+                    ...Fonts.SemiBold12grey,
+                    marginLeft: Default.fixPadding * 0.3,
+                  }}
+                >
+                  RS {item.price}
+                </Text>
+              </View>
             </View>
           </View>
 

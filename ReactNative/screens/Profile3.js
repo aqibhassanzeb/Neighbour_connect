@@ -27,6 +27,7 @@ import moment from "moment";
 import { handleNavigation } from "./profileScreen";
 import useGetUser from "../components/useGetUser";
 import { UIActivityIndicator } from "react-native-indicators";
+import Empty from "../components/EmptyActivity";
 
 const { width, height } = Dimensions.get("window");
 
@@ -369,6 +370,7 @@ const EditProfileScreen = (props) => {
               justifyContent: "center",
               ...Default.shadow,
               paddingVertical: Default.fixPadding * 4,
+              marginTop: 200,
             }}
           >
             <UIActivityIndicator
@@ -387,30 +389,7 @@ const EditProfileScreen = (props) => {
           </View>
         )}
         {activites.length === 0 && !isLoading && (
-          <TouchableOpacity
-            style={{
-              ...Default.shadow,
-              backgroundColor: Colors.white,
-              marginTop: 30,
-              marginHorizontal: 13,
-              //    marginBottom: 27,
-              borderRadius: 10,
-              // overflow: "hidden",
-              flexDirection: isRtl ? "row-reverse" : "row",
-              paddingVertical: Default.fixPadding,
-            }}
-          >
-            <View
-              style={{
-                flex: 2,
-                //  paddingHorizontal: Default.fixPadding * 1.5,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Text>No Activity Today</Text>
-            </View>
-          </TouchableOpacity>
+          <Empty text="No Activity Today" marginTop={150} />
         )}
 
         {activites.length > 0 &&

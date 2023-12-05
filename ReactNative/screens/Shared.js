@@ -71,11 +71,11 @@ const Losted = ({ navigation, route }) => {
   const [likeAdd, setLikeAdd] = useState(false);
   const onToggleSnackBarAdd = () => setLikeAdd(false);
 
-  const [readMore, setReadMore] = useState(false);
+  // const [readMore, setReadMore] = useState(false);
 
-  const days = post.skill?.selected_day;
+  // const days = post.skill?.selected_day;
 
-  const formattedDays = extractDays(days);
+  // const formattedDays = extractDays(days);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
@@ -295,7 +295,7 @@ const Losted = ({ navigation, route }) => {
                   {tr("description")}
                 </Text>
 
-                {readMore ? (
+                {/* {readMore ? (
                   <Text style={{ ...Fonts.Medium14grey }}>
                     {post.skill.description}
                     <Text
@@ -317,7 +317,7 @@ const Losted = ({ navigation, route }) => {
                       {tr("readMore")}
                     </Text>
                   </Text>
-                )}
+                )} */}
                 <Text
                   style={{
                     ...Fonts.SemiBold16primary,
@@ -345,7 +345,9 @@ const Losted = ({ navigation, route }) => {
                   {extractTime(post.skill?.time)}
                 </Text>
 
-                <Text style={{ ...Fonts.Medium14grey }}>{formattedDays}</Text>
+                <Text style={{ ...Fonts.Medium14grey }}>
+                  {/* {post?.skill?.days} */}
+                </Text>
               </View>
             </TouchableOpacity>
           </View>

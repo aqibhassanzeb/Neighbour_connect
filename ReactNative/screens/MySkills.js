@@ -23,9 +23,11 @@ import BreadCrumbs from "../components/BreadCrumbs";
 import { AntDesign } from "@expo/vector-icons";
 import Empty from "../components/Empty";
 import Placeholder from "../components/Placeholders/PlaceholderList";
+import { useSelector } from "react-redux";
 
 const CategoryScreen = ({ navigation, route }) => {
   const { t, i18n } = useTranslation();
+  const user = useSelector((state) => state.authReducer.activeUser.user);
 
   const isRtl = i18n.dir() == "rtl";
 
@@ -170,7 +172,7 @@ const CategoryScreen = ({ navigation, route }) => {
           My Skills
         </Text>
       </BreadCrumbs>
-      {isLoading && userSkills.length === 0 && <Placeholder />}
+      {isLoading && userSkills.length === 0 && <Loader />}
       {!isLoading && userSkills.length === 0 && (
         <Empty marginTop={200} text="Empty? Share your skill now!" />
       )}
@@ -182,8 +184,9 @@ const CategoryScreen = ({ navigation, route }) => {
             <TouchableOpacity
               key={skill._id}
               onPress={() =>
-                navigation.navigate("Shared", {
+                navigation.navigate("CatShared", {
                   post: { skill },
+                  userId: user._id,
                 })
               }
               style={{
@@ -287,7 +290,6 @@ const CategoryScreen = ({ navigation, route }) => {
                       <TouchableOpacity
                         style={[
                           styles.dropdownButton,
-
                           selectedValue === "button1" &&
                             styles.dropdownButtonSelected,
                         ]}
@@ -485,8 +487,9 @@ const styles = StyleSheet.create({
     //   marginRight: 60,
   },
   dropdown: {
-    //  position: 'absolute',
-    top: 1,
+    position: "absolute",
+    top: 5,
+    right: 20,
     marginRight: 8,
     backgroundColor: "white",
     width: 122,

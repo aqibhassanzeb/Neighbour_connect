@@ -215,7 +215,7 @@ const Lostss = ({ navigation }) => {
           My Items
         </Text>
       </BreadCrumbs>
-      {isLoading && userSells.length === 0 && <Placeholder height={120} />}
+      {isLoading && userSells.length === 0 && <Loader />}
       {!isLoading && userSells.length === 0 && (
         <Empty text='"No listings Found' marginTop={190} />
       )}

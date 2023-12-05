@@ -19,7 +19,7 @@ import { useTranslation } from "react-i18next";
 import { lostItemGet, lostandfoundUpdate } from "../apis/apis";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Loader from "../components/loader";
-import { hasPassed15Minutes } from "../utils";
+import { formatText, hasPassed15Minutes } from "../utils";
 import BreadCrumbs from "../components/BreadCrumbs";
 import Empty from "../components/Empty";
 
@@ -188,8 +188,9 @@ const Lostss = ({ navigation }) => {
         {!loader && data.length === 0 && (
           <Empty text="No Activities yet. Start posting!" marginTop={250} />
         )}
-
-        {data.length > 0 &&
+        {!loader && data.length > 0 && <View style={{ marginBottom: 30 }} />}
+        {!loader &&
+          data.length > 0 &&
           data.map((elm) => (
             <View
               style={{
@@ -206,12 +207,13 @@ const Lostss = ({ navigation }) => {
                   }
                   style={{
                     ...Default.shadow,
-
-                    paddingTop: 48,
-                    paddingBottom: 28,
+                    paddingVertical: 10,
+                    marginBottom: 10,
                     paddingLeft: 5,
-
+                    width: 385,
                     flexDirection: "row",
+                    backgroundColor: "white",
+                    borderRadius: 10,
                   }}
                 >
                   <Image
@@ -242,6 +244,7 @@ const Lostss = ({ navigation }) => {
                         ...Fonts.SemiBold15primary,
                         overflow: "hidden",
                         paddingLeft: 20,
+                        marginVertical: 2,
                       }}
                     >
                       {truncateString(elm.description)}
@@ -250,9 +253,11 @@ const Lostss = ({ navigation }) => {
                       style={{
                         overflow: "hidden",
                         paddingLeft: 20,
+                        width: 250,
+                        marginBottom: 10,
                       }}
                     >
-                      Street#04 Harley
+                      {formatText(elm?.location?.name)}
                     </Text>
 
                     {elm.type == "lost" && (
@@ -479,7 +484,7 @@ const styles = StyleSheet.create({
     // flex: 1,
     // alignItems: 'center',
     position: "absolute",
-    marginLeft: 230,
+    marginLeft: 250,
     justifyContent: "center",
     top: 55,
   },
@@ -501,10 +506,10 @@ const styles = StyleSheet.create({
     //  position: 'absolute',
     top: 1,
     marginRight: 8,
-    backgroundColor: "white",
+    backgroundColor: Colors.extraLightGrey,
     width: 80,
     //height:82,
-    borderRadius: 5,
+    borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -519,12 +524,8 @@ const styles = StyleSheet.create({
   dropdownButton: {
     flexDirection: "row",
     alignItems: "center",
-
+    marginLeft: 10,
     height: 42,
-    //   padding: 10,
-    // borderWidth: 1,
-    //  borderColor: 'gray',
-    //  borderBottomWidth: 1,
   },
   dropdownButtonSelected: {
     backgroundColor: "gray",

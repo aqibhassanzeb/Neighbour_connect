@@ -168,7 +168,7 @@ const ChatScreen = (props) => {
           My Topics
         </Text>
       </BreadCrumbs>
-      {isLoading && topics.length === 0 && <Placeholder />}
+      {isLoading && topics.length === 0 && <Loader />}
       {deleteLoading && <Loader />}
       {!isLoading && topics.length === 0 && (
         <Empty text="No Discussion Started Yet" marginTop={210} />
@@ -225,7 +225,7 @@ const ChatScreen = (props) => {
                     </Text>
                   </View>
                 </View>
-                <View>
+                <View style={{ position: "absolute", right: 10 }}>
                   {!hasPassed15Minutes(topic.createdAt) && (
                     <TouchableOpacity
                       onPress={() => {
@@ -251,11 +251,12 @@ const ChatScreen = (props) => {
                           selectedValue === "button1" &&
                             styles.dropdownButtonSelected,
                         ]}
-                        onPress={() =>
+                        onPress={() => {
                           props.navigation.navigate("EditForm", {
                             data: topic,
-                          })
-                        }
+                          });
+                          setDropdownOpens(!dropdownOpens);
+                        }}
                       >
                         <Ionicons
                           name="create-outline"
@@ -273,6 +274,7 @@ const ChatScreen = (props) => {
                         ]}
                         onPress={() => {
                           setCancelModal(true);
+                          setDropdownOpens(!dropdownOpens);
                           //  setSelectedId(item.key);
                         }}
                       >

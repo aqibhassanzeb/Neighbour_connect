@@ -155,9 +155,10 @@ const SellItemsList = ({
                       selectedValue === "button1" &&
                         styles.dropdownButtonSelected,
                     ]}
-                    onPress={() =>
-                      navigation.navigate("EditBuy", { data: sell })
-                    }
+                    onPress={() => {
+                      navigation.navigate("EditBuy", { data: sell });
+                      setDropdownOpend(!dropdownOpend);
+                    }}
                   >
                     <Ionicons name="create-outline" size={20} color="black" />
                     <Text style={styles.dropdownButtonText}>Edit</Text>
@@ -171,6 +172,7 @@ const SellItemsList = ({
                     onPress={() => {
                       setCancelModals(true);
                       setDeleteId(sell._id);
+                      setDropdownOpend(!dropdownOpend);
                     }}
                   >
                     <Ionicons name="trash-outline" size={20} color="black" />
@@ -205,7 +207,7 @@ const styles = StyleSheet.create({
   },
   contain: {
     position: "absolute",
-    marginLeft: -20,
+    marginLeft: 30,
     justifyContent: "center",
   },
   selectedButton: {
@@ -218,11 +220,11 @@ const styles = StyleSheet.create({
   },
   selectedButtonText: {},
   dropdown: {
-    top: 1,
+    top: 5,
     marginRight: 8,
     backgroundColor: "white",
     width: 80,
-
+    right: 20,
     borderRadius: 5,
     shadowColor: "#000",
     shadowOffset: {
@@ -237,8 +239,8 @@ const styles = StyleSheet.create({
   dropdownButton: {
     flexDirection: "row",
     alignItems: "center",
-
     height: 42,
+    marginLeft: 10,
   },
   dropdownButtonSelected: {
     // backgroundColor: "gray",
@@ -251,5 +253,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     top: 4,
     height: 42,
+    marginLeft: 10,
   },
 });

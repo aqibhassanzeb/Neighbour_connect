@@ -139,7 +139,7 @@ const RegisterScreen = ({ navigation, route }) => {
                 paddingLeft: 6,
               }}
             >
-              Add topic
+              Edit Topic
             </Text>
 
             <TextInput
@@ -150,8 +150,11 @@ const RegisterScreen = ({ navigation, route }) => {
               style={{
                 color: Colors.black,
                 fontSize: 14,
-
-                paddingLeft: 6,
+                paddingLeft: 10,
+                height: 50,
+                borderWidth: 1,
+                borderColor: "lightgrey",
+                borderRadius: 10,
               }}
               value={topic}
               onChangeText={(text) => setTopic(text)}
@@ -176,13 +179,13 @@ const RegisterScreen = ({ navigation, route }) => {
                 paddingLeft: 6,
               }}
             >
-              Add Description
+              Edit Description
             </Text>
 
             <TextInput
               marginTop={12}
               marginBottom={12}
-              paddingBottom={40}
+              // paddingBottom={40}
               placeholder={
                 "Provide details to make it easier for others to reply "
               }
@@ -190,8 +193,11 @@ const RegisterScreen = ({ navigation, route }) => {
               style={{
                 color: Colors.black,
                 fontSize: 14,
-
-                paddingLeft: 6,
+                paddingLeft: 10,
+                height: 50,
+                borderWidth: 1,
+                borderColor: "lightgrey",
+                borderRadius: 10,
               }}
               value={description}
               onChangeText={(text) => setDescription(text)}

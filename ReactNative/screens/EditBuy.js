@@ -13,7 +13,7 @@ import {
   Modal,
   TextInput,
 } from "react-native";
-
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import Octicons from "react-native-vector-icons/Octicons";
 import { Slider } from "react-native-range-slider-expo";
@@ -126,14 +126,16 @@ const PayPalScreen = ({ navigation, route }) => {
 
     if (!result.canceled) {
       setSelectedImages([...selectedImages, result.assets[0]]);
-    } else {
-      alert("You did not select any image.");
     }
   };
 
   const dispatch = useDispatch();
 
   const handleUpdate = async () => {
+    if (oldImages?.length === 0 && selectedImages.length === 0) {
+      alert("No Images");
+      return;
+    }
     const newData = {
       _id: data._id,
       title,
@@ -264,13 +266,24 @@ const PayPalScreen = ({ navigation, route }) => {
           style={{
             alignItems: "center",
             justifyContent: "center",
-            flexDirection: "row",
             marginTop: 20,
           }}
         >
-          <TouchableOpacity onPress={pickImageAsync}>
-            <Ionicons name="ios-camera" size={80} color="grey" />
-          </TouchableOpacity>
+          {selectedImages.length + oldImages.length === 0 ||
+          selectedImages.length + oldImages.length < 3 ? (
+            <TouchableOpacity onPress={pickImageAsync}>
+              <MaterialCommunityIcons
+                name="camera-plus"
+                size={60}
+                color="grey"
+              />
+            </TouchableOpacity>
+          ) : (
+            <MaterialCommunityIcons name="camera" size={60} color="grey" />
+          )}
+          <Text style={{ fontSize: 16, letterSpacing: 2, marginLeft: 10 }}>
+            {selectedImages.length + oldImages.length} / 3
+          </Text>
         </View>
 
         <View
@@ -283,7 +296,8 @@ const PayPalScreen = ({ navigation, route }) => {
             <Text
               style={{
                 color: Colors.black,
-                marginLeft: 135,
+                marginLeft: 145,
+                marginVertical: 10,
               }}
             >
               Update Pictures
@@ -296,7 +310,7 @@ const PayPalScreen = ({ navigation, route }) => {
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
-                  marginHorizontal: 5,
+                  marginHorizontal: 10,
                 }}
               >
                 <Image
@@ -389,6 +403,7 @@ const PayPalScreen = ({ navigation, route }) => {
                 flex: 9.3,
                 marginHorizontal: Default.fixPadding,
                 textAlign: isRtl ? "right" : "left",
+                fontSize: 15,
               }}
               value={title}
               onChangeText={(text) => setTitle(text)}
@@ -468,6 +483,11 @@ const PayPalScreen = ({ navigation, route }) => {
                     <TouchableOpacity
                       key={cat._id}
                       onPress={() => handleOptionSelect(cat)}
+                      style={{
+                        borderBottomWidth: 1,
+                        borderBottomColor: "#e2e8f0",
+                        paddingVertical: 2,
+                      }}
                     >
                       <Text style={{ padding: 10 }}>{cat.name}</Text>
                     </TouchableOpacity>
@@ -557,6 +577,7 @@ const PayPalScreen = ({ navigation, route }) => {
                 flex: 9.3,
                 marginHorizontal: Default.fixPadding,
                 textAlign: isRtl ? "right" : "left",
+                fontSize: 15,
               }}
             />
           </View>
@@ -592,6 +613,7 @@ const PayPalScreen = ({ navigation, route }) => {
                 flex: 9.3,
                 marginHorizontal: Default.fixPadding,
                 textAlign: isRtl ? "right" : "left",
+                fontSize: 15,
               }}
             />
           </View>
@@ -663,11 +685,21 @@ const PayPalScreen = ({ navigation, route }) => {
             <View style={styles.dropdowns}>
               <TouchableOpacity
                 onPress={() => handleOptionSelectsd("Neighborhood ")}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#e2e8f0",
+                  paddingVertical: 2,
+                }}
               >
                 <Text style={{ padding: 10 }}>Neighborhood </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => handleOptionSelectsd("Connection ")}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#e2e8f0",
+                  paddingVertical: 2,
+                }}
               >
                 <Text style={{ padding: 10 }}>Connection</Text>
               </TouchableOpacity>
@@ -685,6 +717,7 @@ const PayPalScreen = ({ navigation, route }) => {
             marginTop: Default.fixPadding * 2,
             padding: Default.fixPadding * 1.2,
             marginHorizontal: Default.fixPadding * 2,
+            marginBottom: 20,
           }}
         >
           <Text style={{ ...Fonts.SemiBold18white }}>{tr("Update")}</Text>
@@ -857,25 +890,19 @@ const styles = StyleSheet.create({
   },
 
   dropdown: {
-    width: 390,
-    height: 390,
     backgroundColor: "#fafafa",
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#ddd",
     paddingHorizontal: 10,
-    paddingRight: 100,
     zIndex: 21,
   },
   dropdowns: {
-    width: 390,
-    height: 90,
     backgroundColor: "#fafafa",
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#ddd",
     paddingHorizontal: 10,
-    paddingRight: 100,
     zIndex: 21,
   },
 });

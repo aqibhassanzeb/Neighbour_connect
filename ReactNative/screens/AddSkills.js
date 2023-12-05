@@ -33,6 +33,7 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import ImagePickerHeader from "../components/ImagePickerHeader";
 import ImagePickerAlbum from "../components/ImagePickerAlbum";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { DAYS } from "../utils";
 
 const { width } = Dimensions.get("window");
 const Checkbox = ({ label, onChange, checked }) => {
@@ -94,6 +95,8 @@ const PayPalScreen = ({ navigation }) => {
   const handleCheckboxChange = (value) => {
     if (checkedValues.includes(value)) {
       setCheckedValues(checkedValues.filter((item) => item !== value));
+      const removeDay = days.filter((day) => value !== day.name);
+      setDays(removeDay);
     } else {
       setCheckedValues([...checkedValues, value]);
     }
@@ -151,6 +154,10 @@ const PayPalScreen = ({ navigation }) => {
   const handlePost = async () => {
     if (selectedImages.length === 0) {
       Alert.alert("Error", "Image Is Required", [
+        { text: "OK", onPress: () => {} },
+      ]);
+    } else if (days.length === 0) {
+      Alert.alert("Error", "Days Required", [
         { text: "OK", onPress: () => {} },
       ]);
     } else if (
@@ -236,16 +243,6 @@ const PayPalScreen = ({ navigation }) => {
   useEffect(() => {
     handleGetCategories();
   }, []);
-
-  const DAYS = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-  ];
 
   function setDayTime(value) {
     const { nativeEvent, type } = value;
@@ -740,7 +737,8 @@ const PayPalScreen = ({ navigation }) => {
                 ...Default.shadow,
                 borderRadius: 10,
                 backgroundColor: Colors.white,
-                padding: Default.fixPadding * 1.5,
+                paddingTop: Default.fixPadding * 1.5,
+                paddingLeft: Default.fixPadding * 1.5,
                 flexDirection: isRtl ? "row-reverse" : "row",
                 marginTop: Default.fixPadding * 3,
                 width: 200,
@@ -1181,7 +1179,6 @@ const PayPalScreen = ({ navigation }) => {
                     />
                   </View>
                 ))}
-                {console.log({ timeModal })}
                 {timeModal && (
                   <DateTimePicker
                     value={new Date()}
@@ -1189,36 +1186,6 @@ const PayPalScreen = ({ navigation }) => {
                     mode="time"
                   />
                 )}
-                {/* <Checkbox
-                  label="Tuesday"
-                  checked={checkedValues.includes("Tuesday")}
-                  onChange={() => handleCheckboxChange("Tuesday")}
-                />
-                <Checkbox
-                  label="Wednesday"
-                  checked={checkedValues.includes("Wednesday")}
-                  onChange={() => handleCheckboxChange("Wednesday")}
-                />
-                <Checkbox
-                  label="Thursday"
-                  checked={checkedValues.includes("Thursday")}
-                  onChange={() => handleCheckboxChange("Thursday")}
-                />
-                <Checkbox
-                  label="Friday"
-                  checked={checkedValues.includes("Friday")}
-                  onChange={() => handleCheckboxChange("Friday")}
-                />
-                <Checkbox
-                  label="Saturday"
-                  checked={checkedValues.includes("Saturday")}
-                  onChange={() => handleCheckboxChange("Saturday")}
-                />
-                <Checkbox
-                  label="Sunday"
-                  checked={checkedValues.includes("Sunday")}
-                  onChange={() => handleCheckboxChange("Sunday")}
-                /> */}
               </View>
             </View>
           )}

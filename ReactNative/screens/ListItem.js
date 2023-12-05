@@ -391,6 +391,7 @@ const PayPalScreen = ({ navigation, route }) => {
                 flex: 9.3,
                 marginHorizontal: Default.fixPadding,
                 textAlign: isRtl ? "right" : "left",
+                fontSize: 15,
               }}
               value={title}
               onChangeText={(text) => setTitle(text)}
@@ -644,10 +645,11 @@ const PayPalScreen = ({ navigation, route }) => {
               selectionColor={Colors.primary}
               maxLength={100}
               style={{
-                ...Fonts.Medium16Black,
+                // ...Fonts.Medium16Black,
                 flex: 9.3,
                 marginHorizontal: Default.fixPadding,
                 textAlign: isRtl ? "right" : "left",
+                fontSize: 15,
               }}
               value={description}
               onChangeText={(text) => setDescription(text)}
