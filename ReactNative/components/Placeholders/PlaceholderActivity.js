@@ -59,19 +59,16 @@ const Placeholder = () => {
           paddingTop: 16,
         }}
       >
-        <ShimmerBox width={350} height={100} />
-        <ShimmerBox width={350} height={100} />
-        <ShimmerBox width={350} height={100} />
+        <ShimmerBox width={390} height={100} />
+        <ShimmerBox width={390} height={100} />
+        <ShimmerBox width={390} height={100} />
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    paddingLeft: 25,
-  },
+  container: {},
   shimmer: {
     borderRadius: 10,
     marginBottom: 8,

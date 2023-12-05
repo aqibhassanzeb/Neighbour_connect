@@ -23,6 +23,7 @@ import Empty from "./Empty";
 import { useNavigation } from "@react-navigation/native";
 const { width } = Dimensions.get("window");
 import Placeholder from "./Placeholders/PlacehoderOne";
+import { formatText } from "../utils";
 
 const OngoingTab = (props) => {
   const user = useSelector((state) => state.authReducer.activeUser.user);
@@ -137,7 +138,7 @@ const OngoingTab = (props) => {
                       fontWeight: "600",
                     }}
                   >
-                    {item?.location?.name}
+                    {formatText(item?.location?.name)}
                   </Text>
                 </Text>
                 <Text

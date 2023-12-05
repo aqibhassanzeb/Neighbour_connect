@@ -169,7 +169,13 @@ const OngoingTab = ({ navigation, route }) => {
 
                 <View></View>
                 <Text
-                  style={{ fontSize: 16, paddingLeft: 3, fontWeight: "bold" }}
+                  style={{
+                    fontSize: 16,
+                    paddingLeft: 3,
+                    fontWeight: "bold",
+                    width: 170,
+                    marginTop: 10,
+                  }}
                 >
                   {item.title}
                 </Text>

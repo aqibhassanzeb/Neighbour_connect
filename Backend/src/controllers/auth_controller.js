@@ -2,7 +2,7 @@ import { Tracker, User } from "../models/user.js";
 import bycrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { sendMail } from "../middleware/email_send.js";
-import { calculateDistance } from "../utils/index.js";
+import { calculateDistance, convertRangeToMeters } from "../utils/index.js";
 import { Activity } from "../models/activity.js";
 import { Forum } from "../models/forum.js";
 import { Report } from "../models/report.js";
@@ -12,6 +12,7 @@ import { Sell } from "../models/sell.js";
 import { Skill } from "../models/skill.js";
 import { Watch } from "../models/watch.js";
 import { Message } from "../models/message.js";
+import { getDistance } from "geolib";
 
 export const userSignup = async (req, res) => {
   const { status, email, password, name } = req.body;
@@ -457,29 +458,34 @@ export const getMayKnow = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const addressRange = parseFloat(user.address_rang) || 5;
+    const addressRange = parseInt(user.address_range) * 1000;
 
-    // Fetch potential connections who are not in the user's connections
     const potentialConnections = await User.find({
       _id: {
         $ne: userId,
         $nin: user.connections,
       },
+      isActive: true,
       "address.latitude": { $exists: true },
       "address.longitude": { $exists: true },
     });
 
-    const filteredConnections = potentialConnections.filter(
-      (u) =>
-        calculateDistance(
-          parseFloat(user.address.latitude),
-          parseFloat(user.address.longitude),
-          parseFloat(u.address.latitude),
-          parseFloat(u.address.longitude)
-        ) <= addressRange
-    );
+    const usersWithinRange = potentialConnections.filter((pUser) => {
+      const distance = getDistance(
+        {
+          latitude: parseFloat(user.address.latitude),
+          longitude: parseFloat(user.address.longitude),
+        },
+        {
+          latitude: parseFloat(pUser.address.latitude),
+          longitude: parseFloat(pUser.address.longitude),
+        }
+      );
+      const pUserRange = convertRangeToMeters(pUser.address_range);
+      return distance <= addressRange && distance <= pUserRange;
+    });
 
-    res.json(filteredConnections);
+    res.json(usersWithinRange);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });

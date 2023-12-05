@@ -80,6 +80,7 @@ const OngoingTab = (props) => {
               flexDirection: "row",
               backgroundColor: "white",
               borderRadius: 10,
+              marginBottom: 10,
             }}
           >
             <View
@@ -117,7 +118,12 @@ const OngoingTab = (props) => {
 
                 <View style={{ paddingLeft: 10, paddingTop: 5 }}>
                   <Text
-                    style={{ fontSize: 16, paddingLeft: 3, fontWeight: "bold" }}
+                    style={{
+                      fontSize: 16,
+                      paddingLeft: 3,
+                      fontWeight: "bold",
+                      width: 165,
+                    }}
                   >
                     {item.title}
                   </Text>

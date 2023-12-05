@@ -1,8 +1,14 @@
 import { Skill } from "../models/skill.js";
 import { User } from "../models/user.js";
 import { v2 as cloudinary } from "cloudinary";
-import { calculateDistance, isObjectEmpty } from "../utils/index.js";
+import {
+  calculateDistance,
+  checkIfUserInConnections,
+  convertRangeToMeters,
+  isObjectEmpty,
+} from "../utils/index.js";
 import { Activity } from "../models/activity.js";
+import { getDistance } from "geolib";
 
 export const addSkill = async (req, res) => {
   const location = JSON.parse(req.body.location);
@@ -144,32 +150,44 @@ export const deleteSkill = async (req, res) => {
 };
 
 export const getSkillsByCat = async (req, res) => {
-  let { address_range, address } = req.user;
-  let { latitude, longitude } = address;
-  const { _id } = req.params;
-
+  let { address_range, address, _id } = req.user;
+  const addressRange = parseInt(address_range) * 1000;
+  const catId = req.params.catId;
   try {
-    const posts = await Skill.find({ category: _id })
+    const posts = await Skill.find({ category: catId })
       .populate("category")
-      .populate("posted_by", "name image address endorse_count endorsed_by");
-    const filtered_array = posts.filter((item) => {
-      if (
-        item.selected_visibility === "Connections" &&
-        req.user.connections.includes(item.posted_by._id)
-      ) {
-        return true;
-      }
-      const docLatitude = parseFloat(item.posted_by.address.latitude);
-      const docLongitude = parseFloat(item.posted_by.address.longitude);
-      const distanceInKm = calculateDistance(
-        latitude,
-        longitude,
-        docLatitude,
-        docLongitude
+      .populate(
+        "posted_by",
+        "name email image connections address address_range endorse_count endorsed_by"
       );
-      return distanceInKm <= parseFloat(address_range);
+
+    const postsWithinRange = posts.filter((post) => {
+      const { selected_visibility } = post;
+      if (selected_visibility.trim() === "Neighborhood") {
+        const distance = getDistance(
+          {
+            latitude: parseFloat(address.latitude),
+            longitude: parseFloat(address.longitude),
+          },
+          {
+            latitude: parseFloat(post.posted_by.address.latitude),
+            longitude: parseFloat(post.posted_by.address.longitude),
+          }
+        );
+        const PostedUserRange = convertRangeToMeters(
+          post.posted_by.address_range
+        );
+        return distance <= addressRange && distance <= PostedUserRange;
+      } else if (selected_visibility.trim() === "Connection") {
+        const connected = checkIfUserInConnections(
+          _id,
+          post.posted_by.connections
+        );
+        return connected ? true : false;
+      }
     });
-    res.json(filtered_array);
+
+    res.json(postsWithinRange);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Error fetching posts by category" });

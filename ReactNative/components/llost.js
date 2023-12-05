@@ -19,6 +19,7 @@ import moment from "moment";
 import Empty from "../components/Empty";
 import { useNavigation } from "@react-navigation/native";
 import Placeholder from "./Placeholders/PlacehoderOne";
+import { formatText } from "../utils";
 
 const { width } = Dimensions.get("window");
 
@@ -152,7 +153,7 @@ const OngoingTab = (props) => {
                       fontWeight: "600",
                     }}
                   >
-                    {item?.location?.name}
+                    {formatText(item?.location?.name)}
                   </Text>
                 </Text>
                 <Text
@@ -183,7 +184,7 @@ const OngoingTab = (props) => {
             }}
           />
         ) : (
-          <Empty text="No Item Listed" marginTop={100} />
+          !loader && <Empty text="No Item Listed" marginTop={100} />
         )}
 
         <View

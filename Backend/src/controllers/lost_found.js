@@ -3,6 +3,11 @@ import { Activity } from "../models/activity.js";
 import dotenv from "dotenv";
 dotenv.config();
 import { v2 as cloudinary } from "cloudinary";
+import { getDistance } from "geolib";
+import {
+  checkIfUserInConnections,
+  convertRangeToMeters,
+} from "../utils/index.js";
 
 export const lostandfound_Create = async (req, res) => {
   const location = JSON.parse(req.body.location);
@@ -191,37 +196,43 @@ export const lostandfoundLoc_Get = async (req, res) => {
     filter.category = req.query.category;
   }
   try {
-    let { address_range, address } = req.user;
-    let { latitude, longitude } = address;
-
+    let { address_range, address, _id } = req.user;
+    const addressRange = parseInt(address_range) * 1000;
     const result = await lostandFound
       .find(filter)
       .populate("posted_by", "-password")
       .populate("category")
       .sort({ createdAt: -1 });
 
-    const filteredData = result.filter((elm) => {
-      if (
-        elm.visibility === "connections" &&
-        req.user.connections.includes(elm.posted_by)
-      ) {
-        return true;
+    const postsWithinRange = result.filter((post) => {
+      const { visibility } = post;
+      if (visibility.trim() === "neighborhood") {
+        const distance = getDistance(
+          {
+            latitude: parseFloat(address.latitude),
+            longitude: parseFloat(address.longitude),
+          },
+          {
+            latitude: parseFloat(post.posted_by.address.latitude),
+            longitude: parseFloat(post.posted_by.address.longitude),
+          }
+        );
+        const PostedUserRange = convertRangeToMeters(
+          post.posted_by.address_range
+        );
+        return distance <= addressRange && distance <= PostedUserRange;
+      } else if (visibility.trim() === "connection") {
+        const connected = checkIfUserInConnections(
+          _id,
+          post.posted_by.connections
+        );
+        return connected ? true : false;
       }
-      const docLatitude = parseFloat(elm.posted_by.address.latitude);
-      const docLongitude = parseFloat(elm.posted_by.address.longitude);
-
-      // Calculate the distance in kilometers between two points
-      const distanceInKm = calculateDistanceInKm(
-        latitude,
-        longitude,
-        docLatitude,
-        docLongitude
-      );
-
-      // Check if the distance is within the specified range
-      return distanceInKm <= parseFloat(address_range);
     });
-    res.status(200).json({ data: filteredData, count: filteredData.length });
+
+    res
+      .status(200)
+      .json({ data: postsWithinRange, count: postsWithinRange.length });
   } catch (error) {
     res.status(400).json({ error: "something went wrong!" });
   }

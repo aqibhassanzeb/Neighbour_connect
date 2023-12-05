@@ -1,7 +1,13 @@
 import { Watch } from "../models/watch.js";
 import { v2 as cloudinary } from "cloudinary";
-import { calculateDistance, isObjectEmpty } from "../utils/index.js";
+import {
+  calculateDistance,
+  checkIfUserInConnections,
+  convertRangeToMeters,
+  isObjectEmpty,
+} from "../utils/index.js";
 import { Activity } from "../models/activity.js";
+import { getDistance } from "geolib";
 
 export const addWatch = async (req, res) => {
   const location = JSON.parse(req.body?.location);
@@ -166,37 +172,45 @@ export const getWatchByUser = async (req, res) => {
 };
 
 export const getAllWatch = async (req, res) => {
-  let { address_range, address } = req.user;
-  let { latitude, longitude } = address;
+  let { address_range, address, _id } = req.user;
+  const addressRange = parseInt(address_range) * 1000;
 
   try {
     const posts = await Watch.find({ is_active: true })
       .sort({ createdAt: -1 })
       .populate(
         "posted_by",
-        "name email image helpful_count address connections requests"
+        "name email image helpful_count address connections requests address_range"
       )
       .populate("category");
 
-    const filtered_array = posts.filter((item) => {
-      if (
-        item.selected_visibility === "Connections" &&
-        req.user.connections.includes(item.posted_by._id)
-      ) {
-        return true;
+    const postsWithinRange = posts.filter((post) => {
+      const { selected_visibility } = post;
+      if (selected_visibility.trim() === "Neighborhood") {
+        const distance = getDistance(
+          {
+            latitude: parseFloat(address.latitude),
+            longitude: parseFloat(address.longitude),
+          },
+          {
+            latitude: parseFloat(post.posted_by.address.latitude),
+            longitude: parseFloat(post.posted_by.address.longitude),
+          }
+        );
+        const PostedUserRange = convertRangeToMeters(
+          post.posted_by.address_range
+        );
+        return distance <= addressRange && distance <= PostedUserRange;
+      } else if (selected_visibility.trim() === "Connection") {
+        const connected = checkIfUserInConnections(
+          _id,
+          post.posted_by.connections
+        );
+        return connected ? true : false;
       }
-      const docLatitude = parseFloat(item.posted_by.address.latitude);
-      const docLongitude = parseFloat(item.posted_by.address.longitude);
-      const distanceInKm = calculateDistance(
-        latitude,
-        longitude,
-        docLatitude,
-        docLongitude
-      );
-      return distanceInKm <= parseFloat(address_range);
     });
 
-    res.json(filtered_array);
+    res.json(postsWithinRange);
   } catch (error) {
     console.log("Error fetching posts", error);
     res.status(500).json({ error: "Error fetching posts" });

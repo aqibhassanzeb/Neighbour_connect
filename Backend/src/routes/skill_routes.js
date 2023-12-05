@@ -42,7 +42,7 @@ routes.post("/add_skill", upload.array("photos", 3), addSkill);
 routes.put("/update_skill/:_id", updateSkill);
 routes.put("/update_images/:_id", upload.array("images", 3), updateImages);
 routes.delete("/delete_skill/:_id", deleteSkill);
-routes.get("/skill_category/:_id", protect, getSkillsByCat);
+routes.get("/skill_category/:catId", protect, getSkillsByCat);
 routes.get("/skills/:user_id", getSkillsByUser);
 routes.get("/all_skills", getAllSkills);
 routes.get("/all_skills_deleted", getAllDeletedSkills);

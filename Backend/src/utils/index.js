@@ -26,9 +26,15 @@ export const replacements = {
 
 export function checkIfUserInConnections(userId, postUserConnections = []) {
   for (const connection of postUserConnections) {
-    if (connection === userId) {
+    if (connection.toString() === userId.toString()) {
       return true;
     }
   }
   return false;
+}
+
+export function convertRangeToMeters(range) {
+  const rangeInKilometers = parseInt(range);
+  const rangeInMeters = rangeInKilometers * 1000;
+  return rangeInMeters;
 }

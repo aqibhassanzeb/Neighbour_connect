@@ -31,6 +31,7 @@ import { ImagePicker } from "expo-image-multiple-picker";
 import ImagePickerHeader from "../components/ImagePickerHeader";
 import ImagePickerAlbum from "../components/ImagePickerAlbum";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { formatText } from "../utils";
 
 const { width, height } = Dimensions.get("window");
 const PayPalScreen = ({ navigation, route }) => {
@@ -611,10 +612,12 @@ const PayPalScreen = ({ navigation, route }) => {
                     ...Fonts.SemiBold14grey,
                     overflow: "hidden",
                     textAlign: isRtl ? "right" : "left",
-                    paddingLeft: 21,
+                    paddingLeft: 15,
                   }}
                 >
-                  {selectedLocation?.name ? selectedLocation.name : "Location"}
+                  {selectedLocation?.name
+                    ? formatText(selectedLocation.name)
+                    : "Location"}
                 </Text>
               </View>
             </TouchableOpacity>

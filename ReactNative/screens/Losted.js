@@ -23,7 +23,7 @@ import ChatScreen from "../screens/chatScreen";
 import { getId, lostItemGet } from "../apis/apis";
 import { handleLoaderforOne } from "../redux/loanandfoundSlice";
 import Loader from "../components/loader";
-import { extractDate } from "../utils";
+import { extractDate, formatText } from "../utils";
 import { useSelector } from "react-redux";
 const { width, height } = Dimensions.get("window");
 
@@ -212,7 +212,7 @@ const Losted = ({ navigation, route }) => {
                     marginLeft: Default.fixPadding * 0.5,
                   }}
                 >
-                  {data && data?.location?.name}
+                  {data && formatText(data?.location?.name)}
                 </Text>
               </View>
             </View>
@@ -298,7 +298,7 @@ const Losted = ({ navigation, route }) => {
                     paddingBottom: 30,
                   }}
                 >
-                  {data && data.location?.name}
+                  {data && formatText(data.location?.name)}
                 </Text>
                 <Text
                   style={{

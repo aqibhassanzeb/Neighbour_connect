@@ -1,6 +1,8 @@
 import { Forum } from "../models/forum.js";
 import { Activity } from "../models/activity.js";
 import { response } from "express";
+import { getDistance } from "geolib";
+import { convertRangeToMeters } from "../utils/index.js";
 
 export const addForum = async (req, res) => {
   try {
@@ -64,15 +66,39 @@ export const getForumsByUser = async (req, res) => {
 };
 
 export const getAllForums = async (req, res) => {
+  let { address_range, address } = req.user;
+  const addressRange = parseInt(address_range) * 1000;
+
   try {
     const items = await Forum.find({ is_active: true })
       .sort({ createdAt: -1 })
-      .populate("posted_by", "name email image connections requests")
+      .populate(
+        "posted_by",
+        "name email image connections requests address address_range"
+      )
       .populate({
         path: "replies.reply_by",
         select: "image name image connections requests",
       });
-    res.json(items);
+
+    const postsWithinRange = items.filter((post) => {
+      const distance = getDistance(
+        {
+          latitude: parseFloat(address.latitude),
+          longitude: parseFloat(address.longitude),
+        },
+        {
+          latitude: parseFloat(post.posted_by.address.latitude),
+          longitude: parseFloat(post.posted_by.address.longitude),
+        }
+      );
+      const PostedUserRange = convertRangeToMeters(
+        post.posted_by.address_range
+      );
+      return distance <= addressRange && distance <= PostedUserRange;
+    });
+
+    res.json(postsWithinRange);
   } catch (error) {
     console.log("Error fetching posts", error);
     res.status(500).json({ error: "Error fetching posts" });
