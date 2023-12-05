@@ -169,7 +169,8 @@ const PickAddressScreen = ({ navigation, route }) => {
         onPoiClick={onPoiClick}
         onPress={onPoiClick}
         showsUserLocation={true}
-        mapPadding={{ top: 100, right: 0, bottom: 0, left: 0 }}
+        mapPadding={{ top: 100, right: 0, bottom: 80, left: 0 }}
+        zoomControlEnabled
       >
         {poi && (
           <Marker

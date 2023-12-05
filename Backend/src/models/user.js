@@ -53,6 +53,10 @@ const UserSchema = new mongoose.Schema(
     verification_code: {
       type: String,
     },
+    result_from: {
+      type: String,
+      default: "user",
+    },
     image: {
       type: String,
       default:

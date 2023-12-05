@@ -34,10 +34,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { handleClearUserInfo } from "../redux/loanandfoundSlice";
 import { setSettings } from "../redux/notificationSlice";
 import { logout } from "../redux/authSlice";
-
+import { UIActivityIndicator } from "react-native-indicators";
 const { width, height } = Dimensions.get("window");
+import { useNavigation } from "@react-navigation/native";
 
-const HomeScreen = ({ navigation, route }) => {
+const HomeScreen = ({ route }) => {
+  const user = useSelector((state) => state.authReducer.activeUser?.user);
   const [cancelModal, setCancelModal] = useState(false);
   const [query, setQuery] = useState("");
   const [searchResults, setsearchResults] = useState([]);
@@ -47,6 +49,7 @@ const HomeScreen = ({ navigation, route }) => {
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const [loader, setLoader] = useState(false);
   const userData = useSelector((state) => state.authReducer.activeUser?.user);
+  const navigation = useNavigation();
 
   const toggleSidePanel = () => {
     setIsSidePanelOpen(!isSidePanelOpen);
@@ -136,6 +139,7 @@ const HomeScreen = ({ navigation, route }) => {
   // }, [navigation]);
 
   const handleNavigation = (value) => {
+    console.log("HERE");
     switch (value) {
       case "lost & found":
         return "Losted";
@@ -170,6 +174,29 @@ const HomeScreen = ({ navigation, route }) => {
 
   function formatLocation(text) {
     return text?.replace(/\n/g, " ");
+  }
+
+  function handleUserNavigation(userId, userInfo) {
+    if (userId === user._id) {
+      navigation.navigate("profileScreen");
+    } else if (user.connections.includes(userId)) {
+      navigation.navigate("Profile3", { user: userInfo });
+    } else if (
+      user.requests &&
+      user.requests.some((req) => req.sender === userId)
+    ) {
+      navigation.navigate("Profile4", {
+        user: {
+          sender: {
+            _id: userId,
+            name: userInfo.name,
+            image: userInfo.image,
+          },
+        },
+      });
+    } else {
+      navigation.navigate("Profile1", { user: userInfo });
+    }
   }
 
   return (
@@ -280,7 +307,7 @@ const HomeScreen = ({ navigation, route }) => {
             <View
               style={{
                 width: 320,
-                height: 50,
+                height: 150,
                 backgroundColor: "white",
                 position: "absolute",
                 top: 50,
@@ -291,6 +318,14 @@ const HomeScreen = ({ navigation, route }) => {
                 zIndex: 998,
               }}
             >
+              <UIActivityIndicator
+                color={Colors.primary}
+                size={35}
+                style={{
+                  marginTop: Default.fixPadding * 1.5,
+                  marginBottom: 20,
+                }}
+              />
               <Text
                 style={{ fontWeight: 700, fontSize: 15, textAlign: "center" }}
               >
@@ -333,9 +368,8 @@ const HomeScreen = ({ navigation, route }) => {
                   }}
                 >
                   <Image
-                    source={require("../assets/icons/not-found.png")}
-                    style={{ height: 50, width: 50, marginTop: 10 }}
-                    resizeMode="contain"
+                    source={require("../assets/icons/empty-icon.png")}
+                    style={{ height: 100, width: 100, marginTop: 10 }}
                   />
                   <Text
                     style={{
@@ -343,6 +377,7 @@ const HomeScreen = ({ navigation, route }) => {
                       fontSize: 15,
                       textAlign: "center",
                       height: 50,
+                      marginTop: 20,
                     }}
                   >
                     No result found for{" "}
@@ -367,20 +402,24 @@ const HomeScreen = ({ navigation, route }) => {
                         <TouchableOpacity
                           onPress={() => {
                             setshowDropDown(false);
-                            navigation.navigate(
-                              handleNavigation(item.result_from),
+
+                            item.result_from === "user"
+                              ? handleUserNavigation(item._id, item)
+                              : navigation.navigate(
+                                  handleNavigation(item.result_from)
+                                ),
                               {
                                 item: item,
                                 _id: item._id,
                                 topic: item,
-                              }
-                            );
+                                data: item,
+                              };
                           }}
                           key={item._id}
                           style={{ paddingVertical: 10, gap: 10 }}
                         >
                           <Text style={{ fontSize: 15, fontWeight: "700" }}>
-                            {item.title || item.topic}
+                            {item.title || item.topic || item.name}
                           </Text>
                           <Text
                             style={{

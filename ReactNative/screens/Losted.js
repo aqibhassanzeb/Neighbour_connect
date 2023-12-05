@@ -96,7 +96,6 @@ const Losted = ({ navigation, route }) => {
         </TouchableOpacity>
         <View style={{}}></View>
       </View>
-
       <View style={{ height: height / 2.8 }}>
         <Swiper
           dot={
@@ -373,7 +372,9 @@ const Losted = ({ navigation, route }) => {
                     paddingBottom: 30,
                   }}
                 >
-                  {extractDate(JSON.parse(data?.date))}
+                  {typeof data?.date === "string"
+                    ? extractDate(data?.date)
+                    : extractDate(JSON.parse(data?.date))}
                 </Text>
                 <Text
                   style={{
