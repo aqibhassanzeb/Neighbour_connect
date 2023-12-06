@@ -174,10 +174,8 @@ export const getSkillsByCat = async (req, res) => {
             longitude: parseFloat(post.posted_by.address.longitude),
           }
         );
-        const PostedUserRange = convertRangeToMeters(
-          post.posted_by.address_range
-        );
-        return distance <= addressRange && distance <= PostedUserRange;
+
+        return distance <= addressRange;
       } else if (selected_visibility.trim() === "Connection") {
         const connected = checkIfUserInConnections(
           _id,

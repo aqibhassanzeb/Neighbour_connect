@@ -217,10 +217,7 @@ export const lostandfoundLoc_Get = async (req, res) => {
             longitude: parseFloat(post.posted_by.address.longitude),
           }
         );
-        const PostedUserRange = convertRangeToMeters(
-          post.posted_by.address_range
-        );
-        return distance <= addressRange && distance <= PostedUserRange;
+        return distance <= addressRange;
       } else if (visibility.trim() === "connection") {
         const connected = checkIfUserInConnections(
           _id,

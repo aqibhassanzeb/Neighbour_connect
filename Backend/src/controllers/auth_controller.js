@@ -483,8 +483,7 @@ export const getMayKnow = async (req, res) => {
           longitude: parseFloat(pUser.address.longitude),
         }
       );
-      const pUserRange = convertRangeToMeters(pUser.address_range);
-      return distance <= addressRange && distance <= pUserRange;
+      return distance <= addressRange;
     });
 
     res.json(usersWithinRange);

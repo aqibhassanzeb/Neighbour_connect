@@ -127,7 +127,7 @@ const MyAccountScreen = (props) => {
               paddingHorizontal: 10,
             }}
             value={locationName}
-            onChange={(text) => setlocationName(text)}
+            onChangeText={(text) => setlocationName(text)}
           />
         </View>
       </View>

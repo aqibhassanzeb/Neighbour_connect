@@ -62,8 +62,7 @@ export const searchAll = async (req, res) => {
           longitude: parseFloat(pUser.address.longitude),
         }
       );
-      const pUserRange = convertRangeToMeters(pUser.address_range);
-      return distance <= ADDRESS_RANGE && distance <= pUserRange;
+      return distance <= ADDRESS_RANGE;
     });
 
     const forumResults = await Forum.find({
@@ -90,10 +89,8 @@ export const searchAll = async (req, res) => {
           longitude: parseFloat(post.posted_by.address.longitude),
         }
       );
-      const PostedUserRange = convertRangeToMeters(
-        post.posted_by.address_range
-      );
-      return distance <= ADDRESS_RANGE && distance <= PostedUserRange;
+
+      return distance <= ADDRESS_RANGE;
     });
 
     const lostFoundResults = await lostandFound
@@ -119,10 +116,8 @@ export const searchAll = async (req, res) => {
             longitude: parseFloat(post.posted_by.address.longitude),
           }
         );
-        const PostedUserRange = convertRangeToMeters(
-          post.posted_by.address_range
-        );
-        return distance <= ADDRESS_RANGE && distance <= PostedUserRange;
+
+        return distance <= ADDRESS_RANGE;
       } else if (visibility.trim() === "connection") {
         const connected = checkIfUserInConnections(
           _id,
@@ -158,10 +153,8 @@ export const searchAll = async (req, res) => {
             longitude: parseFloat(post.posted_by.address.longitude),
           }
         );
-        const PostedUserRange = convertRangeToMeters(
-          post.posted_by.address_range
-        );
-        return distance <= ADDRESS_RANGE && distance <= PostedUserRange;
+
+        return distance <= ADDRESS_RANGE;
       } else if (selected_visibility.trim() === "Connection") {
         const connected = checkIfUserInConnections(
           _id,
@@ -197,10 +190,8 @@ export const searchAll = async (req, res) => {
             longitude: parseFloat(post.posted_by.address.longitude),
           }
         );
-        const PostedUserRange = convertRangeToMeters(
-          post.posted_by.address_range
-        );
-        return distance <= ADDRESS_RANGE && distance <= PostedUserRange;
+
+        return distance <= ADDRESS_RANGE;
       } else if (selected_visibility.trim() === "Connection") {
         const connected = checkIfUserInConnections(
           _id,

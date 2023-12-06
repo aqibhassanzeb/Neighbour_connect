@@ -92,10 +92,8 @@ export const getAllForums = async (req, res) => {
           longitude: parseFloat(post.posted_by.address.longitude),
         }
       );
-      const PostedUserRange = convertRangeToMeters(
-        post.posted_by.address_range
-      );
-      return distance <= addressRange && distance <= PostedUserRange;
+
+      return distance <= addressRange;
     });
 
     res.json(postsWithinRange);
