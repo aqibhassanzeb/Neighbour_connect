@@ -10,7 +10,6 @@ import { Activity } from "../models/activity.js";
 import { getDistance } from "geolib";
 
 export const addWatch = async (req, res) => {
-  const location = JSON.parse(req.body?.location);
   if (!req.files || req.files.length === 0) {
     return res.status(400).send("No files uploaded.");
   }
@@ -47,7 +46,6 @@ export const addWatch = async (req, res) => {
 
     const post = new Watch({
       ...req.body,
-      location,
       media,
     });
 
@@ -186,7 +184,9 @@ export const getAllWatch = async (req, res) => {
 
     const postsWithinRange = posts.filter((post) => {
       const { selected_visibility } = post;
-      if (selected_visibility.trim() === "Neighborhood") {
+      if (post.posted_by._id.toString() === _id.toString()) {
+        return true;
+      } else if (selected_visibility.trim() === "Neighborhood") {
         const distance = getDistance(
           {
             latitude: parseFloat(address.latitude),

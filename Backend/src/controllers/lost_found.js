@@ -10,9 +10,8 @@ import {
 } from "../utils/index.js";
 
 export const lostandfound_Create = async (req, res) => {
-  const location = JSON.parse(req.body.location);
-  const { title, description, category } = req.body;
-  if (!title || !description || !category) {
+  const { title, category } = req.body;
+  if (!title || !category) {
     return res.status(422).json({ error: "please fill the field " });
   }
   if (!req.files || req.files.length === 0) {
@@ -45,7 +44,6 @@ export const lostandfound_Create = async (req, res) => {
     const lostfound = new lostandFound({
       ...req.body,
       posted_by: req.user?._id,
-      location,
       gallary_images: images,
     });
     let item = await lostfound.save();
@@ -206,7 +204,9 @@ export const lostandfoundLoc_Get = async (req, res) => {
 
     const postsWithinRange = result.filter((post) => {
       const { visibility } = post;
-      if (visibility.trim() === "neighborhood") {
+      if (post.posted_by._id.toString() === _id.toString()) {
+        return true;
+      } else if (visibility.trim() === "neighborhood") {
         const distance = getDistance(
           {
             latitude: parseFloat(address.latitude),

@@ -259,7 +259,9 @@ const Losted = ({ navigation, route }) => {
                     marginLeft: Default.fixPadding * 0.3,
                   }}
                 >
-                  {post?.skill?.location?.name || "No Location"}
+                  {post?.skill?.location
+                    ? post?.skill?.location
+                    : post?.skill?.posted_by?.address?.name}
                 </Text>
               </View>
 

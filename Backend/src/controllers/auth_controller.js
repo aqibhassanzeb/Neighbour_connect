@@ -165,8 +165,10 @@ export const userUpdate = async (req, res) => {
     const updateData = passwordUpdate
       ? { ...req.body, password: newPassword }
       : req.body;
-    await User.findByIdAndUpdate(_id, updateData);
-    res.status(200).json({ message: "updated successfully" });
+    const response = await User.findByIdAndUpdate(_id, updateData, {
+      new: true,
+    });
+    res.status(200).json({ message: "updated successfully", user: response });
   } catch (error) {
     res.status(400).json({ error: "something went wrong!" });
   }

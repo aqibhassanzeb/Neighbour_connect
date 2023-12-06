@@ -14,17 +14,7 @@ const lostFound = new mongoose.Schema(
     gallary_images: {
       type: [],
     },
-    location: {
-      latitude: {
-        type: String,
-      },
-      longitude: {
-        type: String,
-      },
-      name: {
-        type: String,
-      },
-    },
+    location: String,
     type: {
       type: String,
     },

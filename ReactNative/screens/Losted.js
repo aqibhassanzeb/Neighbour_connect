@@ -25,6 +25,7 @@ import { handleLoaderforOne } from "../redux/loanandfoundSlice";
 import Loader from "../components/loader";
 import { extractDate, formatText } from "../utils";
 import { useSelector } from "react-redux";
+import moment from "moment";
 const { width, height } = Dimensions.get("window");
 
 const Losted = ({ navigation, route }) => {
@@ -211,7 +212,9 @@ const Losted = ({ navigation, route }) => {
                     marginLeft: Default.fixPadding * 0.5,
                   }}
                 >
-                  {data && formatText(data?.location?.name)}
+                  {data && data?.location
+                    ? formatText(data?.location)
+                    : formatText(data?.posted_by.address.name)}
                 </Text>
               </View>
             </View>
@@ -297,7 +300,9 @@ const Losted = ({ navigation, route }) => {
                     paddingBottom: 30,
                   }}
                 >
-                  {data && formatText(data.location?.name)}
+                  {data && data?.location
+                    ? formatText(data?.location)
+                    : formatText(data?.posted_by.address.name)}
                 </Text>
                 <Text
                   style={{
@@ -370,11 +375,13 @@ const Losted = ({ navigation, route }) => {
                     overflow: "hidden",
                     paddingLeft: 20,
                     paddingBottom: 30,
+                    marginTop: 10,
                   }}
                 >
+                  {console.log(typeof data?.date)}
                   {typeof data?.date === "string"
-                    ? extractDate(data?.date)
-                    : extractDate(JSON.parse(data?.date))}
+                    ? data?.date.slice(1, 11)
+                    : moment(JSON.parse(item?.date)).format("ddd MMM DD YYYY")}
                 </Text>
                 <Text
                   style={{

@@ -55,6 +55,7 @@ const PayPalScreen = ({ navigation, route }) => {
   const [dropdownOpensd, setDropdownOpensd] = useState(false);
   const [selectedOptionsd, setSelectedOptionsd] = useState("Visibility");
   const [open, setOpen] = useState(false);
+  const [location, setLocation] = useState("");
 
   const handleOptionSelect = (option) => {
     setSelectedOption(option);
@@ -174,11 +175,7 @@ const PayPalScreen = ({ navigation, route }) => {
       formData.append("category", selectedOption._id);
       formData.append("description", description);
       formData.append("date", JSON.stringify(finalDate));
-      const mapLocation = {
-        ...selectedLocation.coordinate,
-        name: selectedLocation.name,
-      };
-      formData.append("location", JSON.stringify(mapLocation));
+      formData.append("location", location);
       formData.append("type", type);
       formData.append("visibility", selectedOptionsd);
       formData.append("notify", checked);
@@ -606,19 +603,20 @@ const PayPalScreen = ({ navigation, route }) => {
                   alignItems: "center",
                 }}
               >
-                <Text
-                  numberOfLines={2}
+                <TextInput
+                  numberOfLines={1}
                   style={{
-                    ...Fonts.SemiBold14grey,
                     overflow: "hidden",
                     textAlign: isRtl ? "right" : "left",
                     paddingLeft: 15,
+                    width: 350,
+                    fontSize: 15,
+                    fontWeight: "normal",
                   }}
-                >
-                  {selectedLocation?.name
-                    ? formatText(selectedLocation.name)
-                    : "Location"}
-                </Text>
+                  value={location}
+                  onChangeText={(value) => setLocation(value)}
+                  placeholder="Specific Address (Optional)"
+                />
               </View>
             </TouchableOpacity>
           </View>
@@ -883,7 +881,6 @@ const PayPalScreen = ({ navigation, route }) => {
                       style={{ marginHorizontal: Default.fixPadding }}
                     />
                   }
-                  minDate={today}
                 />
 
                 <View

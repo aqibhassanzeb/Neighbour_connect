@@ -11,17 +11,7 @@ const skillSchema = new mongoose.Schema(
       ref: "skill-category",
       required: true,
     },
-    location: {
-      latitude: {
-        type: String,
-      },
-      longitude: {
-        type: String,
-      },
-      name: {
-        type: String,
-      },
-    },
+    location: String,
     skill_level: {
       type: String,
     },

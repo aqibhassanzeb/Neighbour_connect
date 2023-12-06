@@ -153,7 +153,9 @@ const OngoingTab = (props) => {
                       fontWeight: "600",
                     }}
                   >
-                    {formatText(item?.location?.name)}
+                    {item.location
+                      ? formatText(item?.location)
+                      : formatText(item?.posted_by?.address?.name)}
                   </Text>
                 </Text>
                 <Text

@@ -15,17 +15,7 @@ const sellSchema = new mongoose.Schema(
       ref: "sell-category",
       required: true,
     },
-    location: {
-      latitude: {
-        type: String,
-      },
-      longitude: {
-        type: String,
-      },
-      name: {
-        type: String,
-      },
-    },
+    location: String,
     description: {
       type: String,
     },

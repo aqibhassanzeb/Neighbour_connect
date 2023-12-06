@@ -223,7 +223,7 @@ const PickAddressScreen = ({ navigation, route }) => {
             color={Colors.black}
           />
         </TouchableOpacity>
-        <View
+        {/* <View
           style={{
             ...Default.shadow,
             flexDirection: isRtl ? "row-reverse" : "row",
@@ -256,7 +256,7 @@ const PickAddressScreen = ({ navigation, route }) => {
             }}
             fetchDetails={true}
           />
-        </View>
+        </View> */}
       </View>
 
       {/* Location Show and Button  */}

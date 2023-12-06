@@ -11,7 +11,6 @@ import { Activity } from "../models/activity.js";
 import { getDistance } from "geolib";
 
 export const addSkill = async (req, res) => {
-  const location = JSON.parse(req.body.location);
   const days = JSON.parse(req.body.days);
   if (!req.files || req.files.length === 0) {
     return res.status(400).send("No files uploaded.");
@@ -44,7 +43,6 @@ export const addSkill = async (req, res) => {
 
     const post = new Skill({
       ...req.body,
-      location,
       days,
       images,
     });
@@ -163,7 +161,9 @@ export const getSkillsByCat = async (req, res) => {
 
     const postsWithinRange = posts.filter((post) => {
       const { selected_visibility } = post;
-      if (selected_visibility.trim() === "Neighborhood") {
+      if (post.posted_by._id.toString() === _id.toString()) {
+        return true;
+      } else if (selected_visibility.trim() === "Neighborhood") {
         const distance = getDistance(
           {
             latitude: parseFloat(address.latitude),

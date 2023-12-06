@@ -379,7 +379,9 @@ const CategoryScreen = ({ navigation, route }) => {
                   color="#005D7A"
                 />
                 <Text style={{ marginLeft: 1, fontSize: 15, marginBottom: 10 }}>
-                  {post.location?.name}
+                  {post?.location
+                    ? post?.location
+                    : post?.posted_by?.address?.name}
                 </Text>
               </View>
               <View style={{ height: height / 2.8, marginHorizontal: 5 }}>

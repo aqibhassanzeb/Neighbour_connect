@@ -29,8 +29,9 @@ import { getId, getUserActivities, userUpdate } from "../apis/apis";
 import { DEFAULT_USER_PIC } from "../config";
 import { useFocusEffect } from "@react-navigation/native";
 import Empty from "../components/EmptyActivity";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Placeholder from "../components/Placeholders/PlaceholderActivity";
+import { setActiveUser } from "../redux/authSlice";
 
 const { width } = Dimensions.get("window");
 
@@ -126,9 +127,11 @@ const EditProfileScreen = (props) => {
 
   const onToggleSnackBarRemoveImage = () => setRemoveImageToast(false);
 
+  const dispatch = useDispatch();
   const updateUser = async (updateDate) => {
     try {
-      await userUpdate(updateDate);
+      const res = await userUpdate(updateDate);
+      dispatch(setActiveUser({ message: "", user: res.data.user, token: "" }));
     } catch (error) {
       console.log(error);
     }

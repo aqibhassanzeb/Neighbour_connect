@@ -365,7 +365,9 @@ const Losted = ({ route }) => {
                     paddingBottom: 30,
                   }}
                 >
-                  {item.location?.name}
+                  {item.location
+                    ? item.location
+                    : item?.posted_by?.address?.name}
                 </Text>
 
                 <Text

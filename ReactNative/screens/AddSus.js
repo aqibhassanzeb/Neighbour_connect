@@ -57,6 +57,7 @@ const PayPalScreen = ({ navigation }) => {
   const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [location, setLocation] = useState("");
 
   const { t, i18n } = useTranslation();
   const isRtl = i18n.dir() == "rtl";
@@ -132,14 +133,14 @@ const PayPalScreen = ({ navigation }) => {
 
   const dispatch = useDispatch();
   const handlePost = async () => {
-    if (
-      selectedMedia.length === 0 ||
+    if (selectedMedia.length === 0) {
+      alert("Please select at least 1 image or video");
+    } else if (
       !title ||
       !selectedOption._id ||
       !description ||
       !finalDate ||
-      !time ||
-      !selectedLocation
+      !time
     ) {
       alert("Please fill all fields");
     } else {
@@ -161,11 +162,7 @@ const PayPalScreen = ({ navigation }) => {
       formData.append("description", description);
       formData.append("date", String(finalDate));
       formData.append("time", String(time));
-      const mapLocation = {
-        ...selectedLocation.coordinate,
-        name: selectedLocation.name,
-      };
-      formData.append("location", JSON.stringify(mapLocation));
+      formData.append("location", location);
       formData.append("selected_visibility", selectedOptionsd);
       formData.append("notify", checked);
 
@@ -670,17 +667,19 @@ const PayPalScreen = ({ navigation }) => {
                   alignItems: "center",
                 }}
               >
-                <Text
-                  numberOfLines={2}
+                <TextInput
+                  numberOfLines={1}
                   style={{
-                    ...Fonts.SemiBold14grey,
                     overflow: "hidden",
                     textAlign: isRtl ? "right" : "left",
                     paddingLeft: 21,
+                    fontSize: 15,
+                    width: 350,
                   }}
-                >
-                  {selectedLocation?.name ? selectedLocation.name : "Location"}
-                </Text>
+                  value={location}
+                  onChangeText={(value) => setLocation(value)}
+                  placeholder="Specific Address (Optional)"
+                />
               </View>
             </TouchableOpacity>
           </View>

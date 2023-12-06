@@ -53,6 +53,7 @@ const PayPalScreen = ({ navigation }) => {
   const [price, setPrice] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [open, setOpen] = useState(false);
+  const [location, setLocation] = useState("");
 
   const { t, i18n } = useTranslation();
 
@@ -137,11 +138,7 @@ const PayPalScreen = ({ navigation }) => {
       formData.append("description", description);
       formData.append("price", price);
       formData.append("selected_visibility", selectedOptionsd);
-      const mapLocation = {
-        ...selectedLocation.coordinate,
-        name: selectedLocation.name,
-      };
-      formData.append("location", JSON.stringify(mapLocation));
+      formData.append("location", location);
 
       try {
         setIsLoading(true);
@@ -510,18 +507,19 @@ const PayPalScreen = ({ navigation }) => {
                   alignItems: "center",
                 }}
               >
-                <Text
-                  numberOfLines={2}
+                <TextInput
+                  numberOfLines={1}
                   style={{
-                    // ...Fonts.SemiBold14grey,
                     overflow: "hidden",
                     textAlign: isRtl ? "right" : "left",
-                    // paddingLeft: 21,
-                    color: selectedLocation?.name ? "black" : "grey",
+                    width: 350,
+                    fontSize: 15,
+                    fontWeight: "700",
                   }}
-                >
-                  {selectedLocation?.name ? selectedLocation.name : "Location"}
-                </Text>
+                  value={location}
+                  onChangeText={(value) => setLocation(value)}
+                  placeholder="Specific Address (Optional)"
+                />
               </View>
             </TouchableOpacity>
           </View>
