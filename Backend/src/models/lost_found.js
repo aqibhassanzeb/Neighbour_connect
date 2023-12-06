@@ -44,6 +44,10 @@ const lostFound = new mongoose.Schema(
       ref: "user",
       required: true,
     },
+    result_from: {
+      type: String,
+      default: "lost & found",
+    },
   },
   { timestamps: true }
 );

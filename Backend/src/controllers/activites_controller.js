@@ -51,27 +51,19 @@ export const searchAll = async (req, res) => {
       isActive: true,
     }).select("-password");
 
-    userResults.forEach((user) => {
+    const usersWithinRange = userResults.filter((pUser) => {
       const distance = getDistance(
         {
           latitude: parseFloat(address.latitude),
           longitude: parseFloat(address.longitude),
         },
         {
-          latitude: parseFloat(user.address.latitude),
-          longitude: parseFloat(user.address.longitude),
+          latitude: parseFloat(pUser.address.latitude),
+          longitude: parseFloat(pUser.address.longitude),
         }
       );
-      const pUserRange = convertRangeToMeters(user.address_range);
-      const inRadius = distance <= ADDRESS_RANGE && distance <= pUserRange;
-      if (!inRadius) {
-        const index = userResults.indexOf(user);
-        if (index !== -1) {
-          userResults.splice(index, 1);
-        }
-      } else {
-        user.result_from = "user";
-      }
+      const pUserRange = convertRangeToMeters(pUser.address_range);
+      return distance <= ADDRESS_RANGE && distance <= pUserRange;
     });
 
     const forumResults = await Forum.find({
@@ -87,7 +79,7 @@ export const searchAll = async (req, res) => {
       })
       .lean();
 
-    forumResults.forEach((post) => {
+    const forumsWithinRange = forumResults.filter((post) => {
       const distance = getDistance(
         {
           latitude: parseFloat(address.latitude),
@@ -101,10 +93,7 @@ export const searchAll = async (req, res) => {
       const PostedUserRange = convertRangeToMeters(
         post.posted_by.address_range
       );
-      const inRadius = distance <= ADDRESS_RANGE && distance <= PostedUserRange;
-      if (inRadius) {
-        post.result_from = "neighbour forum";
-      }
+      return distance <= ADDRESS_RANGE && distance <= PostedUserRange;
     });
 
     const lostFoundResults = await lostandFound
@@ -115,9 +104,11 @@ export const searchAll = async (req, res) => {
       .populate("category")
       .lean();
 
-    lostFoundResults.forEach((post) => {
+    const lostFoundWithinRange = lostFoundResults.filter((post) => {
       const { visibility } = post;
-      if (visibility.trim() === "neighborhood") {
+      if (post.posted_by._id.toString() === _id.toString()) {
+        return true;
+      } else if (visibility.trim() === "neighborhood") {
         const distance = getDistance(
           {
             latitude: parseFloat(address.latitude),
@@ -131,31 +122,13 @@ export const searchAll = async (req, res) => {
         const PostedUserRange = convertRangeToMeters(
           post.posted_by.address_range
         );
-        const inRadius =
-          distance <= ADDRESS_RANGE && distance <= PostedUserRange;
-        if (!inRadius) {
-          const index = lostFoundResults.indexOf(post);
-          if (index !== -1) {
-            lostFoundResults.splice(index, 1);
-          }
-        } else {
-          post.date = JSON.parse(post.date);
-          post.result_from = "lost & found";
-        }
+        return distance <= ADDRESS_RANGE && distance <= PostedUserRange;
       } else if (visibility.trim() === "connection") {
         const connected = checkIfUserInConnections(
           _id,
           post.posted_by.connections
         );
-        if (connected) {
-          post.date = JSON.parse(post.date);
-          post.result_from = "sell zone";
-        } else {
-          const index = lostFoundResults.indexOf(post);
-          if (index !== -1) {
-            lostFoundResults.splice(index, 1);
-          }
-        }
+        return connected ? true : false;
       }
     });
 
@@ -170,13 +143,15 @@ export const searchAll = async (req, res) => {
       )
       .lean();
 
-    sellResults.forEach((post) => {
+    const sellWithinRange = sellResults.filter((post) => {
       const { selected_visibility } = post;
-      if (selected_visibility.trim() === "Neighborhood") {
+      if (post.posted_by._id.toString() === _id.toString()) {
+        return true;
+      } else if (selected_visibility.trim() === "Neighborhood") {
         const distance = getDistance(
           {
-            latitude: parseFloat(req_latitude),
-            longitude: parseFloat(req_longitude),
+            latitude: parseFloat(address.latitude),
+            longitude: parseFloat(address.longitude),
           },
           {
             latitude: parseFloat(post.posted_by.address.latitude),
@@ -186,29 +161,13 @@ export const searchAll = async (req, res) => {
         const PostedUserRange = convertRangeToMeters(
           post.posted_by.address_range
         );
-        const inRadius =
-          distance <= ADDRESS_RANGE && distance <= PostedUserRange;
-        if (!inRadius) {
-          const index = sellResults.indexOf(post);
-          if (index !== -1) {
-            sellResults.splice(index, 1);
-          }
-        } else {
-          post.result_from = "sell zone";
-        }
+        return distance <= ADDRESS_RANGE && distance <= PostedUserRange;
       } else if (selected_visibility.trim() === "Connection") {
         const connected = checkIfUserInConnections(
           _id,
           post.posted_by.connections
         );
-        if (connected) {
-          post.result_from = "sell zone";
-        } else {
-          const index = sellResults.indexOf(post);
-          if (index !== -1) {
-            sellResults.splice(index, 1);
-          }
-        }
+        return connected ? true : false;
       }
     });
 
@@ -223,9 +182,11 @@ export const searchAll = async (req, res) => {
       .populate("category")
       .lean();
 
-    watchResults.forEach((post) => {
+    const watchWithinRange = watchResults.filter((post) => {
       const { selected_visibility } = post;
-      if (selected_visibility.trim() === "Neighborhood") {
+      if (post.posted_by._id.toString() === _id.toString()) {
+        return true;
+      } else if (selected_visibility.trim() === "Neighborhood") {
         const distance = getDistance(
           {
             latitude: parseFloat(address.latitude),
@@ -239,38 +200,22 @@ export const searchAll = async (req, res) => {
         const PostedUserRange = convertRangeToMeters(
           post.posted_by.address_range
         );
-        const inRadius =
-          distance <= ADDRESS_RANGE && distance <= PostedUserRange;
-        if (!inRadius) {
-          const index = watchResults.indexOf(post);
-          if (index !== -1) {
-            watchResults.splice(index, 1);
-          }
-        } else {
-          post.result_from = "neighbour watch";
-        }
+        return distance <= ADDRESS_RANGE && distance <= PostedUserRange;
       } else if (selected_visibility.trim() === "Connection") {
         const connected = checkIfUserInConnections(
           _id,
           post.posted_by.connections
         );
-        if (connected) {
-          post.result_from = "neighbour watch";
-        } else {
-          const index = watchResults.indexOf(post);
-          if (index !== -1) {
-            watchResults.splice(index, 1);
-          }
-        }
+        return connected ? true : false;
       }
     });
 
     res.json([
-      ...sellResults,
-      ...forumResults,
-      ...watchResults,
-      ...lostFoundResults,
-      ...userResults,
+      ...sellWithinRange,
+      ...forumsWithinRange,
+      ...watchWithinRange,
+      ...lostFoundWithinRange,
+      ...usersWithinRange,
     ]);
   } catch (error) {
     console.error(error);

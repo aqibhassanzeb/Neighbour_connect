@@ -15,6 +15,10 @@ const forumSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    result_from: {
+      type: String,
+      default: "neighbour forum",
+    },
     replies: [
       {
         reply_by: { type: mongoose.Schema.Types.ObjectId, ref: "user" },

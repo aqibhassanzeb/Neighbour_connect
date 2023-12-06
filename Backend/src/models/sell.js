@@ -37,6 +37,10 @@ const sellSchema = new mongoose.Schema(
     selected_visibility: {
       type: String,
     },
+    result_from: {
+      type: String,
+      default: "sell zone",
+    },
   },
   { timestamps: true }
 );

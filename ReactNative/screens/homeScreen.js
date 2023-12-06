@@ -138,24 +138,30 @@ const HomeScreen = ({ route }) => {
   //   loadUserData();
   // }, [navigation]);
 
-  const handleNavigation = (value) => {
-    console.log("HERE");
-    switch (value) {
-      case "lost & found":
-        return "Losted";
-      case "suspicious activity":
-        return "Mysus";
+  const handleNavigation = (item) => {
+    setshowDropDown(false);
+
+    switch (item.result_from) {
+      case "user":
+        handleUserNavigation(item._id, item);
+        break;
       case "neighbour watch":
-        return "SearchSus";
+        handleWatchNavigate(item);
+        break;
+      case "lost & found":
+        handleLostNavigate(item);
+        break;
       case "neighbour forum":
-        return "FormSearch";
+        handleForumNavigate(item);
+        break;
       case "sell zone":
-        return "BuyDetails";
+        handleSellNavigate(item);
+        break;
       default:
-        return;
+        // Handle other cases or do nothing
+        break;
     }
   };
-
   const handleGetSettings = async () => {
     try {
       let result = await getSettings();
@@ -197,6 +203,20 @@ const HomeScreen = ({ route }) => {
     } else {
       navigation.navigate("Profile1", { user: userInfo });
     }
+  }
+
+  function handleWatchNavigate(item) {
+    navigation.navigate("SearchSus", { item });
+  }
+
+  function handleForumNavigate(item) {
+    navigation.navigate("FormSearch", { topic: item });
+  }
+  function handleLostNavigate(item) {
+    navigation.navigate("Losted", { data: item });
+  }
+  function handleSellNavigate(item) {
+    navigation.navigate("BuyDetails", { item, userId: user._id });
   }
 
   return (
@@ -400,21 +420,7 @@ const HomeScreen = ({ route }) => {
                       data={searchResults}
                       renderItem={({ item }) => (
                         <TouchableOpacity
-                          onPress={() => {
-                            setshowDropDown(false);
-
-                            item.result_from === "user"
-                              ? handleUserNavigation(item._id, item)
-                              : navigation.navigate(
-                                  handleNavigation(item.result_from)
-                                ),
-                              {
-                                item: item,
-                                _id: item._id,
-                                topic: item,
-                                data: item,
-                              };
-                          }}
+                          onPress={() => handleNavigation(item)}
                           key={item._id}
                           style={{ paddingVertical: 10, gap: 10 }}
                         >

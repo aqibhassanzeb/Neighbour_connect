@@ -47,6 +47,10 @@ const watchSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    result_from: {
+      type: String,
+      default: "neighbour watch",
+    },
   },
   { timestamps: true }
 );
