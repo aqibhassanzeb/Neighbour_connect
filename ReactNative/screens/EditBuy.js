@@ -60,6 +60,7 @@ const PayPalScreen = ({ navigation, route }) => {
   const [selectedImages, setSelectedImages] = useState([]);
   const [price, setPrice] = useState(data.price);
   const [modalVisible, setModalVisible] = useState(false);
+  const [location, setLocation] = useState(data.location);
   const { t, i18n } = useTranslation();
 
   const handleOptionSelect = (option) => {
@@ -143,20 +144,14 @@ const PayPalScreen = ({ navigation, route }) => {
       description: description,
       price,
       selected_visibility: selectedOptionsd,
+      location: location,
     };
-    if (selectedLocation.name) {
-      newData.location = {
-        ...selectedLocation.coordinate,
-        name: selectedLocation.name,
-      };
-    }
 
     try {
       setIsLoading(true);
       let response = await updateSell(newData);
 
       if (response.status === 200) {
-        dispatch(clearLocation());
         navigation.navigate("SkillUpdated", { title: "Sell" });
       }
     } catch (error) {
@@ -530,19 +525,20 @@ const PayPalScreen = ({ navigation, route }) => {
                   alignItems: "center",
                 }}
               >
-                <Text
-                  numberOfLines={2}
+                <TextInput
+                  numberOfLines={1}
                   style={{
-                    ...Fonts.SemiBold14grey,
                     overflow: "hidden",
                     textAlign: isRtl ? "right" : "left",
-                    // paddingLeft: 21,
+                    paddingLeft: 15,
+                    width: 350,
+                    fontSize: 15,
+                    fontWeight: "normal",
                   }}
-                >
-                  {selectedLocation.name
-                    ? selectedLocation.name
-                    : data?.location?.name}
-                </Text>
+                  value={location}
+                  onChangeText={(value) => setLocation(value)}
+                  placeholder="Address"
+                />
               </View>
             </TouchableOpacity>
           </View>

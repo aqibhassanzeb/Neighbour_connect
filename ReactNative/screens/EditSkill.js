@@ -87,6 +87,7 @@ const PayPalScreen = ({ navigation, route }) => {
   const [open, setOpen] = useState(false);
   const [priceUnitDropdown, setPriceUnitDropdown] = useState(false);
   const [timeDetails, setTimeDetails] = useState({});
+  const [location, setLocation] = useState(data.location);
 
   const { t, i18n } = useTranslation();
 
@@ -190,20 +191,14 @@ const PayPalScreen = ({ navigation, route }) => {
       price_unit: priceUnit,
       days: days,
       selected_visibility: selectedOptionsd,
+      location: location,
     };
-    if (selectedLocation.name) {
-      newData.location = {
-        ...selectedLocation.coordinate,
-        name: selectedLocation.name,
-      };
-    }
 
     try {
       setIsLoading(true);
       let response = await updateSkill(newData);
 
       if (response.status === 200) {
-        dispatch(clearLocation());
         navigation.navigate("SkillUpdated");
       }
     } catch (error) {
@@ -647,18 +642,20 @@ const PayPalScreen = ({ navigation, route }) => {
                   alignItems: "center",
                 }}
               >
-                <Text
-                  numberOfLines={2}
+                <TextInput
+                  numberOfLines={1}
                   style={{
                     overflow: "hidden",
                     textAlign: isRtl ? "right" : "left",
-                    paddingLeft: 21,
+                    paddingLeft: 15,
+                    width: 350,
+                    fontSize: 15,
+                    fontWeight: "normal",
                   }}
-                >
-                  {selectedLocation.name
-                    ? selectedLocation.name
-                    : "Select new location"}
-                </Text>
+                  value={location}
+                  onChangeText={(value) => setLocation(value)}
+                  placeholder="Address"
+                />
               </View>
             </TouchableOpacity>
           </View>

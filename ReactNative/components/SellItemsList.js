@@ -63,7 +63,7 @@ const SellItemsList = ({
                 justifyContent: "center",
                 alignItems: "center",
                 fontWeight: "900",
-
+                width: 140,
                 fontSize: 15,
                 color: "black",
               }}
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   },
   contain: {
     position: "absolute",
-    marginLeft: 30,
+    left: 10,
     justifyContent: "center",
   },
   selectedButton: {

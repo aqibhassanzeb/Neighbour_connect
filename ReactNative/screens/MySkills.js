@@ -293,9 +293,10 @@ const CategoryScreen = ({ navigation, route }) => {
                           selectedValue === "button1" &&
                             styles.dropdownButtonSelected,
                         ]}
-                        onPress={() =>
-                          navigation.navigate("EditSkill", { data: skill })
-                        }
+                        onPress={() => {
+                          navigation.navigate("EditSkill", { data: skill });
+                          setDropdownOpend(!dropdownOpend);
+                        }}
                       >
                         <Ionicons
                           name="create-outline"
@@ -314,6 +315,7 @@ const CategoryScreen = ({ navigation, route }) => {
                         onPress={() => {
                           setCancelModal(true);
                           setSelectedId(skill._id);
+                          setDropdownOpend(!dropdownOpend);
                         }}
                       >
                         <Ionicons

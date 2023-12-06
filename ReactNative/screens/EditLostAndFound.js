@@ -58,6 +58,7 @@ const PayPalScreen = ({ navigation, route }) => {
   const [categories, setCategories] = useState([]);
   const [description, setDescription] = useState(data.description);
   const [isLoading, setIsLoading] = useState(false);
+  const [location, setLocation] = useState(data.location);
 
   const { t, i18n } = useTranslation();
   const isRtl = i18n.dir() == "rtl";
@@ -162,17 +163,13 @@ const PayPalScreen = ({ navigation, route }) => {
       date: String(finalDate),
       visibility: selectedOptionsd,
       type: selectedOptions,
-      location: {
-        ...selectedLocation.coordinate,
-        name: selectedLocation.name,
-      },
+      location: location,
       notify: checked,
     };
     try {
       setIsLoading(true);
       let response = await lostandfoundUpdate(newData);
       if (response.status === 200) {
-        dispatch(clearLocation());
         navigation.navigate("LostPosted");
       }
     } catch (error) {
@@ -518,19 +515,20 @@ const PayPalScreen = ({ navigation, route }) => {
                   alignItems: "center",
                 }}
               >
-                <Text
-                  numberOfLines={2}
+                <TextInput
+                  numberOfLines={1}
                   style={{
-                    ...Fonts.SemiBold14grey,
                     overflow: "hidden",
                     textAlign: isRtl ? "right" : "left",
-                    paddingLeft: 21,
+                    paddingLeft: 15,
+                    width: 350,
+                    fontSize: 15,
+                    fontWeight: "normal",
                   }}
-                >
-                  {selectedLocation?.name
-                    ? selectedLocation.name
-                    : "Select New Location"}
-                </Text>
+                  value={location}
+                  onChangeText={(value) => setLocation(value)}
+                  placeholder="Address"
+                />
               </View>
             </TouchableOpacity>
           </View>
