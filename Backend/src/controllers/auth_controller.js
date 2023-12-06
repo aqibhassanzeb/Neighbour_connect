@@ -599,3 +599,25 @@ export const RecentLogins = async (req, res) => {
       .json({ error: "An error occurred while fetching latest logins" });
   }
 };
+
+export const locationUpdate = async (req, res) => {
+  const { _id } = req.params;
+  const { name, latitude, longitude } = req.body;
+  const update_fields = {};
+
+  if (name) {
+    update_fields["address.name"] = name;
+  }
+
+  if (latitude && longitude) {
+    update_fields["address.latitude"] = latitude;
+    update_fields["address.longitude"] = longitude;
+  }
+  try {
+    await User.updateOne({ _id }, { $set: update_fields }, { new: true });
+    const response = await User.findById(_id);
+    res.status(200).json({ message: "updated successfully", user: response });
+  } catch (error) {
+    res.status(400).json({ error: "something went wrong!" });
+  }
+};

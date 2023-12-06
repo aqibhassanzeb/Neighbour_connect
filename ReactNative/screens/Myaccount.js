@@ -18,13 +18,14 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { Colors, Default, Fonts } from "../constants/styles";
 import Loader from "../components/loader";
 import { userGet, userGetbyId, userUpdate } from "../apis/apis";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setActiveUser } from "../redux/authSlice";
 const MyAccountScreen = (props) => {
-  const { userInfo } = useSelector((state) => state.loanandfound);
+  const userData = useSelector((state) => state.authReducer.activeUser?.user);
 
   const { width, height } = Dimensions.get("window");
   const [cancelModal, setCancelModal] = useState(false);
-  const [userData, setUserData] = useState("");
+  // const [userData, setUserData] = useState("");
   const [loader, setLoader] = useState(false);
   const [cancelModals, setCancelModals] = useState(false);
   const { t, i18n } = useTranslation();
@@ -57,7 +58,7 @@ const MyAccountScreen = (props) => {
     }
     setCancelModals(true);
   };
-
+  const dispatch = useDispatch();
   const handleSubmit = async () => {
     setCancelModals(false);
     try {
@@ -66,6 +67,9 @@ const MyAccountScreen = (props) => {
       let verified = await userUpdate(payload);
       if (verified.status == 200) {
         alert("updated successfully");
+        dispatch(
+          setActiveUser({ message: "", user: verified.data.user, token: "" })
+        );
       } else {
         alert(verified.data.error);
       }
@@ -90,28 +94,36 @@ const MyAccountScreen = (props) => {
     // ...
   };
 
-  const handleGetuser = async () => {
-    try {
-      setLoader(true);
-      let paylaod = {};
-      paylaod._id = props.route.params.userData._id;
-      let result = await userGetbyId(paylaod);
-      if (result.status == 200) {
-        setUserData(result.data.data);
-        const nameParts = result.data?.data?.name.split(" ");
-        setFirstName(nameParts[0]);
-        setLastName(nameParts.slice(1).join(" "));
-      }
-    } catch (error) {
-      console.log("error ;", error);
-      alert("something went wrong!");
-    } finally {
-      setLoader(false);
-    }
-  };
+  // const handleGetuser = async () => {
+  //   try {
+  //     setLoader(true);
+  //     let paylaod = {};
+  //     paylaod._id = props.route.params.userData._id;
+  //     let result = await userGetbyId(paylaod);
+  //     if (result.status == 200) {
+  //       setUserData(result.data.data);
+  //       const nameParts = result.data?.data?.name.split(" ");
+  //       setFirstName(nameParts[0]);
+  //       setLastName(nameParts.slice(1).join(" "));
+  //     }
+  //   } catch (error) {
+  //     console.log("error ;", error);
+  //     alert("something went wrong!");
+  //   } finally {
+  //     setLoader(false);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   handleGetuser();
+  // }, []);
 
   useEffect(() => {
-    handleGetuser();
+    const nameParts = userData?.name?.split(" ");
+    if (nameParts) {
+      setFirstName(nameParts[0]);
+      setLastName(nameParts.slice(1).join(" "));
+    }
   }, []);
 
   return (
@@ -248,6 +260,26 @@ const MyAccountScreen = (props) => {
             }
           >
             <Text style={styles.buttonText}>Change Password</Text>
+          </TouchableOpacity>
+        </View>
+        <Text
+          style={{
+            color: Colors.darkGrey,
+            fontSize: 15,
+            paddingLeft: 3,
+            paddingBottom: 3,
+          }}
+        >
+          Location
+        </Text>
+        <View>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() =>
+              props.navigation.navigate("LocationChange", { userData })
+            }
+          >
+            <Text style={styles.buttonText}>Change Location</Text>
           </TouchableOpacity>
         </View>
       </View>

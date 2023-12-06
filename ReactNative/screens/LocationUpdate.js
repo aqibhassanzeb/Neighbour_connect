@@ -24,25 +24,21 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 
 const { width, height } = Dimensions.get("window");
 
-const ASPECT_RATIO = width / height;
-const LATITUDE = 33.5651;
-const LONGITUDE = 73.0169;
-const LATITUDE_DELTA = 0.0922;
-const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-
 const PickAddressScreen = ({ navigation, route }) => {
-  const { user, lostandfoundCreate } = route.params;
+  const userData = route.params?.userData || {};
+
+  const ASPECT_RATIO = width / height;
+  const LATITUDE = 33.5651;
+  const LONGITUDE = 73.0169;
+  const LATITUDE_DELTA = 0.0922;
+  const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
   const { t, i18n } = useTranslation();
   const mapRef = useRef(null);
 
-  const [location, setLocation] = useState(null);
   const [isNameLoading, setIsNameLoading] = useState(false);
-
-  const [poi, setPoi] = useState(null);
-
-  const dispatch = useDispatch();
-
+  const [location, setLocation] = useState(null);
+  const [poi, setPoi] = useState();
   const isRtl = i18n.dir() == "rtl";
 
   function tr(key) {
@@ -53,6 +49,16 @@ const PickAddressScreen = ({ navigation, route }) => {
     navigation.goBack();
     return true;
   };
+
+  useEffect(() => {
+    setPoi({
+      name: userData?.address?.name,
+      coordinate: {
+        latitude: parseFloat(userData?.address?.latitude),
+        longitude: parseFloat(userData?.address?.longitude),
+      },
+    });
+  }, []);
 
   useEffect(() => {
     BackHandler.addEventListener("hardwareBackPress", backAction);
@@ -78,47 +84,22 @@ const PickAddressScreen = ({ navigation, route }) => {
   };
 
   const handleButtonPress = async () => {
-    if (poi === null && location === null) {
-      alert("Please tap on any location");
-      return;
-    }
-    if (poi === null) {
+    if (!poi.name) {
       const placeName = await getPlaceName(
-        location.latitude,
-        location.longitude
+        poi.coordinate.latitude,
+        poi.coordinate.longitude
       );
-      navigation.navigate("Radius", {
-        user,
-        address: {
-          latitude: location.latitude,
-          longitude: location.longitude,
-          name: placeName,
-        },
+      navigation.navigate("LocationName", {
+        name: placeName,
+        latitude: poi.coordinate.latitude,
+        longitude: poi.coordinate.longitude,
       });
     } else {
-      if (!poi.name) {
-        const placeName = await getPlaceName(
-          poi.coordinate.latitude,
-          poi.coordinate.longitude
-        );
-        navigation.navigate("Radius", {
-          user,
-          address: {
-            latitude: poi.coordinate.latitude,
-            longitude: poi.coordinate.longitude,
-            name: placeName,
-          },
-        });
-      } else {
-        navigation.navigate("Radius", {
-          user,
-          address: {
-            latitude: poi.coordinate.latitude,
-            longitude: poi.coordinate.longitude,
-            name: poi.name,
-          },
-        });
-      }
+      navigation.navigate("LocationName", {
+        latitude: poi.coordinate.latitude,
+        longitude: poi.coordinate.longitude,
+        name: poi.name,
+      });
     }
   };
 
@@ -154,6 +135,9 @@ const PickAddressScreen = ({ navigation, route }) => {
       });
     }
   };
+
+  console.log({ poi });
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <MapView
@@ -161,18 +145,18 @@ const PickAddressScreen = ({ navigation, route }) => {
         provider={PROVIDER_GOOGLE}
         style={{ flex: 1 }}
         initialRegion={{
-          latitude: LATITUDE,
-          longitude: LONGITUDE,
+          latitude: parseFloat(userData?.address?.latitude),
+          longitude: parseFloat(userData?.address?.longitude),
           latitudeDelta: 2,
           longitudeDelta: LONGITUDE_DELTA,
         }}
         onPoiClick={onPoiClick}
         onPress={onPoiClick}
         showsUserLocation={true}
-        mapPadding={{ top: 30, right: 0, bottom: 80, left: 0 }}
+        mapPadding={{ top: 100, right: 0, bottom: 80, left: 0 }}
         zoomControlEnabled
       >
-        {poi && (
+        {poi && poi.coordinate.latitude && (
           <Marker
             coordinate={poi.coordinate}
             pinColor={Colors.steelBlue}
@@ -180,16 +164,6 @@ const PickAddressScreen = ({ navigation, route }) => {
           >
             <Callout />
           </Marker>
-        )}
-        {!poi && location && (
-          <Marker
-            coordinate={{
-              latitude: location.latitude,
-              longitude: location.longitude,
-            }}
-            pinColor={Colors.steelBlue}
-            draggable
-          />
         )}
       </MapView>
 
@@ -238,6 +212,8 @@ const PickAddressScreen = ({ navigation, route }) => {
           <GooglePlacesAutocomplete
             placeholder="Search"
             onPress={(data, details = null) => {
+              // 'details' is provided when fetchDetails = true
+              console.log(details.geometry, details.name);
               handleZoomToLocation(
                 details.geometry.location.lat,
                 details.geometry.location.lng
@@ -297,14 +273,18 @@ const PickAddressScreen = ({ navigation, route }) => {
               color={Colors.primary}
             />
           </View>
-          <Text
+          <TextInput
             style={{
-              ...Fonts.Medium14Black,
               marginHorizontal: Default.fixPadding,
+              width: 300,
+              fontSize: 14,
+              borderWidth: 1,
+              padding: 2,
+              borderRadius: 10,
             }}
-          >
-            {poi ? poi.name : "Rawalpindi"}
-          </Text>
+            value={poi.name ? poi.name : locationName}
+            onChangeText={(value) => setLocationName(value)}
+          ></TextInput>
         </View> */}
 
         <TouchableOpacity

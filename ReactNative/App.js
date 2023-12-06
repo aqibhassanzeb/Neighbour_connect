@@ -134,6 +134,8 @@ import Appearance from "./screens/Appearance";
 import Myaccount from "./screens/Myaccount";
 import RegSucc from "./screens/RegistrationSuccess";
 import ChooseLF from "./screens/ChooseLF";
+import LocationChange from "./screens/LocationUpdate";
+import LocationName from "./screens/LocationName";
 
 import { store } from "./redux/store";
 import { Provider as ReduxProvider } from "react-redux";
@@ -285,6 +287,16 @@ const MainNavigation = (props) => {
         <Stack.Screen
           name="Locate"
           component={Locate}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="LocationChange"
+          component={LocationChange}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="LocationName"
+          component={LocationName}
           options={{ headerShown: false }}
         />
         <Stack.Screen

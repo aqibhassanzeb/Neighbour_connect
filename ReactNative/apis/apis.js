@@ -126,6 +126,18 @@ export const userUpdate = async (data) => {
   );
   return result;
 };
+
+export const updateLocation = async (data) => {
+  let { _id } = data;
+  const headersWithToken = await getHeadersWithToken();
+  let result = await apiRequest(
+    "PUT",
+    `location_update/${_id}`,
+    data,
+    headersWithToken
+  );
+  return result;
+};
 export const userpassUpdate = async (data) => {
   const headersWithToken = await getHeadersWithToken();
   let result = await apiRequest(

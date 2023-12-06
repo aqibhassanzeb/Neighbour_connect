@@ -251,7 +251,10 @@ const HomeScreen = ({ route }) => {
               //  paddingHorizontal: Default.fixPadding * 2,
             }}
           >
-            <View
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("LocationChange", { userData: user })
+              }
               style={{
                 flex: 1,
                 paddingHorizontal: Default.fixPadding * 4.5,
@@ -263,6 +266,7 @@ const HomeScreen = ({ route }) => {
                 name="location-pin"
                 size={22}
                 color={Colors.white}
+                style={{ marginTop: 10 }}
               />
               <Text
                 style={{
@@ -275,7 +279,7 @@ const HomeScreen = ({ route }) => {
               >
                 {formatLocation(userData?.address?.name)}
               </Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
         <View
