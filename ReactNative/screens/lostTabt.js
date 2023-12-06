@@ -28,6 +28,7 @@ import {
 import { FlatList } from "react-native-gesture-handler";
 import { AntDesign } from "@expo/vector-icons";
 import BreadCrumbs from "../components/BreadCrumbs";
+import { useFocusEffect } from "@react-navigation/native";
 
 // import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
@@ -72,9 +73,15 @@ const CustomTabBar = ({ state, descriptors, navigation, position }) => {
 
     dispatch(handleSearchData(text));
   };
-  useEffect(() => {
-    handleGetlost();
-  }, [state.index, selectedCat]);
+  useFocusEffect(
+    React.useCallback(() => {
+      handleGetlost();
+    }, [state.index, selectedCat])
+  );
+
+  // useEffect(() => {
+  //   handleGetlost();
+  // }, [state.index, selectedCat]);
 
   const handleGetCateg = async () => {
     try {

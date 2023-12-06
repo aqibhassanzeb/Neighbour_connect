@@ -26,7 +26,7 @@ import { AntDesign } from "@expo/vector-icons";
 import BreadCrumbs from "../components/BreadCrumbs";
 import Placeholder from "../components/Placeholders/PlaceholderForm";
 import Empty from "../components/Empty";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 const ChatScreen = (props) => {
@@ -89,9 +89,15 @@ const ChatScreen = (props) => {
     }
   };
 
-  useEffect(() => {
-    handleGetTopics();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      handleGetTopics();
+    }, [])
+  );
+
+  // useEffect(() => {
+  //   handleGetTopics();
+  // }, []);
 
   const handleSearch = (query) => {
     setSearchQuery(query);

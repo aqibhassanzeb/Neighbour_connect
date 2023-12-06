@@ -226,7 +226,7 @@ const PayPalScreen = ({ navigation }) => {
               album: ImagePickerAlbum,
             }}
             onSave={(assets) => {
-              // selectedMedia([...selectedMedia, ...assets]);
+              setSelectedMedia([...selectedMedia, ...assets]);
               setOpen(false);
             }}
             onCancel={() => {
@@ -320,7 +320,7 @@ const PayPalScreen = ({ navigation }) => {
                 style={{ flexDirection: "row", alignItems: "center" }}
               >
                 <TouchableOpacity style={{ marginRight: 10 }}>
-                  {uri.type === "image" ? (
+                  {uri.mediaType === "photo" ? (
                     <Image
                       source={{ uri: uri.uri }}
                       style={{ width: 120, height: 150, borderRadius: 10 }}

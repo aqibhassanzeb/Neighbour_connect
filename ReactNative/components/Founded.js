@@ -132,7 +132,7 @@ const OngoingTab = (props) => {
                     fontWeight: "bold",
                   }}
                 >
-                  Lost Location:{" "}
+                  Found Location:{" "}
                   <Text
                     style={{
                       fontWeight: "600",
@@ -151,7 +151,7 @@ const OngoingTab = (props) => {
                     fontWeight: "bold",
                   }}
                 >
-                  Lost Date:{" "}
+                  Found Date:{" "}
                   <Text
                     style={{
                       fontWeight: "600",

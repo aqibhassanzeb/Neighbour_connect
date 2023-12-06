@@ -121,7 +121,7 @@ const PayPalScreen = ({ navigation }) => {
       alert("Please fill all fields");
     } else {
       const formData = new FormData();
-      selectedImages.slice(0, 3).forEach((image) => {
+      selectedImages.slice(0, 6).forEach((image) => {
         const extension = image.uri.split(".").pop();
         const type = `${
           image.mediaType === "photo" ? "image" : "video"
@@ -239,7 +239,7 @@ const PayPalScreen = ({ navigation }) => {
               setOpen(false);
             }}
             multiple
-            limit={3 - selectedImages.length}
+            limit={6 - selectedImages.length}
           />
           <TouchableOpacity onPress={() => setOpen(false)}>
             <Text
@@ -291,7 +291,7 @@ const PayPalScreen = ({ navigation }) => {
             marginTop: 20,
           }}
         >
-          {selectedImages.length === 0 || selectedImages.length < 3 ? (
+          {selectedImages.length === 0 || selectedImages.length < 6 ? (
             <TouchableOpacity onPress={pickImageAsync}>
               <MaterialCommunityIcons
                 name="camera-plus"
@@ -303,7 +303,7 @@ const PayPalScreen = ({ navigation }) => {
             <MaterialCommunityIcons name="camera" size={60} color="grey" />
           )}
           <Text style={{ fontSize: 16, letterSpacing: 2, marginLeft: 10 }}>
-            {selectedImages.length} / 3
+            {selectedImages.length} / 6
           </Text>
         </View>
 
