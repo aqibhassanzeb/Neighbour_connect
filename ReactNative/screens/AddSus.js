@@ -34,6 +34,7 @@ import ImagePickerHeader from "../components/ImagePickerHeader";
 import ImagePickerAlbum from "../components/ImagePickerAlbum";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ImagePicker } from "expo-image-multiple-picker";
+import * as VideoPicker from "expo-image-picker";
 
 const { width, height } = Dimensions.get("window");
 const PayPalScreen = ({ navigation }) => {
@@ -58,6 +59,7 @@ const PayPalScreen = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [location, setLocation] = useState("");
+  const [openSelection, setOpenSelection] = useState(false);
 
   const { t, i18n } = useTranslation();
   const isRtl = i18n.dir() == "rtl";
@@ -147,10 +149,11 @@ const PayPalScreen = ({ navigation }) => {
       const formData = new FormData();
       selectedMedia.slice(0, 3).forEach((media) => {
         const extension = media.uri.split(".").pop();
+        const mediaType = media.mediaType || media.type;
+        const name = media.filename || media.uri.split("/").pop();
         const type = `${
-          media.mediaType === "photo" ? "image" : "video"
+          mediaType === "photo" ? "image" : "video"
         }/${extension}`;
-        const name = media.filename;
         formData.append("media", {
           uri: media.uri,
           type,
@@ -180,6 +183,22 @@ const PayPalScreen = ({ navigation }) => {
       }
     }
   };
+
+  async function pickVideo() {
+    if (selectedMedia.length >= 3) {
+      alert("You can select a maximum of 3 Files");
+      return;
+    }
+
+    let result = await VideoPicker.launchImageLibraryAsync({
+      mediaTypes: VideoPicker.MediaTypeOptions.Videos,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setSelectedMedia([...selectedMedia, result.assets[0]]);
+    }
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
@@ -234,7 +253,7 @@ const PayPalScreen = ({ navigation }) => {
             }}
             multiple
             limit={3 - selectedMedia.length}
-            video
+            // video
           />
           <TouchableOpacity onPress={() => setOpen(false)}>
             <Text
@@ -298,7 +317,7 @@ const PayPalScreen = ({ navigation }) => {
           }}
         >
           {selectedMedia.length === 0 || selectedMedia.length < 3 ? (
-            <TouchableOpacity onPress={pickMedia}>
+            <TouchableOpacity onPress={() => setOpenSelection(true)}>
               <MaterialCommunityIcons
                 name="camera-plus"
                 size={60}
@@ -824,6 +843,125 @@ const PayPalScreen = ({ navigation }) => {
         >
           <Text style={{ ...Fonts.SemiBold18white }}>{"Post"}</Text>
         </TouchableOpacity>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={openSelection}
+          onRequestClose={() => {
+            setOpenSelection(false);
+          }}
+        >
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => setOpenSelection(false)}
+            style={{ flex: 1 }}
+          >
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: Colors.transparentBlack,
+              }}
+            >
+              <View
+                style={{
+                  width: width / 1.1,
+                  backgroundColor: Colors.white,
+                  borderRadius: 10,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  ...Default.shadow,
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: isRtl ? "row-reverse" : "row",
+                  }}
+                >
+                  <View style={{ flex: 0.7 }} />
+                  <View
+                    style={{
+                      flex: 8.6,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text style={{ ...Fonts.SemiBold18black }}>
+                      Choose Media Type
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => setOpenSelection(false)}
+                    style={{
+                      alignSelf: "flex-end",
+                      padding: Default.fixPadding * 0.5,
+                      flex: 0.7,
+                    }}
+                  >
+                    <Ionicons name="close" size={25} color={Colors.grey} />
+                  </TouchableOpacity>
+                </View>
+                <View style={{ marginVertical: 20, gap: 10 }}>
+                  <TouchableOpacity
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 10,
+                      backgroundColor: Colors.primary,
+                      paddingHorizontal: 70,
+                      paddingVertical: 10,
+                      borderRadius: 10,
+                    }}
+                    onPress={() => {
+                      setOpenSelection(false);
+                      setOpen(true);
+                    }}
+                  >
+                    <Ionicons name="images" size={20} color="white" />
+                    <Text
+                      style={{
+                        color: "white",
+                        fontSize: 17,
+                      }}
+                    >
+                      Images
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 10,
+                      backgroundColor: Colors.primary,
+                      paddingHorizontal: 70,
+                      paddingVertical: 10,
+                      borderRadius: 10,
+                      marginBottom: 20,
+                    }}
+                    onPress={() => {
+                      setOpenSelection(false);
+                      pickVideo();
+                    }}
+                  >
+                    <Ionicons name="videocam" size={20} color="white" />
+                    <Text
+                      style={{
+                        color: "white",
+                        fontSize: 17,
+                      }}
+                    >
+                      Video
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </Modal>
         <Modal
           animationType="fade"
           transparent={true}

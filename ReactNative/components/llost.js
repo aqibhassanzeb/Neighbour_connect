@@ -118,15 +118,22 @@ const OngoingTab = (props) => {
                   />
                   <Text>{item?.posted_by.name}</Text>
                 </TouchableOpacity>
-                <Image
-                  source={{ uri: item?.gallary_images[0] }}
-                  height={180}
-                  style={{
-                    width: "100%",
-                    borderTopLeftRadius: 10,
-                    borderTopRightRadius: 10,
-                  }}
-                />
+                <View>
+                  <Image
+                    source={{ uri: item?.gallary_images[0] }}
+                    height={180}
+                    style={{
+                      width: "100%",
+                      borderTopLeftRadius: 10,
+                      borderTopRightRadius: 10,
+                    }}
+                  />
+                  {item.mark_found && (
+                    <View style={styles.tagContainer}>
+                      <Text style={styles.tag}>Founded</Text>
+                    </View>
+                  )}
+                </View>
                 <Text
                   style={{
                     paddingHorizontal: 4,
@@ -243,5 +250,19 @@ const styles = StyleSheet.create({
   bar: {
     width: 3,
     height: 5,
+  },
+  tagContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    backgroundColor: "green",
+    padding: 5,
+    borderTopLeftRadius: 10,
+    width: 80,
+  },
+  tag: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

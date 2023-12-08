@@ -153,6 +153,7 @@ export const getSkillsByCat = async (req, res) => {
   const catId = req.params.catId;
   try {
     const posts = await Skill.find({ category: catId })
+      .sort({ createdAt: -1 })
       .populate("category")
       .populate(
         "posted_by",

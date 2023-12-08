@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     left: 0,
     backgroundColor: "red",
     padding: 5,
-    borderTopLeftRadius: 30,
+    borderTopLeftRadius: 10,
     width: 60,
   },
   tag: {

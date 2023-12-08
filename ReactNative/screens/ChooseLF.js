@@ -27,7 +27,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { uploadImageToCloudinary } from "../utils";
 import { getId, getUserActivities, userUpdate } from "../apis/apis";
 import { DEFAULT_USER_PIC } from "../config";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Button } from "react-native-paper";
 import BreadCrumbs from "../components/BreadCrumbs";
 import { AntDesign } from "@expo/vector-icons";
@@ -35,13 +35,14 @@ import { AntDesign } from "@expo/vector-icons";
 const { width } = Dimensions.get("window");
 
 const ChooseLF = (props) => {
+  const navigation = useNavigation();
   const { t, i18n } = useTranslation();
   const isRtl = i18n.dir() == "rtl";
   function tr(key) {
     return t(`editProfileScreen:${key}`);
   }
   const backAction = () => {
-    props.navigation.goBack();
+    navigation.goBack();
     return true;
   };
   useEffect(() => {

@@ -22,6 +22,7 @@ import Loader from "../components/loader";
 import { formatText, hasPassed15Minutes } from "../utils";
 import BreadCrumbs from "../components/BreadCrumbs";
 import Empty from "../components/Empty";
+import { Entypo } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -72,7 +73,7 @@ const Lostss = ({ navigation }) => {
   const truncateString = (str) => {
     const words = str.split(" ");
     const truncated = words.slice(0, 2).join(" ");
-    return words.length > 2 ? truncated + "..." : truncated;
+    return words.length > 2 ? truncated + " ..." : truncated;
   };
 
   const handleGetitem = async () => {
@@ -156,7 +157,7 @@ const Lostss = ({ navigation }) => {
             marginHorizontal: Default.fixPadding * 1.2,
           }}
         >
-          {"My Activites"}
+          {"My Items"}
         </Text>
       </View>
       <BreadCrumbs>
@@ -218,7 +219,12 @@ const Lostss = ({ navigation }) => {
                 >
                   <Image
                     source={{ uri: elm.gallary_images[0] }}
-                    style={{ height: 85, width: 75, ...Default.shadow }}
+                    style={{
+                      height: 85,
+                      width: 75,
+                      ...Default.shadow,
+                      borderRadius: 10,
+                    }}
                   />
                   <View>
                     <Text
@@ -235,65 +241,92 @@ const Lostss = ({ navigation }) => {
                         fontSize: 20,
                         color: "black",
                         marginRight: 120,
+                        letterSpacing: 1,
                       }}
                     >
                       {elm.title}
                     </Text>
-                    <Text
+                    {elm.type === "lost" && elm.mark_found && (
+                      <View style={{ paddingLeft: 20, marginBottom: 5 }}>
+                        <Text
+                          style={{
+                            fontSize: 16,
+                            letterSpacing: 1,
+                            color: Colors.primary,
+                            fontWeight: "bold",
+                          }}
+                        >
+                          (Founded)
+                        </Text>
+                      </View>
+                    )}
+                    <View
                       style={{
-                        ...Fonts.SemiBold15primary,
-                        overflow: "hidden",
+                        flexDirection: "row",
+                        alignItems: "center",
                         paddingLeft: 20,
-                        marginVertical: 2,
+                        marginBottom: 4,
                       }}
                     >
-                      {truncateString(elm.description)}
-                    </Text>
-                    <Text
+                      <Text>
+                        <Entypo name="text" size={15} color="black" />
+                      </Text>
+                      <Text
+                        style={{
+                          overflow: "hidden",
+                          marginVertical: 2,
+                          color: "black",
+                        }}
+                      >
+                        {truncateString(elm.description)}
+                      </Text>
+                    </View>
+
+                    <View
                       style={{
-                        overflow: "hidden",
-                        paddingLeft: 20,
-                        width: 250,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        paddingLeft: 15,
                         marginBottom: 10,
                       }}
                     >
-                      {formatText(elm?.location?.name)}
-                    </Text>
+                      <Text>
+                        <Entypo name="location-pin" size={24} color="black" />
+                      </Text>
+                      <Text
+                        style={{
+                          overflow: "hidden",
+                          width: 250,
+                        }}
+                      >
+                        {formatText(elm?.location)}
+                      </Text>
+                    </View>
 
-                    {elm.type == "lost" && (
-                      <View style={styles.container}>
-                        <View style={styles.buttonContainer}>
-                          <View
-                            style={{
-                              flex: 2.5,
-                              justifyContent: "center",
-                              marginHorizontal: Default.fixPadding,
-                            }}
-                          >
-                            <TouchableOpacity
-                              onPress={() => {
-                                if (elm.mark_found != true) {
-                                  setCancelModal(true);
-                                  setSetselectedEditId(elm._id);
-                                }
-                              }}
-                            >
-                              <Text
-                                numberOfLines={1}
-                                style={{
-                                  ...Fonts.SemiBold15white,
-                                  textAlign: "center",
-                                  overflow: "hidden",
-                                }}
-                              >
-                                {elm.mark_found == true
-                                  ? "Founded "
-                                  : "Mark As Recovered"}
-                              </Text>
-                            </TouchableOpacity>
-                          </View>
-                        </View>
-                      </View>
+                    {elm.type == "lost" && !elm.mark_found && (
+                      <TouchableOpacity
+                        onPress={() => {
+                          setCancelModal(true);
+                          setSetselectedEditId(elm._id);
+                        }}
+                        style={{ paddingLeft: 20 }}
+                      >
+                        <Text
+                          numberOfLines={1}
+                          style={{
+                            textAlign: "center",
+                            overflow: "hidden",
+                            backgroundColor: Colors.primary,
+                            borderRadius: 10,
+                            width: 150,
+                            paddingVertical: 6,
+                            fontSize: 13,
+                            color: "white",
+                          }}
+                        >
+                          Mark As Recovered
+                        </Text>
+                      </TouchableOpacity>
                     )}
                   </View>
 

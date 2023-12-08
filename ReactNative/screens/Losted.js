@@ -170,26 +170,32 @@ const Losted = ({ navigation, route }) => {
             >
               <TouchableOpacity
                 style={{
-                  flexDirection: "row",
                   marginTop: 20,
                   alignItems: "center",
-                  gap: 10,
                 }}
                 onPress={() =>
                   profileNavigation(data?.posted_by._id, data?.posted_by)
                 }
               >
-                <Image
-                  source={{ uri: data?.posted_by?.image }}
-                  style={{ width: 40, height: 40, borderRadius: 50 }}
-                />
-                <Text
+                <View
                   style={{
-                    ...Fonts.SemiBold16black,
+                    flexDirection: "row",
+                    gap: 10,
+                    alignItems: "center",
                   }}
                 >
-                  {data?.posted_by?.name}
-                </Text>
+                  <Image
+                    source={{ uri: data?.posted_by?.image }}
+                    style={{ width: 40, height: 40, borderRadius: 50 }}
+                  />
+                  <Text
+                    style={{
+                      ...Fonts.SemiBold16black,
+                    }}
+                  >
+                    {data?.posted_by?.name}
+                  </Text>
+                </View>
               </TouchableOpacity>
 
               <View
@@ -198,7 +204,6 @@ const Losted = ({ navigation, route }) => {
                   alignItems: "center",
                   marginTop: Default.fixPadding * 0.5,
                   marginLeft: 10,
-                  marginTop: 10,
                 }}
               >
                 <SimpleLineIcons
@@ -212,9 +217,7 @@ const Losted = ({ navigation, route }) => {
                     marginLeft: Default.fixPadding * 0.5,
                   }}
                 >
-                  {data && data?.location
-                    ? formatText(data?.location)
-                    : formatText(data?.posted_by.address.name)}
+                  {formatText(data?.posted_by.address.name)}
                 </Text>
               </View>
             </View>
@@ -280,7 +283,7 @@ const Losted = ({ navigation, route }) => {
                   style={{
                     ...Fonts.SemiBold15primary,
                     overflow: "hidden",
-                    paddingLeft: 20,
+                    paddingLeft: 10,
                   }}
                 >
                   <Ionicons
@@ -302,7 +305,7 @@ const Losted = ({ navigation, route }) => {
                 >
                   {data && data?.location
                     ? formatText(data?.location)
-                    : formatText(data?.posted_by.address.name)}
+                    : "No Specific Location Added"}
                 </Text>
                 <Text
                   style={{
