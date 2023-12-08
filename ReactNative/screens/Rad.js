@@ -23,10 +23,12 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import Feather from "react-native-vector-icons/Feather";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Loader from "../components/loader";
+import { setActiveUser } from "../redux/authSlice";
 
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { userUpdate } from "../apis/apis";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from "react-redux";
 
 const { width, height } = Dimensions.get("window");
 
@@ -81,14 +83,19 @@ const RegisterScreen = ({ navigation, route }) => {
   //   }, 800);
   // };
 
+  const dispatch = useDispatch();
+
   const handleUpdate = async () => {
     try {
       let payload = { address_range: value, _id: route.params.userData?._id };
       setRegisterLoader(true);
       let verified = await userUpdate(payload);
       if (verified.status == 200) {
-        await AsyncStorage.setItem("userUpdated", "true"),
-          alert("updated successfully");
+        dispatch(
+          setActiveUser({ message: "", user: verified?.data?.user, token: "" })
+        );
+        // await AsyncStorage.setItem("userUpdated", "true"),
+        alert("User Range Updated");
         // navigation.navigate("homeScreen");
       } else {
         alert(verified.data.error);

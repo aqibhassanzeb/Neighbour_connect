@@ -131,6 +131,12 @@ const Losted = ({ navigation, route }) => {
     }
   }
 
+  const filteredDays = post?.skill?.days?.filter((day) =>
+    day.timeSlots.every(
+      (slot) => slot.startHours !== null && slot.endHours !== null
+    )
+  );
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       <View
@@ -255,7 +261,7 @@ const Losted = ({ navigation, route }) => {
                 />
                 <Text
                   style={{
-                    ...Fonts.SemiBold12grey,
+                    ...Fonts.Medium14grey,
                     marginLeft: Default.fixPadding * 0.3,
                   }}
                 >
@@ -270,10 +276,22 @@ const Losted = ({ navigation, route }) => {
                   marginVertical: Default.fixPadding * 0.5,
                   alignItems: "center",
                   flexDirection: isRtl ? "row-reverse" : "row",
-                  marginLeft: 45,
+                  marginLeft: 40,
+                  marginTop: 10,
                 }}
               >
-                <Text
+                <Image
+                  source={{ uri: post?.skill?.category?.image }}
+                  style={{ width: 30, height: 30 }}
+                />
+                <Text style={{ ...Fonts.Medium14grey, marginLeft: 10 }}>
+                  {post?.skill?.category?.name} |
+                </Text>
+                <Text style={{ ...Fonts.Medium14grey, marginLeft: 5 }}>
+                  {post?.skill?.skill_level}
+                </Text>
+
+                {/* <Text
                   numberOfLines={1}
                   style={{
                     ...Fonts.SemiBold14grey,
@@ -282,7 +300,7 @@ const Losted = ({ navigation, route }) => {
                   }}
                 >
                   {post?.skill?.skill_level} {post?.skill?.category?.name}
-                </Text>
+                </Text> */}
               </View>
               {user?._id === post?.skill?.posted_by?._id ? (
                 <></>
@@ -438,7 +456,22 @@ const Losted = ({ navigation, route }) => {
 
                   {"Availability"}
                 </Text>
-                {post?.skill?.days?.map((day) => (
+                {filteredDays?.map((day) => (
+                  <View key={day.name}>
+                    <Text style={{ ...Fonts.Medium14grey, marginLeft: 18 }}>
+                      {day.name}
+                    </Text>
+                    {day.timeSlots.map((slot, index) => (
+                      <View key={index}>
+                        <Text style={{ ...Fonts.Medium14grey, marginLeft: 18 }}>
+                          From {moment(slot.startHours).format("LT")} To{" "}
+                          {moment(slot.endHours).format("LT")}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                ))}
+                {/* {post?.skill?.days?.map((day) => (
                   <Text
                     key={day.name}
                     style={{ ...Fonts.Medium14grey, marginLeft: 18 }}
@@ -446,7 +479,7 @@ const Losted = ({ navigation, route }) => {
                     {day.name} - From {moment(day.startHours).format("LT")} To{" "}
                     {moment(day.endHours).format("LT")}
                   </Text>
-                ))}
+                ))} */}
               </View>
             </TouchableOpacity>
           </View>

@@ -24,8 +24,10 @@ import Empty from "../components/Empty";
 import { AntDesign } from "@expo/vector-icons";
 import BreadCrumbs from "../components/BreadCrumbs";
 import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
 
 const ChatScreen = (props) => {
+  const user = useSelector((state) => state.authReducer.activeUser?.user);
   const [topics, setTopics] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -226,22 +228,21 @@ const ChatScreen = (props) => {
                   </View>
                 </View>
                 <View style={{ position: "absolute", right: 10 }}>
-                  {!hasPassed15Minutes(topic.createdAt) && (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setDropdownOpens(!dropdownOpens);
-                        setSelectedId(topic._id);
-                      }}
-                    >
-                      <Ionicons
-                        name="ellipsis-vertical"
-                        size={24}
-                        color="black"
-                        marginLeft={179}
-                        marginTop={10}
-                      />
-                    </TouchableOpacity>
-                  )}
+                  <TouchableOpacity
+                    onPress={() => {
+                      setDropdownOpens(!dropdownOpens);
+                      setSelectedId(topic._id);
+                    }}
+                  >
+                    <Ionicons
+                      name="ellipsis-vertical"
+                      size={24}
+                      color="black"
+                      marginLeft={179}
+                      marginTop={10}
+                    />
+                  </TouchableOpacity>
+
                   {dropdownOpens && selectedId === topic._id && (
                     <View style={styles.dropdowns}>
                       <TouchableOpacity
@@ -317,7 +318,9 @@ const ChatScreen = (props) => {
                 {topic.description}
               </Text>
               <TouchableOpacity
-                onPress={() => props.navigation.navigate("Replies", { topic })}
+                onPress={() =>
+                  props.navigation.navigate("Replies", { topic, user })
+                }
               >
                 <View style={{ flexDirection: "row" }}>
                   <Ionicons

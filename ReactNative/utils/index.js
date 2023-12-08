@@ -133,6 +133,13 @@ export function hasPassed15Minutes(dateTime) {
   return minutesDifference >= 15;
 }
 
+export function hasPassed10Days(dateTime) {
+  const targetDateTime = moment(dateTime);
+  const currentDateTime = moment();
+  const daysDifference = currentDateTime.diff(targetDateTime, "days");
+  return daysDifference >= 10;
+}
+
 export function formatText(text) {
   return text?.replace(/\n/g, " ");
 }

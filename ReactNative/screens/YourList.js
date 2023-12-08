@@ -50,25 +50,12 @@ const Lostss = ({ navigation }) => {
   }, []);
 
   const [allClear, setAllClear] = useState(false);
-  const [search, setSearch] = useState();
-  const [selectedId, setSelectedId] = useState("");
   const [selectedValue, setSelectedValue] = useState("");
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [dropdownOpens, setDropdownOpens] = useState(false);
   const [dropdownOpend, setDropdownOpend] = useState(false);
   const [setselectedEditId, setSetselectedEditId] = useState("");
-  const [dropdownOpendd, setDropdownOpendd] = useState(false);
+  const [selectedType, setSelectedType] = useState("");
   const [data, setData] = useState([]);
   const [loader, setLoader] = useState(false);
-  const [userId, setUserId] = useState("");
-
-  const handleButtonPress = (buttonValue) => {
-    setSelectedValue(buttonValue);
-    setDropdownOpen(false);
-    setDropdownOpens(false);
-    setDropdownOpend(false);
-    setDropdownOpendd(false);
-  };
 
   const truncateString = (str) => {
     const words = str.split(" ");
@@ -104,7 +91,18 @@ const Lostss = ({ navigation }) => {
     setCancelModal(false);
     try {
       setLoader(true);
-      let paylaod = { _id: setselectedEditId, mark_found: true };
+      let paylaod = {
+        _id: setselectedEditId,
+      };
+      if (selectedType === "Return") {
+        paylaod.mark_returned = true;
+        paylaod.mark_returned_date = new Date().toISOString();
+      }
+      if (selectedType === "Recover") {
+        paylaod.mark_found = true;
+        paylaod.mark_found_date = new Date().toISOString();
+      }
+
       let result = await lostandfoundUpdate(paylaod);
       if (result.status == 200) {
         navigation.navigate("lostTabt");
@@ -117,20 +115,6 @@ const Lostss = ({ navigation }) => {
       setLoader(false);
     }
   };
-
-  const handleGetuser = async () => {
-    try {
-      let userData = await AsyncStorage.getItem("userData");
-      let userInformation = JSON.parse(userData);
-      setUserId(userInformation?.user._id);
-    } catch (error) {
-      console.log("error ;", error);
-    }
-  };
-
-  useEffect(() => {
-    handleGetuser();
-  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
@@ -246,20 +230,17 @@ const Lostss = ({ navigation }) => {
                     >
                       {elm.title}
                     </Text>
-                    {elm.type === "lost" && elm.mark_found && (
-                      <View style={{ paddingLeft: 20, marginBottom: 5 }}>
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            letterSpacing: 1,
-                            color: Colors.primary,
-                            fontWeight: "bold",
-                          }}
-                        >
-                          (Founded)
-                        </Text>
-                      </View>
-                    )}
+
+                    <View style={{ paddingLeft: 20, marginBottom: 5 }}>
+                      <Text
+                        style={{
+                          ...Fonts.Medium14grey,
+                        }}
+                      >
+                        Type : {elm.type === "lost" ? "Lost" : "Found"}
+                      </Text>
+                    </View>
+
                     <View
                       style={{
                         flexDirection: "row",
@@ -303,10 +284,11 @@ const Lostss = ({ navigation }) => {
                       </Text>
                     </View>
 
-                    {elm.type == "lost" && !elm.mark_found && (
+                    {elm.type == "lost" && !elm.mark_found ? (
                       <TouchableOpacity
                         onPress={() => {
                           setCancelModal(true);
+                          setSelectedType("Recover");
                           setSetselectedEditId(elm._id);
                         }}
                         style={{ paddingLeft: 20 }}
@@ -327,6 +309,58 @@ const Lostss = ({ navigation }) => {
                           Mark As Recovered
                         </Text>
                       </TouchableOpacity>
+                    ) : (
+                      elm.mark_found && (
+                        <Text
+                          numberOfLines={1}
+                          style={{
+                            marginLeft: 24,
+                            ...Fonts.Bold15primary,
+                            marginTop: -7,
+                          }}
+                        >
+                          Recovered
+                        </Text>
+                      )
+                    )}
+                    {elm.type == "found" && !elm.mark_returned ? (
+                      <TouchableOpacity
+                        onPress={() => {
+                          setCancelModal(true);
+                          setSelectedType("Return");
+                          setSetselectedEditId(elm._id);
+                        }}
+                        style={{ paddingLeft: 20 }}
+                      >
+                        <Text
+                          numberOfLines={1}
+                          style={{
+                            textAlign: "center",
+                            overflow: "hidden",
+                            backgroundColor: Colors.primary,
+                            borderRadius: 10,
+                            width: 150,
+                            paddingVertical: 6,
+                            fontSize: 13,
+                            color: "white",
+                          }}
+                        >
+                          Mark As Returned
+                        </Text>
+                      </TouchableOpacity>
+                    ) : (
+                      elm.mark_returned && (
+                        <Text
+                          numberOfLines={1}
+                          style={{
+                            marginLeft: 24,
+                            ...Fonts.Bold15primary,
+                            marginTop: -7,
+                          }}
+                        >
+                          Returned
+                        </Text>
+                      )
                     )}
                   </View>
 
@@ -416,7 +450,9 @@ const Lostss = ({ navigation }) => {
                       marginTop: Default.fixPadding,
                     }}
                   >
-                    {"Are you sure you want to mark this item as recovered?"}
+                    {`Are you sure you want to mark this item as ${
+                      selectedType === "Return" ? "Returned" : "Recovered"
+                    } ?`}
                   </Text>
                   <Text
                     numberOfLines={2}

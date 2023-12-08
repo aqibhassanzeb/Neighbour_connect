@@ -24,7 +24,7 @@ export const userActivites = async (req, res) => {
         populate: {
           path: "posted_by",
           select:
-            "name email image requests connections endorse_count endorsed_by",
+            "name email image requests connections endorse_count endorsed_by address",
         },
       })
       .sort({ createdAt: -1 });

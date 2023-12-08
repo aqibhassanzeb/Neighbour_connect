@@ -128,7 +128,7 @@ const Losted = ({ navigation, route }) => {
           loop={true}
         >
           {data &&
-            data.gallary_images.map((elm, index) => (
+            data?.gallary_images?.map((elm, index) => (
               <View key={index}>
                 <Image
                   source={{ uri: elm }}
@@ -217,7 +217,7 @@ const Losted = ({ navigation, route }) => {
                     marginLeft: Default.fixPadding * 0.5,
                   }}
                 >
-                  {formatText(data?.posted_by.address.name)}
+                  {formatText(data?.posted_by?.address?.name)}
                 </Text>
               </View>
             </View>

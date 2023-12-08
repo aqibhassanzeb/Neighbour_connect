@@ -136,15 +136,13 @@ const SellItemsList = ({
 
           <View>
             <View style={styles.contain}>
-              {!hasPassed15Minutes(sell.createdAt) && (
-                <TouchableOpacity
-                  style={styles.selectedButton}
-                  onPress={() => setDropdownOpend(!dropdownOpend)}
-                >
-                  <Ionicons name="ellipsis-vertical" size={24} color="black" />
-                  <Text style={styles.selectedButtonText}>{selectedValue}</Text>
-                </TouchableOpacity>
-              )}
+              <TouchableOpacity
+                style={styles.selectedButton}
+                onPress={() => setDropdownOpend(!dropdownOpend)}
+              >
+                <Ionicons name="ellipsis-vertical" size={24} color="black" />
+                <Text style={styles.selectedButtonText}>{selectedValue}</Text>
+              </TouchableOpacity>
 
               {dropdownOpend && (
                 <View style={styles.dropdown}>

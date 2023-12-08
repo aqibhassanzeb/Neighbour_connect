@@ -300,7 +300,7 @@ const EditProfileScreen = (props) => {
                   onPress={() => {
                     if (activity.post_type === "lost_found") {
                       props.navigation.navigate("Losted", {
-                        _id: activity.post_id._id,
+                        data: activity.post_id,
                         userId: user._id,
                       });
                     } else if (activity.post_type === "neighbour-watch") {

@@ -19,7 +19,7 @@ import moment from "moment";
 import Empty from "../components/Empty";
 import { useNavigation } from "@react-navigation/native";
 import Placeholder from "./Placeholders/PlacehoderOne";
-import { formatText } from "../utils";
+import { formatText, hasPassed10Days } from "../utils";
 
 const { width } = Dimensions.get("window");
 
@@ -79,111 +79,117 @@ const OngoingTab = (props) => {
         {!loader && newData.length > 0 ? (
           <FlatList
             data={newData}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "white",
-                  padding: 5,
-                  margin: 5,
-                  flex: 1,
-                  borderRadius: 10,
-                  borderWidth: 1,
-                  borderColor: "#e2e8f0",
-                }}
-                onPress={() =>
-                  props.navigation.navigate("Losted", {
-                    data: item,
-                  })
-                }
-              >
-                <TouchableOpacity
-                  onPress={() =>
-                    profileNavigation(item?.posted_by._id, item?.posted_by)
-                  }
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    padding: 3,
-                    gap: 10,
-                    paddingBottom: 10,
-                  }}
-                >
-                  <Image
-                    source={{ uri: item?.posted_by.image }}
+            renderItem={({ item }) => {
+              if (!hasPassed10Days(item.mark_found_date)) {
+                return (
+                  <TouchableOpacity
                     style={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: 50,
+                      backgroundColor: "white",
+                      padding: 5,
+                      margin: 5,
+                      flex: 1,
+                      borderRadius: 10,
+                      borderWidth: 1,
+                      borderColor: "#e2e8f0",
                     }}
-                  />
-                  <Text>{item?.posted_by.name}</Text>
-                </TouchableOpacity>
-                <View>
-                  <Image
-                    source={{ uri: item?.gallary_images[0] }}
-                    height={180}
-                    style={{
-                      width: "100%",
-                      borderTopLeftRadius: 10,
-                      borderTopRightRadius: 10,
-                    }}
-                  />
-                  {item.mark_found && (
-                    <View style={styles.tagContainer}>
-                      <Text style={styles.tag}>Founded</Text>
+                    onPress={() =>
+                      props.navigation.navigate("Losted", {
+                        data: item,
+                      })
+                    }
+                  >
+                    <TouchableOpacity
+                      onPress={() =>
+                        profileNavigation(item?.posted_by._id, item?.posted_by)
+                      }
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        padding: 3,
+                        gap: 10,
+                        paddingBottom: 10,
+                      }}
+                    >
+                      <Image
+                        source={{ uri: item?.posted_by.image }}
+                        style={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: 50,
+                        }}
+                      />
+                      <Text>{item?.posted_by.name}</Text>
+                    </TouchableOpacity>
+                    <View>
+                      <Image
+                        source={{ uri: item?.gallary_images[0] }}
+                        height={180}
+                        style={{
+                          width: "100%",
+                          borderTopLeftRadius: 10,
+                          borderTopRightRadius: 10,
+                        }}
+                      />
+                      {item.mark_found && (
+                        <View style={styles.tagContainer}>
+                          <Text style={styles.tag}>Founded</Text>
+                        </View>
+                      )}
                     </View>
-                  )}
-                </View>
-                <Text
-                  style={{
-                    paddingHorizontal: 4,
-                    paddingTop: 4,
-                    color: Colors.primary,
-                    fontWeight: "bold",
-                    fontSize: 15,
-                    letterSpacing: 0.5,
-                  }}
-                >
-                  {item?.title}
-                </Text>
-                <Text
-                  style={{
-                    paddingHorizontal: 4,
-                    fontSize: 12,
-                    letterSpacing: 0.5,
-                    fontWeight: "bold",
-                  }}
-                >
-                  Lost Location:{" "}
-                  <Text
-                    style={{
-                      fontWeight: "600",
-                    }}
-                  >
-                    {item.location
-                      ? formatText(item?.location)
-                      : formatText(item?.posted_by?.address?.name)}
-                  </Text>
-                </Text>
-                <Text
-                  style={{
-                    paddingHorizontal: 4,
-                    fontSize: 12,
-                    letterSpacing: 0.5,
-                    fontWeight: "bold",
-                  }}
-                >
-                  Lost Date:{" "}
-                  <Text
-                    style={{
-                      fontWeight: "600",
-                    }}
-                  >
-                    {moment(JSON.parse(item?.date)).format("ddd MMM DD YYYY")}
-                  </Text>
-                </Text>
-              </TouchableOpacity>
-            )}
+                    <Text
+                      style={{
+                        paddingHorizontal: 4,
+                        paddingTop: 4,
+                        color: Colors.primary,
+                        fontWeight: "bold",
+                        fontSize: 15,
+                        letterSpacing: 0.5,
+                      }}
+                    >
+                      {item?.title}
+                    </Text>
+                    <Text
+                      style={{
+                        paddingHorizontal: 4,
+                        fontSize: 12,
+                        letterSpacing: 0.5,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Lost Location:{" "}
+                      <Text
+                        style={{
+                          fontWeight: "600",
+                        }}
+                      >
+                        {item.location
+                          ? formatText(item?.location)
+                          : formatText(item?.posted_by?.address?.name)}
+                      </Text>
+                    </Text>
+                    <Text
+                      style={{
+                        paddingHorizontal: 4,
+                        fontSize: 12,
+                        letterSpacing: 0.5,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Lost Date:{" "}
+                      <Text
+                        style={{
+                          fontWeight: "600",
+                        }}
+                      >
+                        {moment(JSON.parse(item?.date)).format(
+                          "ddd MMM DD YYYY"
+                        )}
+                      </Text>
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }
+            }}
             keyExtractor={(item) => item._id}
             numColumns={2}
             contentContainerStyle={{

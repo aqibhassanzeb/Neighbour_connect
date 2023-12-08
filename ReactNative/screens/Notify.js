@@ -152,11 +152,10 @@ const NotificationScreen = ({ navigation }) => {
               {
                 if (data.item.title === "lost & found") {
                   navigation.navigate("Losted", {
-                    _id: data.item.post._id,
+                    data: data.item.post,
                     userId: user._id,
                   });
                 } else if (data.item.title === "suspicious activity") {
-                  console.log(data.item.post);
                   navigation.navigate("SusItem", {
                     post: data.item.post,
                     userId: user._id,

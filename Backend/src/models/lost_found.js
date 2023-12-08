@@ -32,6 +32,16 @@ const lostFound = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    mark_found_date: {
+      type: String,
+    },
+    mark_returned: {
+      type: Boolean,
+      default: false,
+    },
+    mark_returned_date: {
+      type: String,
+    },
     is_active: {
       type: Boolean,
       default: true,

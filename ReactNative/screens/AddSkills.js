@@ -34,6 +34,7 @@ import ImagePickerHeader from "../components/ImagePickerHeader";
 import ImagePickerAlbum from "../components/ImagePickerAlbum";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { DAYS } from "../utils";
+import SelectDays from "../components/SelectDays";
 
 const { width } = Dimensions.get("window");
 const Checkbox = ({ label, onChange, checked }) => {
@@ -53,6 +54,7 @@ const PayPalScreen = ({ navigation }) => {
   const { selectedLocation } = useSelector((state) => state.loanandfound);
 
   const [checkedValues, setCheckedValues] = useState([]);
+
   const [image, setImage] = useState(null);
   const [selectedImages, setSelectedImages] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -86,7 +88,15 @@ const PayPalScreen = ({ navigation }) => {
   const [Categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [timeDetails, setTimeDetails] = useState({});
-  const [days, setDays] = useState([]);
+  const [days, setDays] = useState([
+    { name: "Monday", timeSlots: [{ startHours: null, endHours: null }] },
+    { name: "Tuesday", timeSlots: [{ startHours: null, endHours: null }] },
+    { name: "Wednesday", timeSlots: [{ startHours: null, endHours: null }] },
+    { name: "Thursday", timeSlots: [{ startHours: null, endHours: null }] },
+    { name: "Friday", timeSlots: [{ startHours: null, endHours: null }] },
+    { name: "Saturday", timeSlots: [{ startHours: null, endHours: null }] },
+    { name: "Sunday", timeSlots: [{ startHours: null, endHours: null }] },
+  ]);
   const [open, setOpen] = useState(false);
   const [location, setLocation] = useState("");
 
@@ -153,8 +163,9 @@ const PayPalScreen = ({ navigation }) => {
   };
 
   const handlePost = async () => {
+    console.log("HERE");
     if (selectedImages.length === 0) {
-      Alert.alert("Error", "Image Is Required", [
+      Alert.alert("Error", "Please select at least 1 Image", [
         { text: "OK", onPress: () => {} },
       ]);
     } else if (days.length === 0) {
@@ -166,9 +177,14 @@ const PayPalScreen = ({ navigation }) => {
       !description ||
       !priceUnit ||
       !selectedOptions ||
-      !price
+      !price ||
+      selectedOptionsd === "Visibility"
     ) {
       Alert.alert("Error", "Please Fill All Fields", [
+        { text: "OK", onPress: () => {} },
+      ]);
+    } else if (checkedValues.length === 0) {
+      Alert.alert("Error", "Please select at least one Day", [
         { text: "OK", onPress: () => {} },
       ]);
     } else {
@@ -241,60 +257,6 @@ const PayPalScreen = ({ navigation }) => {
     handleGetCategories();
   }, []);
 
-  function setDayTime(value) {
-    const { nativeEvent, type } = value;
-
-    if (type === "dismissed") {
-      setTimeModal(false);
-    } else if (type === "set") {
-      setTimeModal(false);
-
-      const updatedDays = days.map((day) => {
-        if (day.name === timeDetails.day) {
-          if (timeDetails.type === "startHours") {
-            return { ...day, startHours: nativeEvent.timestamp };
-          } else if (timeDetails.type === "endHours") {
-            return { ...day, endHours: nativeEvent.timestamp };
-          }
-        } else {
-          return day;
-        }
-      });
-
-      const dayExists = updatedDays.some((day) => day.name === timeDetails.day);
-
-      if (!dayExists) {
-        const newDay = {
-          name: timeDetails.day,
-          startHours:
-            timeDetails.type === "startHours"
-              ? nativeEvent.timestamp
-              : undefined,
-          endHours:
-            timeDetails.type === "endHours" ? nativeEvent.timestamp : undefined,
-        };
-
-        updatedDays.push(newDay);
-      }
-
-      setDays(updatedDays);
-    }
-  }
-
-  function showStartValue(dayName) {
-    const foundDay = days.find((day) => day.name === dayName);
-    return foundDay && foundDay.startHours
-      ? moment(foundDay.startHours).format("LT")
-      : false;
-  }
-
-  function showEndValue(dayName) {
-    const foundDay = days.find((day) => day.name === dayName);
-    return foundDay && foundDay.endHours
-      ? moment(foundDay.endHours).format("LT")
-      : false;
-  }
-
   function validateDays() {
     let errorMessages = "";
     for (const day of checkedValues) {
@@ -302,11 +264,27 @@ const PayPalScreen = ({ navigation }) => {
       if (!dayEntry) {
         errorMessages += `Empty Start & End Hour for ${day}\n`;
       } else {
-        if (dayEntry.startHours === undefined) {
-          errorMessages += `Empty Start Hour for ${day}\n `;
-        }
-        if (dayEntry.endHours === undefined) {
-          errorMessages += `Empty End Hour for ${day}\n`;
+        const allEmpty = dayEntry.timeSlots.every(
+          (slot) => slot.startHours === null && slot.endHours === null
+        );
+        if (allEmpty) {
+          errorMessages += `Empty Start & End Hour for ${day}\n`;
+        } else {
+          if (
+            dayEntry.timeSlots.some(
+              (slot) =>
+                slot.startHours === null || slot.startHours === undefined
+            )
+          ) {
+            errorMessages += `Empty Start Hour for ${day}\n `;
+          }
+          if (
+            dayEntry.timeSlots.some(
+              (slot) => slot.endHours === null || slot.endHours === undefined
+            )
+          ) {
+            errorMessages += `Empty End Hour for ${day}\n`;
+          }
         }
       }
     }
@@ -314,8 +292,10 @@ const PayPalScreen = ({ navigation }) => {
       Alert.alert("Error", errorMessages, [{ text: "OK", onPress: () => {} }]);
       return false;
     }
+
     return true;
   }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
       {isLoading && <Loader />}
@@ -1064,129 +1044,12 @@ const PayPalScreen = ({ navigation }) => {
             </View>
           </View>
           {dropdownOpensds && (
-            <View style={styles.dropdownsds}>
-              <View style={styles.container}>
-                <View style={{ flexDirection: "row", paddingBottom: 10 }}>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      paddingBottom: 10,
-                    }}
-                  >
-                    Select Days:
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      paddingBottom: 10,
-                      marginLeft: 80,
-                    }}
-                  >
-                    Start Hour
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      paddingBottom: 10,
-                      marginLeft: 25,
-                    }}
-                  >
-                    End Hour
-                  </Text>
-                </View>
-                {DAYS.map((day) => (
-                  <View key={day}>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Checkbox
-                        label={day}
-                        checked={checkedValues.includes(day)}
-                        onChange={() => handleCheckboxChange(day)}
-                      />
-                      <View style={{ flexDirection: "row", gap: 20 }}>
-                        <TouchableOpacity
-                          onPress={() => {
-                            if (checkedValues.includes(day)) {
-                              setTimeModal(true);
-                              setTimeDetails({ day, type: "startHours" });
-                            } else {
-                              Alert.alert("Error", `${day} is not selected`, [
-                                { text: "OK", onPress: () => {} },
-                              ]);
-                            }
-                          }}
-                          style={{ flexDirection: "row", gap: 3 }}
-                        >
-                          <MaterialIcons
-                            name="access-time"
-                            size={20}
-                            color={Colors.grey}
-                          />
-                          <Text
-                            numberOfLines={1}
-                            style={{
-                              color: showStartValue(day) ? "black" : "gray",
-                              fontSize: 14,
-                            }}
-                          >
-                            {showStartValue(day)
-                              ? showStartValue(day)
-                              : "00:00"}
-                          </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          onPress={() => {
-                            if (checkedValues.includes(day)) {
-                              setTimeModal(true);
-                              setTimeDetails({ day, type: "endHours" });
-                            } else {
-                              Alert.alert("Error", `${day} is not selected`, [
-                                { text: "OK", onPress: () => {} },
-                              ]);
-                            }
-                          }}
-                          style={{ flexDirection: "row", gap: 3 }}
-                        >
-                          <MaterialIcons
-                            name="access-time"
-                            size={20}
-                            color={Colors.grey}
-                          />
-                          <Text
-                            numberOfLines={1}
-                            style={{
-                              color: showEndValue(day) ? "black" : "gray",
-                              fontSize: 14,
-                            }}
-                          >
-                            {showEndValue(day) ? showEndValue(day) : "00:00"}
-                          </Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                    <View
-                      style={{
-                        height: 2,
-                        backgroundColor: "lightgray",
-                        marginVertical: 10,
-                      }}
-                    />
-                  </View>
-                ))}
-                {timeModal && (
-                  <DateTimePicker
-                    value={new Date()}
-                    onChange={(value) => setDayTime(value)}
-                    mode="time"
-                  />
-                )}
-              </View>
-            </View>
+            <SelectDays
+              days={days}
+              setDays={setDays}
+              checkedValues={checkedValues}
+              setCheckedValues={setCheckedValues}
+            />
           )}
           <View
             style={{

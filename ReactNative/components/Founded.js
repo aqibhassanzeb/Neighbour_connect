@@ -23,7 +23,7 @@ import Empty from "./Empty";
 import { useNavigation } from "@react-navigation/native";
 const { width } = Dimensions.get("window");
 import Placeholder from "./Placeholders/PlacehoderOne";
-import { formatText } from "../utils";
+import { formatText, hasPassed10Days } from "../utils";
 
 const OngoingTab = (props) => {
   const user = useSelector((state) => state.authReducer.activeUser.user);
@@ -63,105 +63,118 @@ const OngoingTab = (props) => {
         {newData.length > 0 && (
           <FlatList
             data={newData}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "white",
-                  padding: 5,
-                  margin: 5,
-                  flex: 1,
-                  borderRadius: 10,
-                  borderWidth: 1,
-                  borderColor: "#e2e8f0",
-                }}
-                onPress={() =>
-                  props.navigation.navigate("Losted", {
-                    data: item,
-                  })
-                }
-              >
-                <TouchableOpacity
-                  onPress={() =>
-                    profileNavigation(item?.posted_by._id, item?.posted_by)
-                  }
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    padding: 3,
-                    gap: 10,
-                    paddingBottom: 10,
-                  }}
-                >
-                  <Image
-                    source={{ uri: item?.posted_by.image }}
+            renderItem={({ item }) => {
+              if (!hasPassed10Days(item.mark_returned_date)) {
+                return (
+                  <TouchableOpacity
                     style={{
-                      width: 30,
-                      height: 30,
-                      borderTopLeftRadius: 10,
-                      borderTopRightRadius: 10,
+                      backgroundColor: "white",
+                      padding: 5,
+                      margin: 5,
+                      flex: 1,
+                      borderRadius: 10,
+                      borderWidth: 1,
+                      borderColor: "#e2e8f0",
                     }}
-                  />
-                  <Text>{item?.posted_by.name}</Text>
-                </TouchableOpacity>
-                <Image
-                  source={{ uri: item?.gallary_images[0] }}
-                  height={180}
-                  style={{
-                    width: "100%",
-                    borderTopLeftRadius: 10,
-                    borderTopRightRadius: 10,
-                  }}
-                />
-                <Text
-                  style={{
-                    paddingHorizontal: 4,
-                    paddingTop: 4,
-                    color: Colors.primary,
-                    fontWeight: "bold",
-                    fontSize: 15,
-                    letterSpacing: 0.5,
-                  }}
-                >
-                  {item?.title}
-                </Text>
-                <Text
-                  style={{
-                    paddingHorizontal: 4,
-                    fontSize: 12,
-                    letterSpacing: 0.5,
-                    fontWeight: "bold",
-                  }}
-                >
-                  Found Location:{" "}
-                  <Text
-                    style={{
-                      fontWeight: "600",
-                    }}
+                    onPress={() =>
+                      props.navigation.navigate("Losted", {
+                        data: item,
+                      })
+                    }
                   >
-                    {item.location
-                      ? formatText(item?.location)
-                      : formatText(item?.posted_by?.address?.name)}
-                  </Text>
-                </Text>
-                <Text
-                  style={{
-                    paddingHorizontal: 4,
-                    fontSize: 12,
-                    letterSpacing: 0.5,
-                    fontWeight: "bold",
-                  }}
-                >
-                  Found Date:{" "}
-                  <Text
-                    style={{
-                      fontWeight: "600",
-                    }}
-                  >
-                    {moment(JSON.parse(item?.date)).format("ddd MMM DD YYYY")}
-                  </Text>
-                </Text>
-              </TouchableOpacity>
-            )}
+                    <TouchableOpacity
+                      onPress={() =>
+                        profileNavigation(item?.posted_by._id, item?.posted_by)
+                      }
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        padding: 3,
+                        gap: 10,
+                        paddingBottom: 10,
+                      }}
+                    >
+                      <Image
+                        source={{ uri: item?.posted_by.image }}
+                        style={{
+                          width: 30,
+                          height: 30,
+                          borderTopLeftRadius: 10,
+                          borderTopRightRadius: 10,
+                        }}
+                      />
+                      <Text>{item?.posted_by.name}</Text>
+                    </TouchableOpacity>
+                    <View>
+                      <Image
+                        source={{ uri: item?.gallary_images[0] }}
+                        height={180}
+                        style={{
+                          width: "100%",
+                          borderTopLeftRadius: 10,
+                          borderTopRightRadius: 10,
+                        }}
+                      />
+                      {item.mark_returned && (
+                        <View style={styles.tagContainer}>
+                          <Text style={styles.tag}>Returned</Text>
+                        </View>
+                      )}
+                    </View>
+                    <Text
+                      style={{
+                        paddingHorizontal: 4,
+                        paddingTop: 4,
+                        color: Colors.primary,
+                        fontWeight: "bold",
+                        fontSize: 15,
+                        letterSpacing: 0.5,
+                      }}
+                    >
+                      {item?.title}
+                    </Text>
+                    <Text
+                      style={{
+                        paddingHorizontal: 4,
+                        fontSize: 12,
+                        letterSpacing: 0.5,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Found Location:{" "}
+                      <Text
+                        style={{
+                          fontWeight: "600",
+                        }}
+                      >
+                        {item.location
+                          ? formatText(item?.location)
+                          : formatText(item?.posted_by?.address?.name)}
+                      </Text>
+                    </Text>
+                    <Text
+                      style={{
+                        paddingHorizontal: 4,
+                        fontSize: 12,
+                        letterSpacing: 0.5,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Found Date:{" "}
+                      <Text
+                        style={{
+                          fontWeight: "600",
+                        }}
+                      >
+                        {moment(JSON.parse(item?.date)).format(
+                          "ddd MMM DD YYYY"
+                        )}
+                      </Text>
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }
+            }}
             keyExtractor={(item) => item._id}
             numColumns={2}
             contentContainerStyle={{
@@ -221,5 +234,19 @@ const styles = StyleSheet.create({
   bar: {
     width: 3,
     height: 5,
+  },
+  tagContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    backgroundColor: "green",
+    padding: 5,
+    borderTopLeftRadius: 10,
+    width: 80,
+  },
+  tag: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

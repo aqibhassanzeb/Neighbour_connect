@@ -14,18 +14,14 @@ import {
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Colors, Fonts, Default } from "../constants/styles";
-import MapView, { Marker } from "react-native-maps";
-import { Slider } from "react-native-range-slider-expo";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import Feather from "react-native-vector-icons/Feather";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import Loader from "../components/loader";
+import { useSelector } from "react-redux";
 
-import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const { width, height } = Dimensions.get("window");
 
 const RegisterScreen = ({ navigation, route }) => {
+  const user = useSelector((state) => state.authReducer.activeUser?.user);
   const [value, setValue] = useState(0);
 
   const [checked, setChecked] = useState(false);
@@ -49,21 +45,6 @@ const RegisterScreen = ({ navigation, route }) => {
   }, []);
 
   const [selectedLocation, setSelectedLocation] = useState(null);
-
-  const handleMapPress = (event) => {
-    const { coordinate } = event.nativeEvent;
-    setSelectedLocation(coordinate);
-  };
-
-  const [registerLoader, setRegisterLoader] = useState(false);
-
-  const handleRegister = () => {
-    setRegisterLoader(true);
-    setTimeout(() => {
-      setRegisterLoader(false);
-      navigation.navigate("homeScreen");
-    }, 800);
-  };
 
   return (
     <SafeAreaView
@@ -131,9 +112,7 @@ const RegisterScreen = ({ navigation, route }) => {
             Update Radius
           </Text>
           <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("Rad", { userData: route.params.userData })
-            }
+            onPress={() => navigation.navigate("Rad", { userData: user })}
             style={{
               ...Default.shadow,
               borderRadius: 10,
