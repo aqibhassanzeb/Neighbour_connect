@@ -10,6 +10,7 @@ import {
   TextInput,
   FlatList,
   KeyboardAvoidingView,
+  ScrollView,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Colors, Default, Fonts } from "../constants/styles";
@@ -193,7 +194,7 @@ const ServicesScreen = ({ navigation }) => {
         </View>
       </>
       {isLoading && filteredCategories.length === 0 && <Placeholder />}
-      <View>
+      <ScrollView>
         <FlatList
           data={filteredCategories && filteredCategories}
           keyExtractor={(item) => item._id}
@@ -256,7 +257,7 @@ const ServicesScreen = ({ navigation }) => {
             </View>
           </TouchableOpacity>
         )}
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

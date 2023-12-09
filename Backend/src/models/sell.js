@@ -30,6 +30,7 @@ const sellSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    sold_date: String,
     is_active: {
       type: Boolean,
       default: true,

@@ -37,6 +37,7 @@ const PickAddressScreen = ({ navigation, route }) => {
   const mapRef = useRef(null);
 
   const [isNameLoading, setIsNameLoading] = useState(false);
+  const [status, setStatus] = useState("");
   const [location, setLocation] = useState(null);
   const [poi, setPoi] = useState();
   const isRtl = i18n.dir() == "rtl";
@@ -66,17 +67,30 @@ const PickAddressScreen = ({ navigation, route }) => {
       BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
 
-  useEffect(() => {
+  function getCurrentLocation() {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
+      setStatus(status);
       if (status !== "granted") {
         alert("Permission to access location was denied");
         return;
       }
       const { coords } = await Location.getCurrentPositionAsync({});
-      setLocation(coords);
+      handleZoomToLocation(coords.latitude, coords.longitude);
     })();
-  }, []);
+  }
+
+  // useEffect(() => {
+  // (async () => {
+  //   let { status } = await Location.requestForegroundPermissionsAsync();
+  //   if (status !== "granted") {
+  //     alert("Permission to access location was denied");
+  //     return;
+  //   }
+  //   const { coords } = await Location.getCurrentPositionAsync({});
+  //   setLocation(coords);
+  // })();
+  // }, []);
 
   const onPoiClick = (e) => {
     const selectedLocation = e.nativeEvent;
@@ -150,6 +164,7 @@ const PickAddressScreen = ({ navigation, route }) => {
           latitudeDelta: 2,
           longitudeDelta: LONGITUDE_DELTA,
         }}
+        showsMyLocationButton={false}
         onPoiClick={onPoiClick}
         onPress={onPoiClick}
         showsUserLocation={true}
@@ -166,6 +181,25 @@ const PickAddressScreen = ({ navigation, route }) => {
           </Marker>
         )}
       </MapView>
+
+      <TouchableOpacity
+        style={{
+          position: "absolute",
+          right: 12,
+          bottom: 200,
+          backgroundColor: "white",
+          padding: 2,
+          borderRadius: 5,
+          width: 37,
+          alignItems: "center",
+        }}
+        onPress={() => getCurrentLocation()}
+      >
+        <Image
+          source={require("../assets/icons/my-location.png")}
+          style={{ width: 30, height: 30 }}
+        />
+      </TouchableOpacity>
 
       {/* <View
           style={{

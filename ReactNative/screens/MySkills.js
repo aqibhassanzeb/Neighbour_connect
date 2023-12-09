@@ -11,7 +11,7 @@ import {
   Modal,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import { Colors, Default, Fonts } from "../constants/styles";
+import { Colors, Default, Fonts, screenHeight } from "../constants/styles";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import CategorySkill from "../components/CategorySkill";
@@ -176,161 +176,162 @@ const CategoryScreen = ({ navigation, route }) => {
       {!isLoading && userSkills.length === 0 && (
         <Empty marginTop={200} text="Empty? Share your skill now!" />
       )}
-
-      <ScrollView>
-        {!isLoading &&
-          userSkills.length > 0 &&
-          userSkills.map((skill, index) => (
-            <TouchableOpacity
-              key={skill._id}
-              onPress={() =>
-                navigation.navigate("CatShared", {
-                  post: { skill },
-                  userId: user._id,
-                })
-              }
-              style={{
-                ...Default.shadow,
-                backgroundColor: Colors.white,
-                marginTop: 30,
-                marginHorizontal: 13,
-                //    marginBottom: 27,
-                borderRadius: 10,
-                // overflow: "hidden",
-                flexDirection: isRtl ? "row-reverse" : "row",
-                paddingVertical: Default.fixPadding,
-              }}
-            >
-              <View
+      <View style={{ height: screenHeight }}>
+        <ScrollView>
+          {!isLoading &&
+            userSkills.length > 0 &&
+            userSkills.map((skill, index) => (
+              <TouchableOpacity
+                key={skill._id}
+                onPress={() =>
+                  navigation.navigate("CatShared", {
+                    post: { skill },
+                    userId: user._id,
+                  })
+                }
                 style={{
-                  flex: 2,
-                  //  paddingHorizontal: Default.fixPadding * 1.5,
-                  justifyContent: "center",
-                  alignItems: "center",
+                  ...Default.shadow,
+                  backgroundColor: Colors.white,
+                  marginTop: 30,
+                  marginHorizontal: 13,
+                  //    marginBottom: 27,
+                  borderRadius: 10,
+                  // overflow: "hidden",
+                  flexDirection: isRtl ? "row-reverse" : "row",
+                  paddingVertical: Default.fixPadding,
                 }}
               >
-                <Image
-                  source={{ uri: skill.category.image }}
-                  style={{
-                    borderRadius: 5,
-                    height: 70,
-                    width: 70,
-                    marginLeft: 36,
-                  }}
-                />
-              </View>
-              <View
-                style={{
-                  flex: 5,
-                  justifyContent: "center",
-                  alignItems: isRtl ? "flex-end" : "flex-start",
-                }}
-              >
-                <Text
-                  numberOfLines={1}
-                  style={{
-                    ...Fonts.SemiBold15black,
-                    overflow: "hidden",
-                    marginLeft: 36,
-                  }}
-                >
-                  {skill.category.name}
-                </Text>
-                <Text
-                  numberOfLines={1}
-                  style={{
-                    ...Fonts.SemiBold14grey,
-                    overflow: "hidden",
-                    marginLeft: 36,
-                  }}
-                >
-                  {skill.skill_level}
-                </Text>
                 <View
                   style={{
-                    marginVertical: Default.fixPadding * 0.3,
-                    flexDirection: isRtl ? "row-reverse" : "row",
-                    alignItems: "center",
+                    flex: 2,
+                    //  paddingHorizontal: Default.fixPadding * 1.5,
                     justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Image
+                    source={{ uri: skill.category.image }}
+                    style={{
+                      borderRadius: 5,
+                      height: 70,
+                      width: 70,
+                      marginLeft: 36,
+                    }}
+                  />
+                </View>
+                <View
+                  style={{
+                    flex: 5,
+                    justifyContent: "center",
+                    alignItems: isRtl ? "flex-end" : "flex-start",
                   }}
                 >
                   <Text
                     numberOfLines={1}
                     style={{
-                      ...Fonts.SemiBold14grey,
-
-                      textAlign: isRtl ? "right" : "left",
-                    }}
-                  ></Text>
-                </View>
-              </View>
-              <View>
-                <View style={styles.contain}>
-                  <TouchableOpacity
-                    style={styles.selectedButton}
-                    onPress={() => {
-                      setSetselectedSkillforEdit(skill._id);
-                      setDropdownOpend(!dropdownOpend);
+                      ...Fonts.SemiBold15black,
+                      overflow: "hidden",
+                      marginLeft: 36,
                     }}
                   >
-                    <Ionicons
-                      name="ellipsis-vertical"
-                      size={24}
-                      color="black"
-                    />
-                    <Text style={styles.selectedButtonText}>
-                      {selectedValue}
-                    </Text>
-                  </TouchableOpacity>
+                    {skill.category.name}
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    style={{
+                      ...Fonts.SemiBold14grey,
+                      overflow: "hidden",
+                      marginLeft: 36,
+                    }}
+                  >
+                    {skill.skill_level}
+                  </Text>
+                  <View
+                    style={{
+                      marginVertical: Default.fixPadding * 0.3,
+                      flexDirection: isRtl ? "row-reverse" : "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        ...Fonts.SemiBold14grey,
 
-                  {dropdownOpend && setselectedSkillforEdit == skill._id && (
-                    <View style={styles.dropdown}>
-                      <TouchableOpacity
-                        style={[
-                          styles.dropdownButton,
-                          selectedValue === "button1" &&
-                            styles.dropdownButtonSelected,
-                        ]}
-                        onPress={() => {
-                          navigation.navigate("EditSkill", { data: skill });
-                          setDropdownOpend(!dropdownOpend);
-                        }}
-                      >
-                        <Ionicons
-                          name="create-outline"
-                          size={20}
-                          color="black"
-                        />
-                        <Text style={styles.dropdownButtonText}>Edit</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[
-                          styles.dropdownButtons,
-
-                          selectedValue === "button1" &&
-                            styles.dropdownButtonSelected,
-                        ]}
-                        onPress={() => {
-                          setCancelModal(true);
-                          setSelectedId(skill._id);
-                          setDropdownOpend(!dropdownOpend);
-                        }}
-                      >
-                        <Ionicons
-                          name="trash-outline"
-                          size={20}
-                          color="black"
-                        />
-                        <Text style={styles.dropdownButtonText}>Delete</Text>
-                      </TouchableOpacity>
-                    </View>
-                  )}
+                        textAlign: isRtl ? "right" : "left",
+                      }}
+                    ></Text>
+                  </View>
                 </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-      </ScrollView>
+                <View>
+                  <View style={styles.contain}>
+                    <TouchableOpacity
+                      style={styles.selectedButton}
+                      onPress={() => {
+                        setSetselectedSkillforEdit(skill._id);
+                        setDropdownOpend(!dropdownOpend);
+                      }}
+                    >
+                      <Ionicons
+                        name="ellipsis-vertical"
+                        size={24}
+                        color="black"
+                      />
+                      <Text style={styles.selectedButtonText}>
+                        {selectedValue}
+                      </Text>
+                    </TouchableOpacity>
 
+                    {dropdownOpend && setselectedSkillforEdit == skill._id && (
+                      <View style={styles.dropdown}>
+                        <TouchableOpacity
+                          style={[
+                            styles.dropdownButton,
+                            selectedValue === "button1" &&
+                              styles.dropdownButtonSelected,
+                          ]}
+                          onPress={() => {
+                            navigation.navigate("EditSkill", { data: skill });
+                            setDropdownOpend(!dropdownOpend);
+                          }}
+                        >
+                          <Ionicons
+                            name="create-outline"
+                            size={20}
+                            color="black"
+                          />
+                          <Text style={styles.dropdownButtonText}>Edit</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={[
+                            styles.dropdownButtons,
+
+                            selectedValue === "button1" &&
+                              styles.dropdownButtonSelected,
+                          ]}
+                          onPress={() => {
+                            setCancelModal(true);
+                            setSelectedId(skill._id);
+                            setDropdownOpend(!dropdownOpend);
+                          }}
+                        >
+                          <Ionicons
+                            name="trash-outline"
+                            size={20}
+                            color="black"
+                          />
+                          <Text style={styles.dropdownButtonText}>Delete</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          <View style={{ marginBottom: 100 }} />
+        </ScrollView>
+      </View>
       <Modal
         animationType="fade"
         transparent={true}
@@ -488,11 +489,13 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     position: "absolute",
-    top: 5,
-    right: 20,
+    top: 40,
+    right: 15,
     marginRight: 8,
     backgroundColor: "white",
     width: 122,
+    borderWidth: 2,
+    borderColor: Colors.extraLightGrey,
     //height:82,
     borderRadius: 5,
     shadowColor: "#000",
@@ -505,6 +508,7 @@ const styles = StyleSheet.create({
     // marginRight:70,
   },
   dropdownButton: {
+    marginLeft: 10,
     flexDirection: "row",
     alignItems: "center",
     //   padding: 10,
@@ -523,6 +527,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     top: 4,
     height: 42,
+    marginLeft: 10,
+
     //   padding: 10,
     //  borderWidth: 1,
     //  borderColor: 'gray',

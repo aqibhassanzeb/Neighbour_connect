@@ -206,7 +206,7 @@ export const markSolded = async (req, res) => {
   try {
     const solded = await Sell.findByIdAndUpdate(
       _id,
-      { is_sold: true },
+      { is_sold: true, sold_date: new Date().toISOString() },
       { new: true }
     );
     if (solded) {

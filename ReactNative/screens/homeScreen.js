@@ -259,6 +259,7 @@ const HomeScreen = ({ route }) => {
                 flex: 1,
                 paddingHorizontal: Default.fixPadding * 4.5,
                 flexDirection: isRtl ? "row-reverse" : "row",
+                alignItems: "center",
               }}
               // onPress={() => navigation.navigate("AdminMain")}
             >
@@ -266,14 +267,13 @@ const HomeScreen = ({ route }) => {
                 name="location-pin"
                 size={22}
                 color={Colors.white}
-                style={{ marginTop: 10 }}
+                // style={{ marginTop: 10 }}
               />
               <Text
                 style={{
                   ...Fonts.Medium14white,
                   paddingTop: 3,
                   paddingLeft: 2,
-
                   // width: 300,
                 }}
               >

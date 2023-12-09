@@ -178,7 +178,7 @@ const PayPalScreen = ({ navigation, route }) => {
       formData.append("location", location);
       formData.append("type", type);
       formData.append("visibility", selectedOptionsd);
-      formData.append("notify", checked);
+      // formData.append("notify", checked);
 
       try {
         setHandleLoading(true);
@@ -745,7 +745,7 @@ const PayPalScreen = ({ navigation, route }) => {
               </TouchableOpacity>
             </View>
           )}
-          <View
+          {/* <View
             style={{
               //  ...Default.shadow,
               //  borderRadius: 10,
@@ -778,7 +778,7 @@ const PayPalScreen = ({ navigation, route }) => {
             >
               Notify
             </Text>
-          </View>
+          </View> */}
         </View>
 
         <TouchableOpacity
@@ -788,10 +788,10 @@ const PayPalScreen = ({ navigation, route }) => {
             borderRadius: 10,
             justifyContent: "center",
             alignItems: "center",
-            marginTop: Default.fixPadding * 2,
+            // marginTop: Default.fixPadding * 2,
             padding: Default.fixPadding * 1.2,
             marginHorizontal: Default.fixPadding * 2,
-            marginBottom: 20,
+            marginVertical: 40,
           }}
         >
           <Text style={{ ...Fonts.SemiBold18white }}>
@@ -881,6 +881,7 @@ const PayPalScreen = ({ navigation, route }) => {
                       style={{ marginHorizontal: Default.fixPadding }}
                     />
                   }
+                  // maxDate={new Date()}
                 />
 
                 <View
@@ -892,7 +893,7 @@ const PayPalScreen = ({ navigation, route }) => {
                 >
                   <TouchableOpacity onPress={() => setCalendarModel(false)}>
                     <Text style={{ ...Fonts.SemiBold16grey }}>
-                      {tr("cancel")}
+                      {tr("Cancel")}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -908,7 +909,7 @@ const PayPalScreen = ({ navigation, route }) => {
                         marginRight: Default.fixPadding * 2,
                       }}
                     >
-                      {tr("ok")}
+                      {tr("OK")}
                     </Text>
                   </TouchableOpacity>
                 </View>

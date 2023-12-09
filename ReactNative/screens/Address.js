@@ -154,6 +154,19 @@ const PickAddressScreen = ({ navigation, route }) => {
       });
     }
   };
+
+  function getCurrentLocation() {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        alert("Permission to access location was denied");
+        return;
+      }
+      const { coords } = await Location.getCurrentPositionAsync({});
+      handleZoomToLocation(coords.latitude, coords.longitude);
+      setLocation({ latitude: coords.latitude, longitude: coords.longitude });
+    })();
+  }
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <MapView
@@ -171,6 +184,7 @@ const PickAddressScreen = ({ navigation, route }) => {
         showsUserLocation={true}
         mapPadding={{ top: 30, right: 0, bottom: 80, left: 0 }}
         zoomControlEnabled
+        showsMyLocationButton={false}
       >
         {poi && (
           <Marker
@@ -193,6 +207,24 @@ const PickAddressScreen = ({ navigation, route }) => {
         )}
       </MapView>
 
+      <TouchableOpacity
+        style={{
+          position: "absolute",
+          right: 12,
+          bottom: 200,
+          backgroundColor: "white",
+          padding: 2,
+          borderRadius: 5,
+          width: 37,
+          alignItems: "center",
+        }}
+        onPress={() => getCurrentLocation()}
+      >
+        <Image
+          source={require("../assets/icons/my-location.png")}
+          style={{ width: 30, height: 30 }}
+        />
+      </TouchableOpacity>
       {/* <View
           style={{
             flex: 1,

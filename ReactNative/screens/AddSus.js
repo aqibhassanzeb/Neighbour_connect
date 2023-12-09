@@ -167,7 +167,7 @@ const PayPalScreen = ({ navigation }) => {
       formData.append("time", String(time));
       formData.append("location", location);
       formData.append("selected_visibility", selectedOptionsd);
-      formData.append("notify", checked);
+      // formData.append("notify", checked);
 
       try {
         setIsLoading(true);
@@ -791,7 +791,7 @@ const PayPalScreen = ({ navigation }) => {
               </TouchableOpacity>
             </View>
           )}
-          <View
+          {/* <View
             style={{
               //  ...Default.shadow,
               //  borderRadius: 10,
@@ -824,7 +824,7 @@ const PayPalScreen = ({ navigation }) => {
             >
               Notify
             </Text>
-          </View>
+          </View> */}
         </View>
 
         <TouchableOpacity
@@ -1045,7 +1045,7 @@ const PayPalScreen = ({ navigation }) => {
                       style={{ marginHorizontal: Default.fixPadding }}
                     />
                   }
-                  minDate={today}
+                  maxDate={today}
                 />
 
                 <View

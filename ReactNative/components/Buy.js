@@ -17,7 +17,7 @@ import { getAllItems } from "../apis/apis";
 import { useFocusEffect } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { setItems, setSearchResults } from "../redux/globalSlice";
-import { debounce } from "../utils";
+import { debounce, hasPassed10Days } from "../utils";
 import moment from "moment";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import useGetUserId from "./useGetUserId";
@@ -73,82 +73,86 @@ const OngoingTab = (props) => {
         data={filteredSellZoneItems || []}
         numColumns={2}
         keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <View
-            style={{
-              marginLeft: 20,
-              flexDirection: "row",
-              backgroundColor: "white",
-              borderRadius: 10,
-              marginBottom: 10,
-            }}
-          >
-            <View
-              style={{
-                marginBottom: Default.fixPadding * 2,
-              }}
-            >
-              <TouchableOpacity
-                onPress={() =>
-                  props.navigation.navigate("BuyDetails", {
-                    item,
-                    userId,
-                  })
-                }
+        renderItem={({ item }) => {
+          if (item.is_sold && !hasPassed10Days(item.sold_date)) {
+            return (
+              <View
                 style={{
+                  marginLeft: 20,
+                  flexDirection: "row",
+                  backgroundColor: "white",
                   borderRadius: 10,
+                  marginBottom: 10,
                 }}
               >
-                <View style={styles.container}>
-                  <Image
-                    source={{ uri: item.images[0] }}
+                <View
+                  style={{
+                    marginBottom: Default.fixPadding * 2,
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() =>
+                      props.navigation.navigate("BuyDetails", {
+                        item,
+                        userId,
+                      })
+                    }
                     style={{
-                      height: 165,
-                      width: 175,
-                      ...Default.shadow,
                       borderRadius: 10,
                     }}
-                  />
-                  {item.is_sold && (
-                    <View style={styles.tagContainer}>
-                      <Text style={styles.tag}>Sold</Text>
+                  >
+                    <View style={styles.container}>
+                      <Image
+                        source={{ uri: item.images[0] }}
+                        style={{
+                          height: 165,
+                          width: 175,
+                          ...Default.shadow,
+                          borderRadius: 10,
+                        }}
+                      />
+                      {item.is_sold && (
+                        <View style={styles.tagContainer}>
+                          <Text style={styles.tag}>Sold</Text>
+                        </View>
+                      )}
                     </View>
-                  )}
-                </View>
 
-                <View style={{ paddingLeft: 10, paddingTop: 5 }}>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      paddingLeft: 3,
-                      fontWeight: "bold",
-                      width: 165,
-                    }}
-                  >
-                    {item.title}
-                  </Text>
-                  <Text style={{ fontSize: 16, paddingLeft: 4 }}>
-                    RS {item.price}
-                  </Text>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Text>
-                      <Ionicons name="time-outline" size={15} />
-                    </Text>
-                    <Text style={{ fontSize: 13 }}>
-                      {" "}
-                      {moment(item.createdAt).fromNow()}
-                    </Text>
-                  </View>
+                    <View style={{ paddingLeft: 10, paddingTop: 5 }}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          paddingLeft: 3,
+                          fontWeight: "bold",
+                          width: 165,
+                        }}
+                      >
+                        {item.title}
+                      </Text>
+                      <Text style={{ fontSize: 16, paddingLeft: 4 }}>
+                        RS {item.price}
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Text>
+                          <Ionicons name="time-outline" size={15} />
+                        </Text>
+                        <Text style={{ fontSize: 13 }}>
+                          {" "}
+                          {moment(item.createdAt).fromNow()}
+                        </Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
                 </View>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
+              </View>
+            );
+          }
+        }}
       />
     </SafeAreaView>
   );
