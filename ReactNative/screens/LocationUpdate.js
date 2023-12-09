@@ -14,17 +14,20 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { useTranslation } from "react-i18next";
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from "react-native-maps";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { updateLocation } from "../redux/loanandfoundSlice";
 import { GOOGLE_APIKEY } from "../config";
 import axios from "axios";
 import * as Location from "expo-location";
+import { setLocation } from "../redux/authSlice";
 import MapLoading from "../assets/map_loading.gif";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
 const { width, height } = Dimensions.get("window");
 
 const PickAddressScreen = ({ navigation, route }) => {
+  const dispatch = useDispatch();
+  const location = useSelector((state) => state.authReducer?.location);
   const userData = route.params?.userData || {};
 
   const ASPECT_RATIO = width / height;
@@ -37,8 +40,8 @@ const PickAddressScreen = ({ navigation, route }) => {
   const mapRef = useRef(null);
 
   const [isNameLoading, setIsNameLoading] = useState(false);
-  const [status, setStatus] = useState("");
-  const [location, setLocation] = useState(null);
+  // const [status, setStatus] = useState("");
+  // const [location, setLocation] = useState(null);
   const [poi, setPoi] = useState();
   const isRtl = i18n.dir() == "rtl";
 
@@ -68,29 +71,32 @@ const PickAddressScreen = ({ navigation, route }) => {
   }, []);
 
   function getCurrentLocation() {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      setStatus(status);
-      if (status !== "granted") {
-        alert("Permission to access location was denied");
-        return;
-      }
-      const { coords } = await Location.getCurrentPositionAsync({});
-      handleZoomToLocation(coords.latitude, coords.longitude);
-    })();
+    if (location) {
+      handleZoomToLocation(location?.latitude, location?.longitude);
+    } else {
+      LocationPermission();
+    }
   }
 
-  // useEffect(() => {
-  // (async () => {
-  //   let { status } = await Location.requestForegroundPermissionsAsync();
-  //   if (status !== "granted") {
-  //     alert("Permission to access location was denied");
-  //     return;
-  //   }
-  //   const { coords } = await Location.getCurrentPositionAsync({});
-  //   setLocation(coords);
-  // })();
-  // }, []);
+  const LocationPermission = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status === "granted") {
+      const { coords } = await Location.getCurrentPositionAsync({});
+      dispatch(
+        setLocation({ latitude: coords.latitude, longitude: coords.longitude })
+      );
+      handleZoomToLocation(
+        poi?.coordinate?.latitude,
+        poi?.coordinate?.longitude
+      );
+    } else if (status === "rejected") {
+      alert("Permission to access location was denied");
+    }
+  };
+
+  useEffect(() => {
+    LocationPermission();
+  }, []);
 
   const onPoiClick = (e) => {
     const selectedLocation = e.nativeEvent;
@@ -149,8 +155,6 @@ const PickAddressScreen = ({ navigation, route }) => {
       });
     }
   };
-
-  console.log({ poi });
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

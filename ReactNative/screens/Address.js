@@ -60,16 +60,22 @@ const PickAddressScreen = ({ navigation, route }) => {
       BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
 
+  async function getLocationPermission() {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      alert("Permission to access location was denied");
+      return;
+    }
+    const { coords } = await Location.getCurrentPositionAsync({});
+    setPoi({
+      coordinate: { latitude: coords.latitude, longitude: coords.longitude },
+    });
+    setLocation({ latitude: coords.latitude, longitude: coords.longitude });
+    handleZoomToLocation(coords.latitude, coords.longitude);
+  }
+
   useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        alert("Permission to access location was denied");
-        return;
-      }
-      const { coords } = await Location.getCurrentPositionAsync({});
-      setLocation(coords);
-    })();
+    getLocationPermission();
   }, []);
 
   const onPoiClick = (e) => {
@@ -78,47 +84,31 @@ const PickAddressScreen = ({ navigation, route }) => {
   };
 
   const handleButtonPress = async () => {
-    if (poi === null && location === null) {
+    if (poi === null) {
       alert("Please tap on any location");
       return;
-    }
-    if (poi === null) {
+    } else if (!poi.name) {
       const placeName = await getPlaceName(
-        location.latitude,
-        location.longitude
+        poi.coordinate.latitude,
+        poi.coordinate.longitude
       );
       navigation.navigate("Radius", {
         user,
         address: {
-          latitude: location.latitude,
-          longitude: location.longitude,
+          latitude: poi.coordinate.latitude,
+          longitude: poi.coordinate.longitude,
           name: placeName,
         },
       });
     } else {
-      if (!poi.name) {
-        const placeName = await getPlaceName(
-          poi.coordinate.latitude,
-          poi.coordinate.longitude
-        );
-        navigation.navigate("Radius", {
-          user,
-          address: {
-            latitude: poi.coordinate.latitude,
-            longitude: poi.coordinate.longitude,
-            name: placeName,
-          },
-        });
-      } else {
-        navigation.navigate("Radius", {
-          user,
-          address: {
-            latitude: poi.coordinate.latitude,
-            longitude: poi.coordinate.longitude,
-            name: poi.name,
-          },
-        });
-      }
+      navigation.navigate("Radius", {
+        user,
+        address: {
+          latitude: poi.coordinate.latitude,
+          longitude: poi.coordinate.longitude,
+          name: poi.name,
+        },
+      });
     }
   };
 
@@ -142,7 +132,7 @@ const PickAddressScreen = ({ navigation, route }) => {
     }
   };
 
-  const handleZoomToLocation = (latitude, longitude) => {
+  function handleZoomToLocation(latitude, longitude) {
     if (mapRef.current) {
       mapRef.current.animateCamera({
         center: {
@@ -153,19 +143,14 @@ const PickAddressScreen = ({ navigation, route }) => {
         altitude: 2000, // Optional: You can adjust the altitude (zoom level) as needed
       });
     }
-  };
+  }
 
   function getCurrentLocation() {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        alert("Permission to access location was denied");
-        return;
-      }
-      const { coords } = await Location.getCurrentPositionAsync({});
-      handleZoomToLocation(coords.latitude, coords.longitude);
-      setLocation({ latitude: coords.latitude, longitude: coords.longitude });
-    })();
+    if (poi === null) {
+      getLocationPermission();
+    } else {
+      handleZoomToLocation(location.latitude, location.longitude);
+    }
   }
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -194,16 +179,6 @@ const PickAddressScreen = ({ navigation, route }) => {
           >
             <Callout />
           </Marker>
-        )}
-        {!poi && location && (
-          <Marker
-            coordinate={{
-              latitude: location.latitude,
-              longitude: location.longitude,
-            }}
-            pinColor={Colors.steelBlue}
-            draggable
-          />
         )}
       </MapView>
 
