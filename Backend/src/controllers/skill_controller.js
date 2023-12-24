@@ -11,6 +11,13 @@ import { Activity } from "../models/activity.js";
 import { getDistance } from "geolib";
 
 export const addSkill = async (req, res) => {
+  const already = await Skill.findOne({
+    posted_by: req.body.posted_by,
+    category: req.body.category,
+  });
+  if (already) {
+    return res.status(400).send("Skill Already Posted");
+  }
   const days = JSON.parse(req.body.days);
   if (!req.files || req.files.length === 0) {
     return res.status(400).send("No files uploaded.");

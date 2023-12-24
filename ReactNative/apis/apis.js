@@ -100,7 +100,7 @@ async function apiRequest(method, url, data = null, headers = {}) {
     // Process the received data
     return response;
   } catch (error) {
-    console.error("error axios", error);
+    console.error(`error axios ${url} :`, error);
     return error.response;
     throw new Error("API request failed");
   }

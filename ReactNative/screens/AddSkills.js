@@ -220,8 +220,11 @@ const PayPalScreen = ({ navigation }) => {
           if (response.status === 200) {
             dispatch(clearLocation());
             navigation.navigate("SkillPosted");
+          } else if (response.status === 400) {
+            alert(response.data);
           }
         } catch (error) {
+          alert(error.message);
           console.log("Error While Posting", error);
         } finally {
           setIsLoading(false);
