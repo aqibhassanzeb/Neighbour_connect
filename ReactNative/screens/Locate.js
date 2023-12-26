@@ -14,13 +14,14 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { useTranslation } from "react-i18next";
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from "react-native-maps";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { updateLocation } from "../redux/loanandfoundSlice";
 import { GOOGLE_APIKEY } from "../config";
 import axios from "axios";
 import * as Location from "expo-location";
 import MapLoading from "../assets/map_loading.gif";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import { setLocation } from "../redux/authSlice";
 
 const { width, height } = Dimensions.get("window");
 
@@ -32,11 +33,13 @@ const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 const PickAddressScreen = ({ navigation, route }) => {
   const title = route.params?.title || "";
+  const userData = route.params?.userData || {};
+  const location = useSelector((state) => state.authReducer?.location);
 
   const { t, i18n } = useTranslation();
   const mapRef = useRef(null);
 
-  const [location, setLocation] = useState(null);
+  // const [location, setLocation] = useState(null);
   const [isNameLoading, setIsNameLoading] = useState(false);
 
   const [poi, setPoi] = useState(null);
@@ -54,22 +57,48 @@ const PickAddressScreen = ({ navigation, route }) => {
     return true;
   };
 
+  const LocationPermission = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status === "granted") {
+      const { coords } = await Location.getCurrentPositionAsync({});
+      dispatch(
+        setLocation({ latitude: coords.latitude, longitude: coords.longitude })
+      );
+      handleZoomToLocation(
+        poi?.coordinate?.latitude,
+        poi?.coordinate?.longitude
+      );
+    } else if (status === "rejected") {
+      alert("Permission to access location was denied");
+    }
+  };
+
+  useEffect(() => {
+    setPoi({
+      name: userData?.address?.name,
+      coordinate: {
+        latitude: parseFloat(userData?.address?.latitude),
+        longitude: parseFloat(userData?.address?.longitude),
+      },
+    });
+  }, []);
+
   useEffect(() => {
     BackHandler.addEventListener("hardwareBackPress", backAction);
     return () =>
       BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
 
+  function getCurrentLocation() {
+    if (location) {
+      handleZoomToLocation(location?.latitude, location?.longitude);
+    } else {
+      LocationPermission();
+    }
+  }
+
   useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        alert("Permission to access location was denied");
-        return;
-      }
-      const { coords } = await Location.getCurrentPositionAsync({});
-      setLocation(coords);
-    })();
+    LocationPermission();
   }, []);
 
   const onPoiClick = (e) => {
@@ -168,6 +197,7 @@ const PickAddressScreen = ({ navigation, route }) => {
       });
     }
   };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <MapView
@@ -175,18 +205,19 @@ const PickAddressScreen = ({ navigation, route }) => {
         provider={PROVIDER_GOOGLE}
         style={{ flex: 1 }}
         initialRegion={{
-          latitude: LATITUDE,
-          longitude: LONGITUDE,
+          latitude: parseFloat(userData?.address?.latitude),
+          longitude: parseFloat(userData?.address?.longitude),
           latitudeDelta: 2,
           longitudeDelta: LONGITUDE_DELTA,
         }}
         onPoiClick={onPoiClick}
         onPress={onPoiClick}
         showsUserLocation={true}
+        showsMyLocationButton={false}
         mapPadding={{ top: 100, right: 0, bottom: 80, left: 0 }}
         zoomControlEnabled
       >
-        {poi && (
+        {poi && poi?.coordinate?.latitude && (
           <Marker
             coordinate={poi.coordinate}
             pinColor={Colors.steelBlue}
@@ -195,17 +226,25 @@ const PickAddressScreen = ({ navigation, route }) => {
             <Callout />
           </Marker>
         )}
-        {!poi && location && (
-          <Marker
-            coordinate={{
-              latitude: location.latitude,
-              longitude: location.longitude,
-            }}
-            pinColor={Colors.steelBlue}
-            draggable
-          />
-        )}
       </MapView>
+      <TouchableOpacity
+        style={{
+          position: "absolute",
+          right: 12,
+          bottom: 200,
+          backgroundColor: "white",
+          padding: 2,
+          borderRadius: 5,
+          width: 37,
+          alignItems: "center",
+        }}
+        onPress={() => getCurrentLocation()}
+      >
+        <Image
+          source={require("../assets/icons/my-location.png")}
+          style={{ width: 30, height: 30 }}
+        />
+      </TouchableOpacity>
 
       {/* <View
           style={{
@@ -237,7 +276,7 @@ const PickAddressScreen = ({ navigation, route }) => {
             color={Colors.black}
           />
         </TouchableOpacity>
-        <View
+        {/* <View
           style={{
             ...Default.shadow,
             flexDirection: isRtl ? "row-reverse" : "row",
@@ -272,7 +311,7 @@ const PickAddressScreen = ({ navigation, route }) => {
             }}
             fetchDetails={true}
           />
-        </View>
+        </View> */}
       </View>
 
       {/* Location Show and Button  */}

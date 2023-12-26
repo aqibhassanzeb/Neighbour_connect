@@ -36,6 +36,8 @@ import { formatText } from "../utils";
 const { width, height } = Dimensions.get("window");
 const PayPalScreen = ({ navigation, route }) => {
   const { selectedLocation } = useSelector((state) => state.loanandfound);
+  const userData = useSelector((state) => state.authReducer.activeUser?.user);
+
   const { type } = route.params;
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState({
@@ -175,7 +177,7 @@ const PayPalScreen = ({ navigation, route }) => {
       formData.append("category", selectedOption._id);
       formData.append("description", description);
       formData.append("date", JSON.stringify(finalDate));
-      formData.append("location", location);
+      formData.append("location", selectedLocation?.name);
       formData.append("type", type);
       formData.append("visibility", selectedOptionsd);
       // formData.append("notify", checked);
@@ -208,7 +210,12 @@ const PayPalScreen = ({ navigation, route }) => {
             paddingHorizontal: Default.fixPadding * 2,
           }}
         >
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.goBack();
+              dispatch(clearLocation());
+            }}
+          >
             <Ionicons
               name={isRtl ? "arrow-forward" : "arrow-back"}
               size={25}
@@ -579,7 +586,10 @@ const PayPalScreen = ({ navigation, route }) => {
           >
             <TouchableOpacity
               onPress={() =>
-                navigation.navigate("Locate", { title: "LostAndFound" })
+                navigation.navigate("Locate", {
+                  title: "LostAndFound",
+                  userData,
+                })
               }
               style={{
                 flexDirection: isRtl ? "row-reverse" : "row",
@@ -603,20 +613,19 @@ const PayPalScreen = ({ navigation, route }) => {
                   alignItems: "center",
                 }}
               >
-                <TextInput
-                  numberOfLines={1}
+                <Text
+                  numberOfLines={2}
                   style={{
+                    ...Fonts.Medium14grey,
                     overflow: "hidden",
                     textAlign: isRtl ? "right" : "left",
-                    paddingLeft: 15,
-                    width: 350,
-                    fontSize: 15,
-                    fontWeight: "normal",
+                    paddingLeft: 10,
                   }}
-                  value={location}
-                  onChangeText={(value) => setLocation(value)}
-                  placeholder="Specific Address (Optional)"
-                />
+                >
+                  {selectedLocation?.name
+                    ? selectedLocation.name
+                    : "Specific Address (Optional)"}
+                </Text>
               </View>
             </TouchableOpacity>
           </View>

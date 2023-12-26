@@ -63,9 +63,11 @@ const OngoingTab = (props) => {
       handleGetItems();
     }, [])
   );
+
+  const isEmpty = filteredSellZoneItems?.filter((item) => !item.is_sold);
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.extraLightGrey }}>
-      {filteredSellZoneItems.length === 0 && !isLoading && (
+      {isEmpty.length === 0 && !isLoading && (
         <Empty text="Not Items" marginTop={100} />
       )}
       {isLoading && filteredSellZoneItems.length === 0 && <Placeholder />}

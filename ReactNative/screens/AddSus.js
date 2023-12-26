@@ -39,6 +39,7 @@ import * as VideoPicker from "expo-image-picker";
 const { width, height } = Dimensions.get("window");
 const PayPalScreen = ({ navigation }) => {
   const { selectedLocation } = useSelector((state) => state.loanandfound);
+  const userData = useSelector((state) => state.authReducer.activeUser?.user);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Category");
@@ -165,7 +166,7 @@ const PayPalScreen = ({ navigation }) => {
       formData.append("description", description);
       formData.append("date", String(finalDate));
       formData.append("time", String(time));
-      formData.append("location", location);
+      formData.append("location", selectedLocation?.name);
       formData.append("selected_visibility", selectedOptionsd);
       // formData.append("notify", checked);
 
@@ -213,7 +214,12 @@ const PayPalScreen = ({ navigation }) => {
             paddingHorizontal: Default.fixPadding * 2,
           }}
         >
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.goBack();
+              dispatch(clearLocation());
+            }}
+          >
             <Ionicons
               name={isRtl ? "arrow-forward" : "arrow-back"}
               size={25}
@@ -663,7 +669,9 @@ const PayPalScreen = ({ navigation }) => {
             }}
           >
             <TouchableOpacity
-              onPress={() => navigation.navigate("Locate", { title: "Watch" })}
+              onPress={() =>
+                navigation.navigate("Locate", { title: "Watch", userData })
+              }
               style={{
                 flexDirection: isRtl ? "row-reverse" : "row",
                 alignItems: "center",
@@ -686,19 +694,19 @@ const PayPalScreen = ({ navigation }) => {
                   alignItems: "center",
                 }}
               >
-                <TextInput
-                  numberOfLines={1}
+                <Text
+                  numberOfLines={2}
                   style={{
+                    ...Fonts.Medium14grey,
                     overflow: "hidden",
                     textAlign: isRtl ? "right" : "left",
-                    paddingLeft: 21,
-                    fontSize: 15,
-                    width: 350,
+                    paddingLeft: 10,
                   }}
-                  value={location}
-                  onChangeText={(value) => setLocation(value)}
-                  placeholder="Specific Address (Optional)"
-                />
+                >
+                  {selectedLocation?.name
+                    ? selectedLocation.name
+                    : "Specific Address (Optional)"}
+                </Text>
               </View>
             </TouchableOpacity>
           </View>
