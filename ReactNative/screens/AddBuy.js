@@ -87,6 +87,7 @@ const PayPalScreen = ({ navigation }) => {
   }
   const backAction = () => {
     navigation.goBack();
+    dispatch(clearLocation());
     return true;
   };
   useEffect(() => {
