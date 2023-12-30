@@ -461,7 +461,7 @@ const Losted = ({ navigation, route }) => {
                     <Text style={{ ...Fonts.Medium14grey, marginLeft: 18 }}>
                       {day.name}
                     </Text>
-                    {day.timeSlots.map((slot, index) => (
+                    {day?.timeSlots?.map((slot, index) => (
                       <View key={index}>
                         <Text style={{ ...Fonts.Medium14grey, marginLeft: 18 }}>
                           From {moment(slot.startHours).format("LT")} To{" "}

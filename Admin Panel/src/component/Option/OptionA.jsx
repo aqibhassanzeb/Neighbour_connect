@@ -160,7 +160,7 @@ export default function OptionA({ activeSkip, inActiveSkip }) {
       headerName: "Location",
       sortable: false,
       width: 200,
-      valueGetter: (params) => params.row?.location?.name,
+      valueGetter: (params) => params.row?.location,
     },
     {
       field: "createdAt",

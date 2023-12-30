@@ -109,6 +109,30 @@ function ActionsColumn({ row, activeSkip }) {
   );
 }
 
+function RenderDays(row) {
+  const days = row?.values?.row?.days?.filter(
+    (day) =>
+      day.timeSlots &&
+      day.timeSlots[0].startHours !== null &&
+      day.timeSlots[0].endHours !== null
+  );
+  return (
+    <div>
+      {days?.map((day, index) => (
+        <div key={index}>
+          <span>🌄 {day.name} </span>
+          {day.timeSlots.map((timeSlot, timeIndex) => (
+            <span key={timeIndex}>
+              {moment(timeSlot.startHours).format("LT")},{" - "}
+              {moment(timeSlot.startHours).format("LT")} {"  "}
+            </span>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function OptionC({ activeSkip, inActiveSkip }) {
   const { data, isLoading, isError, error } = useGetAllSkillsQuery(undefined, {
     skip: activeSkip,
@@ -145,32 +169,29 @@ export default function OptionC({ activeSkip, inActiveSkip }) {
       headerName: "Location",
       sortable: false,
       width: 200,
-      valueGetter: (params) => params.row?.location?.name,
+      valueGetter: (params) => params.row?.location,
     },
     { field: "skill_level", headerName: "Skill Level", width: 140 },
     { field: "description", headerName: "Description", width: 200 },
+    // {
+    //   field: "time",
+    //   headerName: "Time ",
+    //   sortable: false,
+    //   width: 100,
+    //   valueFormatter: (params) => moment(params?.value).format(" hh:mm A "),
+    // },
     {
-      field: "time",
-      headerName: "Time ",
-      sortable: false,
-      width: 100,
-      valueFormatter: (params) => moment(params?.value).format(" hh:mm A "),
-    },
-    {
-      field: "price_per_hour",
+      field: "price",
       headerName: "Price",
       width: 100,
-      valueFormatter: (params) => `${params.value} Rs`,
+      renderCell: (params) =>
+        `Rs ${params.row.price} Per ${params.row.price_unit}`,
     },
     {
       field: "selected_day",
       headerName: "Days",
       width: 130,
-      renderCell: (values) => (
-        <Typography sx={{ fontSize: 14, wordWrap: "anywhere" }}>
-          {extractDays(values.row.selected_day)}
-        </Typography>
-      ),
+      renderCell: (values) => <RenderDays values={values} />,
     },
     {
       field: "posted_by",

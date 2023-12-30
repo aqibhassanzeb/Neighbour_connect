@@ -209,6 +209,8 @@ const Dashboard = () => {
   const { data, isLoading } = useGetUserStatisticsQuery();
   const { data: logins } = useGetRecentLoginsQuery();
 
+  console.log("data", data);
+
   const dispatch = useDispatch();
 
   const handleShowPost = () => {
@@ -339,8 +341,8 @@ const Dashboard = () => {
               <PersonRoundedIcon
                 sx={{
                   position: "absolute",
-                  width: 100,
-                  height: 90,
+                  minWidth: 100,
+                  minHeight: 90,
                   color: "#e3f2fd",
                   bgcolor: "#26a69a",
                   margin: "15px 0px 0px 35px",
@@ -365,8 +367,8 @@ const Dashboard = () => {
               <BookmarkAddRoundedIcon
                 sx={{
                   position: "relative",
-                  width: 100,
-                  height: 90,
+                  minWidth: 100,
+                  minHeight: 90,
                   color: "#e3f2fd",
                   bgcolor: "#ff8a65",
                   margin: "15px 0px 0px 35px",
@@ -391,8 +393,8 @@ const Dashboard = () => {
               <PersonRemoveOutlinedIcon
                 sx={{
                   position: "relative",
-                  width: 100,
-                  height: 90,
+                  minWidth: 100,
+                  minHeight: 90,
                   color: "#e3f2fd",
                   bgcolor: "#ffb6c1",
                   margin: "15px 0px 0px 35px",
@@ -417,8 +419,8 @@ const Dashboard = () => {
               <ContentPasteOffOutlinedIcon
                 sx={{
                   position: "relative",
-                  width: 100,
-                  height: 90,
+                  minWidth: 100,
+                  minHeight: 90,
                   color: "#e3f2fd",
                   bgcolor: "#87C1FF",
                   margin: "15px 0px 0px 35px",
@@ -443,8 +445,8 @@ const Dashboard = () => {
               <HistoryIcon
                 sx={{
                   position: "relative",
-                  width: 100,
-                  height: 90,
+                  minWidth: 100,
+                  minHeight: 90,
                   color: "#e3f2fd",
                   bgcolor: "#9575cd",
                   margin: "15px 0px 0px 35px",
@@ -513,7 +515,7 @@ const Dashboard = () => {
               barSize={20}
             >
               <XAxis
-                dataKey="month"
+                dataKey="name"
                 scale="point"
                 padding={{ left: 10, right: 10 }}
               />
